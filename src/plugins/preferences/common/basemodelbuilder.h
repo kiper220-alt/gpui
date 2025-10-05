@@ -79,6 +79,8 @@ protected:
                             static_cast<bool>(getOptionalPropertyData(schema.userContext())));
         common->setProperty(CommonItem::propertyToString(CommonItem::REMOVE_POLICY),
                             static_cast<bool>(getOptionalPropertyData(schema.removePolicy())));
+        common->setProperty(CommonItem::propertyToString(CommonItem::RESTART_UNITS),
+                            getOptionalPropertyData(schema.restartUnits()).c_str());
     }
 
     template<typename CommonData>
@@ -94,6 +96,7 @@ protected:
         data.bypassErrors(commonModel->property<bool>(CommonItem::propertyToString(CommonItem::BYPASS_ERRORS)));
         data.userContext(commonModel->property<bool>(CommonItem::propertyToString(CommonItem::USER_CONTEXT)));
         data.removePolicy(commonModel->property<bool>(CommonItem::propertyToString(CommonItem::REMOVE_POLICY)));
+        data.restartUnits(commonModel->property<std::string>(CommonItem::propertyToString(CommonItem::RESTART_UNITS)));
     }
 
     template<typename T>

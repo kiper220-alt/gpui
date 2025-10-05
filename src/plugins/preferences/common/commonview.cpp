@@ -66,6 +66,7 @@ void CommonView::setItem(ModelView::SessionItem *item)
     mapper->addMapping(ui->stopOnErrorCheckBox, CommonItem::propertyToInt(CommonItem::BYPASS_ERRORS));
     mapper->addMapping(ui->userContextCheckBox, CommonItem::propertyToInt(CommonItem::USER_CONTEXT));
     mapper->addMapping(ui->removeThisCheckBox,  CommonItem::propertyToInt(CommonItem::REMOVE_POLICY));
+    mapper->addMapping(ui->restartUnitsLineEdit,  CommonItem::propertyToInt(CommonItem::RESTART_UNITS));
 
     mapper->setCurrentModelIndex(view_model->index(0, 1));
 }

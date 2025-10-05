@@ -44,6 +44,7 @@ public:
         BYPASS_ERRORS   = 8,
         USER_CONTEXT    = 9,
         REMOVE_POLICY   = 10,
+        RESTART_UNITS   = 11,
     };
 
 public:
@@ -68,6 +69,9 @@ public:
     bool removePolicy() const;
     void setRemovePolicy(bool state);
 
+    std::string restartUnits() const;
+    void setRestartUnits(std::string state);
+
     constexpr static inline const char* propertyToString(const PropertyType& type)
     {
         switch (type)
@@ -83,6 +87,7 @@ public:
         case BYPASS_ERRORS: return "bypassErrors";
         case USER_CONTEXT : return "userContext ";
         case REMOVE_POLICY: return "removePolicy";
+        case RESTART_UNITS: return "restartUnits";
         }
         return "";
     }

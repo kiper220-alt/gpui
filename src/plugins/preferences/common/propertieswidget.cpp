@@ -73,6 +73,7 @@ void PropertiesWidget::setItem(ModelView::SessionItem *item)
     mapper->addMapping(ui->stopProcessingStatusLabel, CommonItem::propertyToInt(CommonItem::BYPASS_ERRORS));
     mapper->addMapping(ui->runInUsersContextStatusLabel, CommonItem::propertyToInt(CommonItem::USER_CONTEXT));
     mapper->addMapping(ui->removeIfNotAppliedStatusLabel, CommonItem::propertyToInt(CommonItem::REMOVE_POLICY));
+    mapper->addMapping(ui->restartUnitsStatusLabel, CommonItem::propertyToInt(CommonItem::RESTART_UNITS));
 
     mapper->addMapping(ui->plainTextEdit, CommonItem::propertyToInt(CommonItem::DESC));
 

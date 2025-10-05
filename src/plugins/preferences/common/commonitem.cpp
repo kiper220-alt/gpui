@@ -39,6 +39,7 @@ CommonItem::CommonItem()
     addProperty(propertyToString(BYPASS_ERRORS), false);
     addProperty(propertyToString(USER_CONTEXT), false);
     addProperty(propertyToString(REMOVE_POLICY), false);
+    addProperty(propertyToString(RESTART_UNITS), "");
 }
 
 CommonItem::CommonItem(const CommonItem &other)
@@ -55,6 +56,7 @@ CommonItem::CommonItem(const CommonItem &other)
     copyProperty<bool>(BYPASS_ERRORS, other);
     copyProperty<bool>(USER_CONTEXT, other);
     copyProperty<bool>(REMOVE_POLICY, other);
+    copyProperty<std::string>(RESTART_UNITS, other);
 }
 
 QString CommonItem::name() const
@@ -115,6 +117,16 @@ bool CommonItem::removePolicy() const
 void CommonItem::setRemovePolicy(bool state)
 {
     setProperty(propertyToString(REMOVE_POLICY), state);
+}
+
+std::string CommonItem::restartUnits() const
+{
+    return property<std::string>(propertyToString(RESTART_UNITS));
+}
+
+void CommonItem::setRestartUnits(std::string state)
+{
+    setProperty(propertyToString(RESTART_UNITS), state);
 }
 
 }
