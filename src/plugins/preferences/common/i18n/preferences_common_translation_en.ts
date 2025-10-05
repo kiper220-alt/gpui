@@ -48,7 +48,12 @@ context (user policy option)</translation>
         <translation>Targetting...</translation>
     </message>
     <message>
-        <location filename="../commonview.ui" line="111"/>
+        <location filename="../commonview.ui" line="115"/>
+        <source>Restart units:</source>
+        <translation>Restart units:</translation>
+    </message>
+    <message>
+        <location filename="../commonview.ui" line="130"/>
         <source>Description:</source>
         <translation>Description:</translation>
     </message>
@@ -97,64 +102,70 @@ context (user policy option)</translation>
         <translation>Properties:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="54"/>
+        <location filename="../propertieswidget.ui" line="105"/>
         <source>Stop processing items in extension on error:</source>
         <translation>Stop processing items in extension on error:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="70"/>
-        <location filename="../propertieswidget.ui" line="99"/>
-        <location filename="../propertieswidget.ui" line="128"/>
-        <location filename="../propertieswidget.ui" line="163"/>
-        <location filename="../propertieswidget.ui" line="198"/>
-        <location filename="../propertieswidget.ui" line="233"/>
-        <location filename="../propertieswidget.ui" line="268"/>
+        <location filename="../propertieswidget.ui" line="73"/>
+        <location filename="../propertieswidget.ui" line="137"/>
+        <location filename="../propertieswidget.ui" line="153"/>
+        <location filename="../propertieswidget.ui" line="169"/>
+        <location filename="../propertieswidget.ui" line="261"/>
+        <location filename="../propertieswidget.ui" line="274"/>
+        <location filename="../propertieswidget.ui" line="287"/>
         <location filename="../propertieswidget.ui" line="303"/>
+        <location filename="../propertieswidget.ui" line="317"/>
         <source>No</source>
         <translation>No</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="83"/>
+        <location filename="../propertieswidget.ui" line="121"/>
         <source>Run in user&apos;s context:</source>
         <translation>Run in user&apos;s context:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="112"/>
+        <location filename="../propertieswidget.ui" line="54"/>
         <source>Remove if not applied:</source>
         <translation>Remove if not applied:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="144"/>
+        <location filename="../propertieswidget.ui" line="89"/>
         <source>Apply once:</source>
         <translation>Apply once:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="179"/>
+        <location filename="../propertieswidget.ui" line="185"/>
         <source>Filtered Directly:</source>
         <translation>Filtered Directly:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="214"/>
+        <location filename="../propertieswidget.ui" line="223"/>
         <source>Filtered by ancestor:</source>
         <translation>Filtered by ancestor:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="249"/>
+        <location filename="../propertieswidget.ui" line="204"/>
         <source>Disabled directly:</source>
         <translation>Disabled directly:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="284"/>
+        <location filename="../propertieswidget.ui" line="242"/>
         <source>Disabled by ancestor:</source>
         <translation>Disabled by ancestor:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="313"/>
+        <location filename="../propertieswidget.ui" line="310"/>
+        <source>Restart units:</source>
+        <translation>Restart units:</translation>
+    </message>
+    <message>
+        <location filename="../propertieswidget.ui" line="327"/>
         <source>Description:</source>
         <translation>Description:</translation>
     </message>
     <message>
-        <location filename="../propertieswidget.ui" line="323"/>
+        <location filename="../propertieswidget.ui" line="337"/>
         <source>No description provided.</source>
         <translation>No description provided.</translation>
     </message>
@@ -759,7 +770,7 @@ context (user policy option)</translation>
 <context>
     <name>preferences::CommonView</name>
     <message>
-        <location filename="../commonview.cpp" line="70"/>
+        <location filename="../commonview.cpp" line="74"/>
         <source>Common</source>
         <translation>Common</translation>
     </message>

@@ -36,6 +36,11 @@ CommonView::CommonView(QWidget *parent)
     , delegate(std::make_unique<ModelView::ViewModelDelegate>())
 {
     ui->setupUi(this);
+
+    // `man systemd.unit` valid systemd.unit
+    // services separated by ','
+    const QRegularExpression rx(R"!(^(?:(?:[A-Za-z0-9:_.\\-]+)(?:,[A-Za-z0-9:_.\\-]+)*)?,?$)!");
+    ui->restartUnitsLineEdit->setValidator(new QRegularExpressionValidator(rx, ui->restartUnitsLineEdit));
 }
 
 CommonView::~CommonView()
