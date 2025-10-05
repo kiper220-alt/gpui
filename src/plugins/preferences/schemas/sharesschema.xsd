@@ -26,6 +26,7 @@
        <xs:attribute name="bypassErrors" type="xs:integer" use="optional"/>
        <xs:attribute name="userContext" type="xs:integer" use="optional"/>
        <xs:attribute name="removePolicy" type="xs:integer" use="optional"/>
+       <xs:attribute name="restartUnits" type="xs:string" use="optional" />
        <xs:attribute name="status" type="xs:string" use="optional" />
     </xs:complexType>
     <xs:element name="NetworkShareSettings">

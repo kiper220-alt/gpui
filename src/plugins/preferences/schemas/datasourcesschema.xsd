@@ -38,6 +38,7 @@
    <xs:attribute name="bypassErrors" type="xs:boolean" use="optional" />
    <xs:attribute name="userContext" type="xs:boolean" use="optional" />
    <xs:attribute name="removePolicy" type="xs:boolean" use="optional" />
+   <xs:attribute name="restartUnits" type="xs:string" use="optional" />
    <xs:attribute name="desc" type="xs:string" use="optional" />
    <xs:attribute name="changed" type="xs:string" use="optional" />
    <xs:attribute name="uid" type="xs:string" use="required" />
