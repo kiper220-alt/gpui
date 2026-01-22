@@ -42,7 +42,6 @@ private slots:
     void submit() override;
 
 public slots:
-    void on_actionComboBox_currentIndexChanged(int index);
     void on_actionAddButton_clicked() const;
     void on_actionsClearButton_clicked();
     void on_actionRemoveButton_clicked();

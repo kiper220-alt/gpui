@@ -11,7 +11,17 @@ SystemdModelBuilder::SystemdModelBuilder()
     : BaseModelBuilder() 
 {}
 
-
+/**
+ * Returns a pair containing the systemd state and whether the state is 'now'.
+ *
+ * If the state string is empty, the function will return {SystemdState::Nothing, false}.
+ *
+ * The systemd state is determined by the first character of the state string.
+ * The bool value is determined by whether the state string has at least two characters and the second character is 'N'.
+ *
+ * @param state The systemd state string.
+ * @return A pair containing the systemd state and whether the state is 'now'. 
+ */
 inline QPair<SystemdState, bool> getUnitStateState(const std::string& state) 
 {
     if (state.empty()) 
@@ -42,6 +52,16 @@ inline QPair<SystemdState, bool> getUnitStateState(const std::string& state)
     return {s_state, state.size() >= 2 && state[1] == 'N'};
 }
 
+/**
+ * Returns a string representing the systemd state.
+ *
+ * If the state is 'now', the returned string will have 'N' appended to it.
+ * If the state is not 'now', the returned string will be the single character representing the state.
+ *
+ * @param state The systemd state.
+ * @param now Whether the state is 'now'.
+ * @return A string representing the systemd state.
+ */
 inline std::string getUnitStateModel(const SystemdState state, const bool now) 
 {
     switch (state) 
@@ -58,6 +78,16 @@ inline std::string getUnitStateModel(const SystemdState state, const bool now)
             return "N";
     }
 }
+/**
+ * Returns the unit dependency state based on the given string.
+ *
+ * If the state string is empty or has a length of two, the function returns DependencyState::Changed.
+ * If the state string is "PC", the function returns DependencyState::PresenceChanged.
+ * Otherwise, the function returns DependencyState::Changed.
+ * 
+ * @param state The unit dependency state string.
+ * @return The unit dependency state.
+ */
 inline DependencyState getUnitDependencyState(const std::string& state) 
 {
     if (state.empty() || state.length() != 2) 
@@ -68,6 +98,15 @@ inline DependencyState getUnitDependencyState(const std::string& state)
     return state == "PC" ? DependencyState::PresenceChanged : DependencyState::Changed;
 }
 
+/**
+ * Returns a string representing the unit dependency state.
+ *
+ * DependencyState::PresenceChanged corresponds to "PC".
+ * DependencyState::Changed corresponds to "C".
+ *
+ * @param state The unit dependency state.
+ * @return A string representing the unit dependency state.
+ */
 inline std::string getUnitDependencyModel(const DependencyState state) 
 {
     switch (state) 
@@ -80,6 +119,21 @@ inline std::string getUnitDependencyModel(const DependencyState state)
 }
 
 
+/**
+ * @brief Converts a systemd schema to a preferences model.
+ * 
+ * The function goes through each systemd item in the given schema and 
+ * creates a corresponding item in the preferences model. The created item is 
+ * a SystemdContainerItem with the unit name, state, and state now 
+ * properties set. If the systemd item has edit items, the function 
+ * creates SystemdEditItem for each edit item and sets the type, section, 
+ * key, and value properties. If the systemd item has dependency items, 
+ * the function creates SystemdDependencyItem for each dependency item and sets 
+ * the type and path properties.
+ * 
+ * @param systemds The systemd schema to be converted.
+ * @return The converted preferences model.
+ */
 std::unique_ptr<PreferencesModel> SystemdModelBuilder::schemaToModel(std::unique_ptr<Systemds> &systemds) 
 {
     auto model = std::make_unique<PreferencesModel>();
@@ -173,6 +227,20 @@ std::unique_ptr<PreferencesModel> SystemdModelBuilder::schemaToModel(std::unique
 
     return model;
 }
+/**
+ * @brief Converts a preferences model to a systemd schema.
+ * 
+ * The function goes through each SystemdContainerItem in the given preferences model and 
+ * creates a corresponding item in the systemd schema. The created item is a Systemd_t with 
+ * the unit name, state, and state now properties set. If the SystemdContainerItem 
+ * has edit items, the function creates SystemdAction_t for each edit item and sets the 
+ * type, section, key, and value properties. If the SystemdContainerItem has dependency 
+ * items, the function creates SystemdDependency_t for each dependency item and sets the type 
+ * and path properties.
+ * 
+ * @param model The preferences model to be converted.
+ * @return The converted systemd schema.
+ */
 std::unique_ptr<Systemds> SystemdModelBuilder::modelToSchema(std::unique_ptr<PreferencesModel> &model) 
 {
     auto systemds = std::make_unique<Systemds>("{48ABBD05-0169-4696-8F2C-E1E42A499ADF}");

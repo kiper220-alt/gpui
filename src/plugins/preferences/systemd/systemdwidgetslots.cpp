@@ -26,6 +26,18 @@
 namespace preferences 
 {
 
+/**
+ * @brief Submits changes to the item
+ *
+ * If the mapper is valid and the data is valid, this function
+ * will submit the changes to the mapper and update the item's
+ * state and state_now properties. If the state checkbox is
+ * checked, the state property will be set to the current index
+ * of the state combo box plus 1. If the now checkbox is checked,
+ * the state_now property will be set to true. The function will
+ * then write the changes to the edit table and dependency table and
+ * emit a data changed signal.
+ */
 void SystemdWidget::submit()
 {
     if (mapper && validate()) 
@@ -51,10 +63,12 @@ void SystemdWidget::submit()
     }
 }
 
-
-void SystemdWidget::on_actionComboBox_currentIndexChanged(int)
-{}
-
+/**
+ * @brief Creates a combo box widget with the following items: Create, Replace, update, delete
+ *
+ * @param parent The parent widget for the combo box
+ * @return The created combo box widget
+ */
 static QWidget* createActionComboBox(QWidget* parent)
 {
     const auto comboBox = new QComboBox(parent);
@@ -65,6 +79,12 @@ static QWidget* createActionComboBox(QWidget* parent)
     return comboBox;
 }
 
+/**
+ * @brief Creates a combo box widget with the following items: Changed, Presence Changed
+ *
+ * @param parent The parent widget for the combo box
+ * @return The created combo box widget
+ */
 static QWidget* createDependenceComboBox(QWidget* parent)
 {
     const auto comboBox = new QComboBox(parent);
@@ -73,6 +93,11 @@ static QWidget* createDependenceComboBox(QWidget* parent)
     return comboBox;
 }
 
+/**
+ * @brief Adds a new row to the actions table with a combo box widget in the first column
+ *
+ * The combo box widget has the following items: Create, Replace, update, delete
+ */
 void SystemdWidget::on_actionAddButton_clicked() const
 {
     const auto table = this->ui->actionsTableWidget;
@@ -80,11 +105,17 @@ void SystemdWidget::on_actionAddButton_clicked() const
     table->insertRow(rows);
     table->setCellWidget(rows, 0, createActionComboBox(table));
 }
+/**
+ * @brief Clears the actions table by removing all rows.
+ */
 void SystemdWidget::on_actionsClearButton_clicked()
 {
     const auto table = this->ui->actionsTableWidget;
     table->setRowCount(0);
 }
+/**
+ * @brief Removes all selected rows from the actions table
+ */
 void SystemdWidget::on_actionRemoveButton_clicked()
 {
     auto* table = ui->actionsTableWidget;
@@ -103,6 +134,11 @@ void SystemdWidget::on_actionRemoveButton_clicked()
         table->removeRow(row);
     }
 }
+/**
+ * @brief Adds a new row to the dependencies table with a combo box widget in the first column
+ *
+ * The combo box widget has the following items: Changed, Presence Changed
+ */
 void SystemdWidget::on_dependAddButton_clicked()
 {
     const auto table = this->ui->dependenciesTableWidget;
@@ -110,11 +146,20 @@ void SystemdWidget::on_dependAddButton_clicked()
     table->insertRow(rows);
     table->setCellWidget(rows, 0, createDependenceComboBox(table));
 }
+/**
+ * @brief Clears the dependencies table by removing all rows.
+ */
 void SystemdWidget::on_dependsClearButton_clicked()
 {
     const auto table = this->ui->dependenciesTableWidget;
     table->setRowCount(0);
 }
+/**
+ * @brief Removes all selected rows from the dependencies table.
+ *
+ * This function removes all the rows which are currently selected in the dependencies
+ * table. The rows are removed in reverse order to prevent any indexing issues.
+ */
 void SystemdWidget::on_dependRemoveButton_clicked()
 {
     const auto table = this->ui->dependenciesTableWidget;

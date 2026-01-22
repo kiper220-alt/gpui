@@ -32,6 +32,14 @@ SystemdWidget::~SystemdWidget()
     delete ui;
 }
 
+/**
+ * @brief Sets the item associated with the widget.
+ * @param item The item to associate with the widget.
+ *
+ * This function sets the item associated with the widget and updates the
+ * data mappings accordingly. It also sets the initial state of the UI
+ * elements based on the item's properties.
+ */
 void SystemdWidget::setItem(ModelView::SessionItem *item)
 {
     view_model = ModelView::Factory::CreatePropertyFlatViewModel(item->model());
@@ -65,6 +73,13 @@ void SystemdWidget::setItem(ModelView::SessionItem *item)
     mapper->setCurrentModelIndex(view_model->index(0, 1));
 }
 
+/**
+ * @brief Reads the edit table and populates it with the data from the associated item.
+ *
+ * This function reads the edit items from the associated item and populates the
+ * actions table with the data. If the item has no edit items, the function
+ * does nothing.
+ */
 void SystemdWidget::readEditTable()
 {
     const auto table = this->ui->actionsTableWidget;
@@ -86,6 +101,14 @@ void SystemdWidget::readEditTable()
         }
     }
 }
+/**
+ * @brief Writes the edit table data to the associated item.
+ *
+ * This function writes the edit table data to the associated item. It loops over
+ * each row in the table, reads the data from the row, and writes it to the
+ * corresponding item in the associated item's edit items list. If the table is empty,
+ * the function sets the associated item's edit state to false.
+ */
 void SystemdWidget::writeEditTable()
 {
     const auto table = ui->actionsTableWidget;
@@ -134,6 +157,13 @@ void SystemdWidget::writeEditTable()
     }
 }
 
+/**
+ * @brief Reads the dependency table and populates it with the data from the associated item.
+ *
+ * This function reads the dependency items from the associated item and populates the
+ * dependencies table with the data. If the item has no dependency items, the function
+ * does nothing.
+ */
 void SystemdWidget::readDependencyTable()
 {
     const auto table = this->ui->dependenciesTableWidget;
@@ -151,6 +181,14 @@ void SystemdWidget::readDependencyTable()
         }
     }
 }
+/**
+ * @brief Writes the dependency table into the associated item.
+ *
+ * This function writes the dependency items from the dependencies table into the associated item.
+ * It iterates over the rows of the table, reads the data from each row, and writes it into the
+ * corresponding dependency item in the associated item. If the item has no dependency items, the
+ * function does nothing.
+ */
 void SystemdWidget::writeDependencyTable()
 {
     const auto table = ui->dependenciesTableWidget;
@@ -176,11 +214,26 @@ void SystemdWidget::writeDependencyTable()
     }
 }
 
+/**
+ * @brief Validates the widget data.
+ *
+ * This function validates the widget data. It returns true if the data is valid, and false
+ * otherwise.
+ *
+ * @return true if the data is valid, false otherwise.
+ */
 bool SystemdWidget::validate()
 {
     return true;
 }
 
+/**
+ * @brief Returns the name of the widget.
+ *
+ * This function returns the name of the widget.
+ *
+ * @return The name of the widget.
+ */
 QString SystemdWidget::name() const {
     return "Systemd";
 }

@@ -44,14 +44,35 @@ SystemdItem::SystemdItem(const SystemdItem &other)
     }
 }
 
+/**
+ * @brief Get the number of items in the edit section.
+ * 
+ * @return The number of items in the edit section.
+ */
 size_t SystemdItem::editLength() 
 {
     return items(EDIT_ITEM_TAG).size();
 }
+/**
+ * @brief Get the items in the edit section.
+ * 
+ * @return A vector of items in the edit section.
+ */
 std::vector<SystemdEditItem *> SystemdItem::editItems() 
 {
     return items<SystemdEditItem>(EDIT_ITEM_TAG);
 }
+/**
+ * @brief Set the number of items in the edit section.
+ *
+ * If the current number of items in the edit section is greater than
+ * the given size, then items are removed from the end of the edit
+ * section. If the current number of items in the edit section is
+ * less than the given size, then new items are added to the end of
+ * the edit section.
+ *
+ * @param size The new number of items in the edit section.
+ */
 void SystemdItem::editLength(size_t size)
 {
     const auto length = static_cast<ptrdiff_t>(editItems().size());
@@ -71,14 +92,34 @@ void SystemdItem::editLength(size_t size)
     }
 }
 
+/**
+ * @brief Get the number of items in the dependency section.
+ * 
+ * @return The number of items in the dependency section.
+ */
 size_t SystemdItem::depLength()
 {
     return items(DEPENDENCY_ITEM_TAG).size();
 }
+/**
+ * @brief Get the items in the dependency section.
+ *
+ * @return A vector of items in the dependency section.
+ */
 std::vector<SystemdDependencyItem *> SystemdItem::depItems()
 {
     return items<SystemdDependencyItem>(DEPENDENCY_ITEM_TAG);
 }
+/**
+ * @brief Set the number of items in the dependency section.
+ *
+ * If the current number of items in the dependency section is greater
+ * than the given size, the excess items are removed. If the given size
+ * is greater than the current number of items in the dependency section,
+ * new items are inserted.
+ *
+ * @param size The new number of items in the dependency section.
+ */
 void SystemdItem::depLength(size_t size)
 {
     const auto length = depItems().size();
