@@ -127,6 +127,8 @@ void PreferencesTreeModel::populateModel()
 
     std::map<std::string, QString> deviceTypeIds{{"DeviceContainerItem", QObject::tr("Device")}};
 
+    std::map<std::string, QString> systemdTypeIds{{"SystemdContainerItem", QObject::tr("Systemd")}};
+
     std::map<std::string, QString> localGroupTypeIds{{typeid(LocalGroupContainerItem<LocalGroupItem>).name(),
                                                       QObject::tr("Local Group")},
                                                      {typeid(LocalGroupContainerItem<LocalUserItem>).name(),
@@ -240,6 +242,13 @@ void PreferencesTreeModel::populateModel()
     machineDrivesItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Drive Maps Settings.").toStdString());
     machineDrivesItem->setProperty(PreferenceCategoryItem::MODEL_TYPE, true);
 
+    auto systemdItem = insertItem<PreferenceCategoryItem>(machineSystemSettingsItem);
+    systemdItem->setDisplayName(QObject::tr("Systemd").toStdString());
+    systemdItem->setProperty(FolderItem::PARENT_ID, machineSystemSettingsUuid);
+    systemdItem->setProperty<std::map<std::string, QString>>(PreferenceCategoryItem::TYPE, systemdTypeIds);
+    systemdItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Systemd Settings.").toStdString());
+    systemdItem->setProperty(PreferenceCategoryItem::MODEL_TYPE, true);
+
     //======================================================================================================================
 
     auto userNamespace = insertItem<FolderItem>(topItem);
@@ -298,6 +307,11 @@ void PreferencesTreeModel::populateModel()
     userSharesItem->setDisplayName(QObject::tr("Network Shares").toStdString());
     userSharesItem->setProperty<std::map<std::string, QString>>(PreferenceCategoryItem::TYPE, sharesTypeIds);
     userSharesItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Network shares settings.").toStdString());
+
+    auto userSystemdItem = insertItem<PreferenceCategoryItem>(userSystemSettingsItem);
+    userSystemdItem->setDisplayName(QObject::tr("Systemd").toStdString());
+    userSystemdItem->setProperty<std::map<std::string, QString>>(PreferenceCategoryItem::TYPE, systemdTypeIds);
+    userSystemdItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Systemd settings.").toStdString());
  }
 
 } // namespace preferences

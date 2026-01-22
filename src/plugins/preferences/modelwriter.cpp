@@ -35,6 +35,7 @@
 #include <QMessageBox>
 
 #include "../../../src/plugins/storage/smb/smbdirectory.h"
+#include "systemd/systemdpreferencewriter.h"
 
 namespace preferences
 {
@@ -52,6 +53,7 @@ bool ModelWriter::saveModels(const std::string &policyPath,
     writers["Preferences/Registry/"]             = std::make_unique<RegistryPreferenceWriter>();
     writers["Preferences/NetworkShares/"]        = std::make_unique<SharesPreferenceWriter>();
     writers["Preferences/Shortcuts/"]            = std::make_unique<ShortcutsPreferenceWriter>();
+    writers["Preferences/Systemd/"]              = std::make_unique<SystemdPreferenceWriter>();
     writers["Preferences/EnvironmentVariables/"] = std::make_unique<VariablesPreferenceWriter>();
 
     std::vector<std::string> fileNames = {
@@ -63,6 +65,7 @@ bool ModelWriter::saveModels(const std::string &policyPath,
         "NetworkShares.xml",
         "Registry.xml",
         "Shortcuts.xml",
+        "Systemd.xml",
     };
 
     auto topDirectoryPath = policyPath + "/" + policyType;

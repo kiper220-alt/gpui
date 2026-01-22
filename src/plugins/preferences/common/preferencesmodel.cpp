@@ -48,6 +48,7 @@
 #include "registry/registrycontaineritem.h"
 #include "shares/sharescontaineritem.h"
 #include "shortcuts/shortcutscontaineritem.h"
+#include "systemd/systemdcontaineritem.h"
 #include "variables/variablescontaineritem.h"
 
 namespace preferences
@@ -62,6 +63,7 @@ PreferencesModel::PreferencesModel()
     registerItem<RegistryContainerItem>();
     registerItem<SharesContainerItem>();
     registerItem<ShortcutsContainerItem>();
+    registerItem<SystemdContainerItem>();
     registerItem<VariablesContainerItem>();
 }
 

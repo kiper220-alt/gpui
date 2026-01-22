@@ -32,6 +32,7 @@
 #include "registry/registrypreferencereader.h"
 #include "shares/sharespreferencereader.h"
 #include "shortcuts/shortcutspreferencereader.h"
+#include "systemd/systemdpreferencereader.h"
 #include "variables/variablespreferencereader.h"
 
 namespace preferences
@@ -50,6 +51,7 @@ void ModelCreator::populateModels(const std::string &policyPath,
     readers["Preferences/Registry/Registry.xml"]           = std::make_unique<RegistryPreferenceReader>();
     readers["Preferences/NetworkShares/NetworkShares.xml"] = std::make_unique<SharesPreferenceReader>();
     readers["Preferences/Shortcuts/Shortcuts.xml"]         = std::make_unique<ShortcutsPreferenceReader>();
+    readers["Preferences/Systemd/Systemd.xml"]             = std::make_unique<SystemdPreferenceReader>();
     readers["Preferences/EnvironmentVariables/EnvironmentVariables.xml"] = std::make_unique<VariablesPreferenceReader>();
 
     for (const auto &readerPair : readers)

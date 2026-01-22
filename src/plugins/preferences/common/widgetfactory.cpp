@@ -48,6 +48,8 @@
 #include "registry/registrywidget.h"
 #include "shares/shareswidget.h"
 #include "shortcuts/shortcutswidget.h"
+#include "systemd/systemditem.h"
+#include "systemd/systemdwidget.h"
 #include "variables/variableswidget.h"
 
 namespace preferences
@@ -88,6 +90,7 @@ WidgetFactory::WidgetFactory()
     registerItem("TcpPrinterItem", [](){ return std::make_unique<TcpPrinterGeneralWidget>(); });
     registerItem("TcpPrinterItem", [](){ return std::make_unique<TcpPrinterPortWidget>(); });
     registerItem("SharedPrinterItem", [](){ return std::make_unique<SharedPrinterWidget>(); });
+    registerItem("SystemdItem", [](){ return std::make_unique<SystemdWidget>(); });
 }
 
 WidgetFactory::~WidgetFactory() = default;

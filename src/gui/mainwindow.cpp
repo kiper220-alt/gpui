@@ -479,6 +479,7 @@ void MainWindow::updateStatusBar()
                                  "[{6A4C88C6-C502-4f74-8F60-2CB23EDC24E2}{BFCBBEB0-9DF4-4c0c-A728-434EA66A0373}]" // Preference CSE GUID Network Shares
                                  "[{B087BE9D-ED37-454f-AF9C-04291E351182}{BEE07A6A-EC9F-4659-B8C9-0B1937907C83}]" // Preference CSE GUID Registry
                                  "[{6A4C88C6-C502-4f74-8F60-2CB23EDC24E2}{BFCBBEB0-9DF4-4c0c-A728-434EA66A0373}]" // Preference CSE GUID Network Shares";
+                                 "[{F5087FA9-BF44-4C76-ABB9-08DB6FF4C693}{224F82BE-38CC-4FD0-87DE-BDA28496B3C7}]" // Preference CSE GUID Systemd
                               };
 
     const QString machineAdministrativeTemplates = "[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]";
