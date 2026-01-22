@@ -170,6 +170,7 @@ set(HEADERS
     start_menu/startmenuwinvistaitem.h
     start_menu/startmenuwinxpitem.h
 
+    systemd/systemdcontaineritem.h
     systemd/systemddependencyitem.h
     systemd/systemdedititem.h
     systemd/systemditem.h
@@ -345,6 +346,7 @@ set(SOURCES
     start_menu/startmenuwinvistaitem.cpp
     start_menu/startmenuwinxpitem.cpp
 
+    systemd/systemdcontaineritem.cpp
     systemd/systemddependencyitem.cpp
     systemd/systemdedititem.cpp
     systemd/systemditem.cpp
