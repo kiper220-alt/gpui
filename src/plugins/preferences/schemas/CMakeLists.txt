@@ -16,6 +16,7 @@ set(XSD_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/sharesschema.xsd"
     "${CMAKE_CURRENT_SOURCE_DIR}/shortcutsschema.xsd"
     "${CMAKE_CURRENT_SOURCE_DIR}/startmenuschema.xsd"
+    "${CMAKE_CURRENT_SOURCE_DIR}/systemdschema.xsd"
     "${CMAKE_CURRENT_SOURCE_DIR}/targetingschema.xsd"
     "${CMAKE_CURRENT_SOURCE_DIR}/variablesschema.xsd"
 )

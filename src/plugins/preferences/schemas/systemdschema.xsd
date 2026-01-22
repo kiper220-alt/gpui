@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:complexType name="SystemdDependence_t">
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="path" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SystemdAction_t">
+        <xs:attribute name="type" type="xs:string" use="required"/>
+        <xs:attribute name="section" type="xs:string" use="required"/>
+        <xs:attribute name="key" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SystemdDependencies_t">
+        <xs:sequence>
+            <xs:element name="Properties" type="SystemdDependence_t" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SystemdActions_t">
+        <xs:sequence>
+            <xs:element name="Properties" type="SystemdAction_t" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SystemdProperties_t">
+        <xs:sequence>
+            <xs:element name="Actions" type="SystemdActions_t"/>
+            <xs:element name="Dependencies" type="SystemdDependencies_t"/>
+        </xs:sequence>
+        <xs:attribute name="unit" type="xs:string" use="required"/>
+        <xs:attribute name="state" type="xs:string" use="required"/>
+        <xs:attribute name="disabled" type="xs:unsignedByte" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="Systemd_t">
+        <xs:sequence>
+            <xs:element name="Properties" type="SystemdProperties_t" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="clsid" type="xs:string" use="required"/>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="status" type="xs:string" use="optional"/>
+        <xs:attribute name="image" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="changed" type="xs:string" use="optional"/>
+        <xs:attribute name="uid" type="xs:string" use="required"/>
+        <xs:attribute name="desc" type="xs:string" use="optional"/>
+        <xs:attribute name="bypassErrors" type="xs:integer" use="optional"/>
+        <xs:attribute name="userContext" type="xs:integer" use="optional"/>
+        <xs:attribute name="removePolicy" type="xs:integer" use="optional"/>
+    </xs:complexType>
+    <xs:element name="Systemds">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Systemd" type="Systemd_t" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="clsid" type="xs:string" use="required"/>
+            <xs:attribute name="disabled" type="xs:unsignedByte" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
