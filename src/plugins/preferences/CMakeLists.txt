@@ -170,6 +170,10 @@ set(HEADERS
     start_menu/startmenuwinvistaitem.h
     start_menu/startmenuwinxpitem.h
 
+    systemd/systemddependencyitem.h
+    systemd/systemdedititem.h
+    systemd/systemditem.h
+
     shares/sharesitem.h
     shares/sharespreferencereader.h
     shares/sharespreferencewriter.h
@@ -340,6 +344,10 @@ set(SOURCES
     start_menu/startwinxpwidget.cpp
     start_menu/startmenuwinvistaitem.cpp
     start_menu/startmenuwinxpitem.cpp
+
+    systemd/systemddependencyitem.cpp
+    systemd/systemdedititem.cpp
+    systemd/systemditem.cpp
 
     registry/registrycontaineritem.cpp
     registry/registrypreferencereader.cpp
