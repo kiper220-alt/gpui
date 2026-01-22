@@ -175,6 +175,8 @@ set(HEADERS
     systemd/systemdedititem.h
     systemd/systemditem.h
     systemd/systemdmodelbuilder.h
+    systemd/systemdpreferencereader.h
+    systemd/systemdpreferencewriter.h
 
     shares/sharesitem.h
     shares/sharespreferencereader.h
@@ -352,6 +354,8 @@ set(SOURCES
     systemd/systemdedititem.cpp
     systemd/systemditem.cpp
     systemd/systemdmodelbuilder.cpp
+    systemd/systemdpreferencereader.cpp
+    systemd/systemdpreferencewriter.cpp
 
     registry/registrycontaineritem.cpp
     registry/registrypreferencereader.cpp
