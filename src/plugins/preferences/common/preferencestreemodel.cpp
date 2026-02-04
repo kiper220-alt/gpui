@@ -127,7 +127,18 @@ void PreferencesTreeModel::populateModel()
 
     std::map<std::string, QString> deviceTypeIds{{"DeviceContainerItem", QObject::tr("Device")}};
 
-    std::map<std::string, QString> systemdTypeIds{{"SystemdContainerItem", QObject::tr("Systemd")}};
+    std::map<std::string, QString> systemdTypeIds{{"SystemdServiceContainerItem", QObject::tr("Service Unit")},
+                                                  {"SystemdSocketContainerItem", QObject::tr("Socket Unit")},
+                                                  {"SystemdTimerContainerItem", QObject::tr("Timer Unit")},
+                                                  {"SystemdPathContainerItem", QObject::tr("Path Unit")},
+                                                  {"SystemdMountContainerItem", QObject::tr("Mount Unit")},
+                                                  {"SystemdAutomountContainerItem", QObject::tr("Automount Unit")},
+                                                  {"SystemdSwapContainerItem", QObject::tr("Swap Unit")},
+                                                  {"SystemdTargetContainerItem", QObject::tr("Target Unit")},
+                                                  {"SystemdDeviceContainerItem", QObject::tr("Device Unit")},
+                                                  {"SystemdSliceContainerItem", QObject::tr("Slice Unit")},
+                                                  {"SystemdScopeContainerItem", QObject::tr("Scope Unit")}};
+
 
     std::map<std::string, QString> localGroupTypeIds{{typeid(LocalGroupContainerItem<LocalGroupItem>).name(),
                                                       QObject::tr("Local Group")},
@@ -242,12 +253,12 @@ void PreferencesTreeModel::populateModel()
     machineDrivesItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Drive Maps Settings.").toStdString());
     machineDrivesItem->setProperty(PreferenceCategoryItem::MODEL_TYPE, true);
 
-    auto systemdItem = insertItem<PreferenceCategoryItem>(machineSystemSettingsItem);
-    systemdItem->setDisplayName(QObject::tr("Systemd").toStdString());
-    systemdItem->setProperty(FolderItem::PARENT_ID, machineSystemSettingsUuid);
-    systemdItem->setProperty<std::map<std::string, QString>>(PreferenceCategoryItem::TYPE, systemdTypeIds);
-    systemdItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Systemd Settings.").toStdString());
-    systemdItem->setProperty(PreferenceCategoryItem::MODEL_TYPE, true);
+    auto machineSystemdItem = insertItem<PreferenceCategoryItem>(machineSystemSettingsItem);
+    machineSystemdItem->setDisplayName(QObject::tr("Systemd").toStdString());
+    machineSystemdItem->setProperty<std::map<std::string, QString>>(PreferenceCategoryItem::TYPE, systemdTypeIds);
+    machineSystemdItem->setProperty(FolderItem::PARENT_ID, machineSystemSettingsUuid);
+    machineSystemdItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Systemd units settings.").toStdString());
+    machineSystemdItem->setProperty(PreferenceCategoryItem::MODEL_TYPE, true);
 
     //======================================================================================================================
 
@@ -311,7 +322,7 @@ void PreferencesTreeModel::populateModel()
     auto userSystemdItem = insertItem<PreferenceCategoryItem>(userSystemSettingsItem);
     userSystemdItem->setDisplayName(QObject::tr("Systemd").toStdString());
     userSystemdItem->setProperty<std::map<std::string, QString>>(PreferenceCategoryItem::TYPE, systemdTypeIds);
-    userSystemdItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Systemd settings.").toStdString());
+    userSystemdItem->setProperty(FolderItem::HELP_MSG, QObject::tr("Systemd units settings.").toStdString());
  }
 
 } // namespace preferences

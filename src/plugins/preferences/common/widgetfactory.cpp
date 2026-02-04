@@ -48,8 +48,7 @@
 #include "registry/registrywidget.h"
 #include "shares/shareswidget.h"
 #include "shortcuts/shortcutswidget.h"
-#include "systemd/systemditem.h"
-#include "systemd/systemdwidget.h"
+#include "systemd/unitwidget.h"
 #include "variables/variableswidget.h"
 
 namespace preferences

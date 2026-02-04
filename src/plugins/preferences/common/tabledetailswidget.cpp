@@ -132,9 +132,14 @@ void TableDetailsWidget::on_treeView_customContextMenuRequested(const QPoint &po
     for (const auto &itemType : itemTypes)
     {
         auto addItemAction = newMenuItem->addAction(itemType.second);
-        auto add_item      = [&]() {
+        auto add_item      = [this, itemType]() {
             auto newItem = view_model->sessionModel()->insertNewItem(itemType.first,
                                                                      view_model->sessionModel()->rootItem());
+            if (!newItem)
+            {
+                return;
+            }
+
             if (auto containerItemInterface = dynamic_cast<ContainerItemInterface *>(newItem))
             {
                 containerItemInterface->setupListeners();

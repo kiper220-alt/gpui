@@ -64,6 +64,17 @@ PreferencesModel::PreferencesModel()
     registerItem<SharesContainerItem>();
     registerItem<ShortcutsContainerItem>();
     registerItem<SystemdContainerItem>();
+    registerItem<SystemdServiceContainerItem>();
+    registerItem<SystemdSocketContainerItem>();
+    registerItem<SystemdTimerContainerItem>();
+    registerItem<SystemdPathContainerItem>();
+    registerItem<SystemdMountContainerItem>();
+    registerItem<SystemdAutomountContainerItem>();
+    registerItem<SystemdSwapContainerItem>();
+    registerItem<SystemdTargetContainerItem>();
+    registerItem<SystemdDeviceContainerItem>();
+    registerItem<SystemdSliceContainerItem>();
+    registerItem<SystemdScopeContainerItem>();
     registerItem<VariablesContainerItem>();
 }
 
