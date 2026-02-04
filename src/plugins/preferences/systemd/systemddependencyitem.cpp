@@ -1,20 +1,20 @@
-#include "systemditem.h"
 #include "systemddependencyitem.h"
 
-namespace preferences 
+namespace preferences
 {
 
-SystemdDependencyItem::SystemdDependencyItem() 
+SystemdDependencyItem::SystemdDependencyItem()
     : ModelView::CompoundItem("SystemdDependencyItem")
 {
-    addProperty(TYPE, 0);
+    addProperty(TYPE, static_cast<int>(SystemdDependencyMode::Changed));
     addProperty(PATH, "");
 }
-SystemdDependencyItem::SystemdDependencyItem(const SystemdDependencyItem &other) 
+
+SystemdDependencyItem::SystemdDependencyItem(const SystemdDependencyItem &other)
     : ModelView::CompoundItem("SystemdDependencyItem")
 {
     addProperty(TYPE, other.property<int>(TYPE));
-    addProperty(PATH, other.property<QString>(PATH));
+    addProperty(PATH, other.property<std::string>(PATH));
 }
 
 } // namespace preferences

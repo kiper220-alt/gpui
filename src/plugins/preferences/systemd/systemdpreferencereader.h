@@ -3,7 +3,7 @@
 
 #include "common/basepreferencereader.h"
 
-namespace preferences 
+namespace preferences
 {
 
 class SystemdPreferenceReader : public BasePreferenceReader

@@ -3,16 +3,16 @@
 
 #include "common/basepreferencewriter.h"
 
-namespace preferences 
+namespace preferences
 {
 
-class SystemdPreferenceWriter: public BasePreferenceWriter
+class SystemdPreferenceWriter : public BasePreferenceWriter
 {
 public:
     SystemdPreferenceWriter();
 
-protected:
-    bool writeModel(std::ostream &input, const std::unique_ptr<PreferencesModel> &model) override;
+private:
+    bool writeModel(std::ostream &output, const std::unique_ptr<PreferencesModel> &model) override;
 };
 
 } // namespace preferences

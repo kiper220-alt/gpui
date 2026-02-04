@@ -28,6 +28,7 @@
 #include "registry/registrypreferencewriter.h"
 #include "shares/sharespreferencewriter.h"
 #include "shortcuts/shortcutspreferencewriter.h"
+#include "systemd/systemdpreferencewriter.h"
 #include "variables/variablespreferencewriter.h"
 
 #include <QDebug>
@@ -35,7 +36,6 @@
 #include <QMessageBox>
 
 #include "../../../src/plugins/storage/smb/smbdirectory.h"
-#include "systemd/systemdpreferencewriter.h"
 
 namespace preferences
 {

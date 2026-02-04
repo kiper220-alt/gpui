@@ -1,31 +1,29 @@
 #ifndef GPUI_SYSTEMDDEPENDENCYITEM_H
 #define GPUI_SYSTEMDDEPENDENCYITEM_H
+
 #include <mvvm/model/compounditem.h>
-#include <QMetaType>
 
-namespace preferences 
+namespace preferences
 {
 
-enum class DependencyState 
+enum class SystemdDependencyMode
 {
-    Changed,
-    PresenceChanged,
+    Changed = 0,
+    PresenceChanged = 1,
 };
 
 class SystemdDependencyItem : public ModelView::CompoundItem
 {
-
-//! Dependency item of systemd item representation for editor.
-
 public:
-    static inline const std::string TYPE        = "type";
-    static inline const std::string PATH        = "path";
-
+    static inline const std::string TYPE = "type";
+    static inline const std::string PATH = "path";
 
     SystemdDependencyItem();
     SystemdDependencyItem(const SystemdDependencyItem &other);
 };
 
-}
+} // namespace preferences
+
+Q_DECLARE_METATYPE(::preferences::SystemdDependencyItem)
 
 #endif // GPUI_SYSTEMDDEPENDENCYITEM_H

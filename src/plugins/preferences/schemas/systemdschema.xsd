@@ -1,43 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
 
-    <xs:complexType name="SystemdDependence_t">
-        <xs:attribute name="type" type="xs:string" use="required"/>
+    <xs:simpleType name="UnitState_t">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="as_is"/>
+            <xs:enumeration value="enable"/>
+            <xs:enumeration value="disable"/>
+            <xs:enumeration value="mask"/>
+            <xs:enumeration value="unmask"/>
+            <xs:enumeration value="preset"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="UnitApplyMode_t">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="always"/>
+            <xs:enumeration value="if_exists"/>
+            <xs:enumeration value="if_missing"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="UnitPolicyTarget_t">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="machine"/>
+            <xs:enumeration value="user"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="UnitEditMode_t">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="create"/>
+            <xs:enumeration value="override"/>
+            <xs:enumeration value="create_or_override"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ConflictStrategy_t">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="replace"/>
+            <xs:enumeration value="append"/>
+            <xs:enumeration value="merge"/>
+            <xs:enumeration value="ignore_if_exists"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FileDependencyMode_t">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="changed"/>
+            <xs:enumeration value="presence_changed"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="FileDependence_t">
+        <xs:attribute name="mode" type="FileDependencyMode_t" use="required"/>
         <xs:attribute name="path" type="xs:string" use="required"/>
     </xs:complexType>
 
-    <xs:complexType name="SystemdAction_t">
-        <xs:attribute name="type" type="xs:string" use="required"/>
+    <xs:complexType name="FileDependencies_t">
+        <xs:sequence>
+            <xs:element name="Dependency"
+                        type="FileDependence_t"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="UnitEdit_t">
         <xs:attribute name="section" type="xs:string" use="required"/>
         <xs:attribute name="key" type="xs:string" use="required"/>
-        <xs:attribute name="value" type="xs:string" use="required"/>
+        <xs:attribute name="value" type="xs:string" use="optional"/>
     </xs:complexType>
 
-    <xs:complexType name="SystemdDependencies_t">
+    <xs:complexType name="Edits_t">
         <xs:sequence>
-            <xs:element name="Properties" type="SystemdDependence_t" maxOccurs="unbounded"/>
+            <xs:element name="Edit"
+                        type="UnitEdit_t"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
         </xs:sequence>
-    </xs:complexType>
-    <xs:complexType name="SystemdActions_t">
-        <xs:sequence>
-            <xs:element name="Properties" type="SystemdAction_t" maxOccurs="unbounded"/>
-        </xs:sequence>
+        <xs:attribute name="editMode" type="UnitEditMode_t" use="required"/>
+        <xs:attribute name="dropInName" type="xs:string" use="optional"/>
+        <xs:attribute name="conflictStrategy" type="ConflictStrategy_t"
+                      use="optional" default="replace"/>
     </xs:complexType>
 
-    <xs:complexType name="SystemdProperties_t">
-        <xs:sequence>
-            <xs:element name="Actions" type="SystemdActions_t"/>
-            <xs:element name="Dependencies" type="SystemdDependencies_t"/>
-        </xs:sequence>
+    <xs:complexType name="BaseUnitProperties_t">
         <xs:attribute name="unit" type="xs:string" use="required"/>
-        <xs:attribute name="state" type="xs:string" use="required"/>
-        <xs:attribute name="disabled" type="xs:unsignedByte" use="optional"/>
+        <xs:attribute name="state" type="UnitState_t" use="required"/>
+
+        <xs:attribute name="now" type="xs:boolean" use="optional" default="false"/>
+
+        <xs:attribute name="applyMode" type="UnitApplyMode_t"
+                      use="optional" default="always"/>
+
+        <xs:attribute name="policyTarget" type="UnitPolicyTarget_t"
+                      use="optional" default="machine"/>
+
+        <xs:attribute name="idempotent" type="xs:boolean"
+                      use="optional" default="true"/>
     </xs:complexType>
 
-    <xs:complexType name="Systemd_t">
-        <xs:sequence>
-            <xs:element name="Properties" type="SystemdProperties_t" maxOccurs="unbounded"/>
-        </xs:sequence>
+    <xs:complexType name="UnitWithEdits_t">
+        <xs:complexContent>
+            <xs:extension base="BaseUnitProperties_t">
+                <xs:sequence>
+                    <xs:element name="Edits"
+                                type="Edits_t"
+                                minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="UnitWithEditsAndFileDeps_t">
+        <xs:complexContent>
+            <xs:extension base="BaseUnitProperties_t">
+                <xs:sequence>
+                    <xs:element name="Edits"
+                                type="Edits_t"
+                                minOccurs="0"/>
+                    <xs:element name="FileDependencies"
+                                type="FileDependencies_t"
+                                minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="BasePolicyItem_t">
         <xs:attribute name="clsid" type="xs:string" use="required"/>
         <xs:attribute name="name" type="xs:string" use="required"/>
         <xs:attribute name="status" type="xs:string" use="optional"/>
@@ -49,13 +142,49 @@
         <xs:attribute name="userContext" type="xs:integer" use="optional"/>
         <xs:attribute name="removePolicy" type="xs:integer" use="optional"/>
     </xs:complexType>
+
+    <xs:complexType name="PolicyWithFileDeps_t">
+        <xs:complexContent>
+            <xs:extension base="BasePolicyItem_t">
+                <xs:sequence>
+                    <xs:element name="Properties"
+                                type="UnitWithEditsAndFileDeps_t"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="PolicyEditsOnly_t">
+        <xs:complexContent>
+            <xs:extension base="BasePolicyItem_t">
+                <xs:sequence>
+                    <xs:element name="Properties"
+                                type="UnitWithEdits_t"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
     <xs:element name="Systemds">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="Systemd" type="Systemd_t" maxOccurs="unbounded"/>
+                <xs:element name="Service" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+                <xs:element name="Socket" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+                <xs:element name="Timer" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+                <xs:element name="Path" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+                <xs:element name="Mount" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+                <xs:element name="Automount" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+                <xs:element name="Swap" type="PolicyWithFileDeps_t" maxOccurs="unbounded"/>
+
+                <xs:element name="Target" type="PolicyEditsOnly_t" maxOccurs="unbounded"/>
+                <xs:element name="Device" type="PolicyEditsOnly_t" maxOccurs="unbounded"/>
+                <xs:element name="Slice" type="PolicyEditsOnly_t" maxOccurs="unbounded"/>
+                <xs:element name="Scope" type="PolicyEditsOnly_t" maxOccurs="unbounded"/>
             </xs:sequence>
+
             <xs:attribute name="clsid" type="xs:string" use="required"/>
             <xs:attribute name="disabled" type="xs:unsignedByte" use="optional"/>
         </xs:complexType>
     </xs:element>
+
 </xs:schema>

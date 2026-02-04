@@ -9,15 +9,16 @@
 
 namespace preferences
 {
+
 class SystemdModelBuilder : public BaseModelBuilder
 {
 public:
     SystemdModelBuilder();
 
-    std::unique_ptr<PreferencesModel> schemaToModel(std::unique_ptr<Systemds> &shortcuts);
-
+    std::unique_ptr<PreferencesModel> schemaToModel(std::unique_ptr<Systemds> &systemds);
     std::unique_ptr<Systemds> modelToSchema(std::unique_ptr<PreferencesModel> &model);
 };
+
 } // namespace preferences
 
 #endif // GPUI_SYSTEMD_MODEL_BUILDER_H

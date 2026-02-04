@@ -1,142 +1,124 @@
 #include "systemditem.h"
-#include "systemdedititem.h"
-#include "systemddependencyitem.h"
 
-namespace preferences 
+#include <mvvm/model/taginfo.h>
+
+namespace preferences
 {
 
 SystemdItem::SystemdItem()
     : ModelView::CompoundItem("SystemdItem")
 {
     addProperty(UNIT, "");
-    addProperty(STATE, 0);
+    addProperty(UNIT_TYPE, static_cast<int>(SystemdUnitType::Service));
+    addProperty(STATE, static_cast<int>(SystemdState::AsIs));
     addProperty(STATE_NOW, false);
+    addProperty(APPLY_MODE, static_cast<int>(SystemdApplyMode::Always));
+    addProperty(POLICY_TARGET, static_cast<int>(SystemdPolicyTarget::Machine));
+    addProperty(IDEMPOTENT, true);
+
     addProperty(EDIT, false);
+    addProperty(EDIT_MODE, static_cast<int>(SystemdEditMode::Override));
+    addProperty(DROP_IN_NAME, "50-gpo.conf");
+    addProperty(CONFLICT_STRATEGY, static_cast<int>(SystemdConflictStrategy::Replace));
+
     addProperty(DEPENDENCY, false);
-    registerTag(ModelView::TagInfo::universalTag(SystemdItem::EDIT_ITEM_TAG), false);
-    registerTag(ModelView::TagInfo::universalTag(SystemdItem::DEPENDENCY_ITEM_TAG), false);
+    addProperty(HAS_DEPENDENCIES, true);
+
+    registerTag(ModelView::TagInfo::universalTag(EDIT_ITEM_TAG), false);
+    registerTag(ModelView::TagInfo::universalTag(DEPENDENCY_ITEM_TAG), false);
 }
 
 SystemdItem::SystemdItem(const SystemdItem &other)
     : ModelView::CompoundItem("SystemdItem")
 {
     addProperty(UNIT, other.property<std::string>(UNIT));
+    addProperty(UNIT_TYPE, other.property<int>(UNIT_TYPE));
     addProperty(STATE, other.property<int>(STATE));
     addProperty(STATE_NOW, other.property<bool>(STATE_NOW));
+    addProperty(APPLY_MODE, other.property<int>(APPLY_MODE));
+    addProperty(POLICY_TARGET, other.property<int>(POLICY_TARGET));
+    addProperty(IDEMPOTENT, other.property<bool>(IDEMPOTENT));
+
     addProperty(EDIT, other.property<bool>(EDIT));
+    addProperty(EDIT_MODE, other.property<int>(EDIT_MODE));
+    addProperty(DROP_IN_NAME, other.property<std::string>(DROP_IN_NAME));
+    addProperty(CONFLICT_STRATEGY, other.property<int>(CONFLICT_STRATEGY));
+
     addProperty(DEPENDENCY, other.property<bool>(DEPENDENCY));
+    addProperty(HAS_DEPENDENCIES, other.property<bool>(HAS_DEPENDENCIES));
+
     registerTag(ModelView::TagInfo::universalTag(EDIT_ITEM_TAG), false);
     registerTag(ModelView::TagInfo::universalTag(DEPENDENCY_ITEM_TAG), false);
 
-    for (auto child : other.items<SystemdEditItem>(EDIT)) 
+    for (const auto child : other.editItems())
     {
-        if (child) 
+        if (child)
         {
-            insertItem(new SystemdEditItem(*child), EDIT);
+            insertItem(new SystemdEditItem(*child), EDIT_ITEM_TAG);
         }
     }
-    for (auto child : other.items<SystemdDependencyItem>(DEPENDENCY))
+
+    for (const auto child : other.depItems())
     {
-        if (child) 
+        if (child)
         {
-            insertItem(new SystemdDependencyItem(*child), DEPENDENCY);
+            insertItem(new SystemdDependencyItem(*child), DEPENDENCY_ITEM_TAG);
         }
     }
 }
 
-/**
- * @brief Get the number of items in the edit section.
- * 
- * @return The number of items in the edit section.
- */
-size_t SystemdItem::editLength() 
+size_t SystemdItem::editLength() const
 {
-    return items(EDIT_ITEM_TAG).size();
+    return editItems().size();
 }
-/**
- * @brief Get the items in the edit section.
- * 
- * @return A vector of items in the edit section.
- */
-std::vector<SystemdEditItem *> SystemdItem::editItems() 
+
+std::vector<SystemdEditItem *> SystemdItem::editItems() const
 {
     return items<SystemdEditItem>(EDIT_ITEM_TAG);
 }
-/**
- * @brief Set the number of items in the edit section.
- *
- * If the current number of items in the edit section is greater than
- * the given size, then items are removed from the end of the edit
- * section. If the current number of items in the edit section is
- * less than the given size, then new items are added to the end of
- * the edit section.
- *
- * @param size The new number of items in the edit section.
- */
+
 void SystemdItem::editLength(size_t size)
 {
-    const auto length = static_cast<ptrdiff_t>(editItems().size());
-    if (length > size)
+    while (editItems().size() > size)
     {
-        for (ptrdiff_t i = length - 1; i >= static_cast<ptrdiff_t>(size); --i)
-        {
-            takeItem({EDIT_ITEM_TAG, static_cast<int>(i)});
-        }
+        auto current = editItems();
+        takeItem({EDIT_ITEM_TAG, static_cast<int>(current.size() - 1)});
     }
-    if (size > length)
+
+    while (editItems().size() < size)
     {
-        for (ptrdiff_t i = length; i < static_cast<ptrdiff_t>(size); ++i)
-        {
-            insertItem(new SystemdEditItem(), EDIT_ITEM_TAG);
-        }
+        insertItem(new SystemdEditItem(), EDIT_ITEM_TAG);
     }
 }
 
-/**
- * @brief Get the number of items in the dependency section.
- * 
- * @return The number of items in the dependency section.
- */
-size_t SystemdItem::depLength()
+size_t SystemdItem::depLength() const
 {
-    return items(DEPENDENCY_ITEM_TAG).size();
+    return depItems().size();
 }
-/**
- * @brief Get the items in the dependency section.
- *
- * @return A vector of items in the dependency section.
- */
-std::vector<SystemdDependencyItem *> SystemdItem::depItems()
+
+std::vector<SystemdDependencyItem *> SystemdItem::depItems() const
 {
     return items<SystemdDependencyItem>(DEPENDENCY_ITEM_TAG);
 }
-/**
- * @brief Set the number of items in the dependency section.
- *
- * If the current number of items in the dependency section is greater
- * than the given size, the excess items are removed. If the given size
- * is greater than the current number of items in the dependency section,
- * new items are inserted.
- *
- * @param size The new number of items in the dependency section.
- */
+
 void SystemdItem::depLength(size_t size)
 {
-    const auto length = depItems().size();
-    if (length > size)
+    while (depItems().size() > size)
     {
-        for (ptrdiff_t i = length - 1; i >= static_cast<ptrdiff_t>(size); --i)
-        {
-            takeItem({DEPENDENCY_ITEM_TAG, static_cast<int>(i)});
-        }
+        auto current = depItems();
+        takeItem({DEPENDENCY_ITEM_TAG, static_cast<int>(current.size() - 1)});
     }
-    if (size > length)
+
+    while (depItems().size() < size)
     {
-        for (ptrdiff_t i = length; i < static_cast<ptrdiff_t>(size); ++i)
-        {
-            insertItem(new SystemdDependencyItem(), DEPENDENCY_ITEM_TAG);
-        }
+        insertItem(new SystemdDependencyItem(), DEPENDENCY_ITEM_TAG);
     }
+}
+
+bool SystemdItem::unitTypeHasFileDependencies(int unitType)
+{
+    return unitType >= static_cast<int>(SystemdUnitType::Service)
+        && unitType <= static_cast<int>(SystemdUnitType::Swap);
 }
 
 } // namespace preferences
