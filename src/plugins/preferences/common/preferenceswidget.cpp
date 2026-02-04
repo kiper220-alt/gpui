@@ -109,14 +109,20 @@ void PreferencesWidget::setupConnections()
                     std::map<std::string, QString> types = item->property<std::map<std::string, QString>>(TYPE);
                     if (types.size() > 0)
                     {
-                        auto modelType = types.begin()->first;
-
                         ui->detailsWidget->onItemTypeChange(types);
-
-                        auto model = m_modelsMap->find(modelType);
+                        auto model = m_modelsMap->end();
+                        for (const auto &type : types)
+                        {
+                            model = m_modelsMap->find(type.first);
+                            if (model != m_modelsMap->end())
+                            {
+                                break;
+                            }
+                        }
 
                         if (model == m_modelsMap->end())
                         {
+                            const auto modelType = types.begin()->first;
                             m_modelsMap->insert(std::pair(modelType, new PreferencesModel()));
                             model = m_modelsMap->find(modelType);
                         }

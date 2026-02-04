@@ -127,7 +127,7 @@ void PreferencesTreeModel::populateModel()
 
     std::map<std::string, QString> deviceTypeIds{{"DeviceContainerItem", QObject::tr("Device")}};
 
-    std::map<std::string, QString> systemdTypeIds{{"SystemdServiceContainerItem", QObject::tr("Service Unit")},
+    std::map<std::string, QString> systemdTypeIds{{"SystemdContainerItem", QObject::tr("Service Unit")},
                                                   {"SystemdSocketContainerItem", QObject::tr("Socket Unit")},
                                                   {"SystemdTimerContainerItem", QObject::tr("Timer Unit")},
                                                   {"SystemdPathContainerItem", QObject::tr("Path Unit")},

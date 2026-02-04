@@ -120,21 +120,36 @@ QVariant PreferencesTreeProxyModel::data(const QModelIndex &proxyIndex, int role
                 if (types.size() > 0)
                 {
                     auto &models = isMachineModel ? d->machineModels : d->userModels;
-
-                    auto modelType = models->find(types.begin()->first);
-                    if (modelType != models->end())
+                    if (!models)
                     {
-                        contentWidget->onItemTypeChange(types);
-                        contentWidget->setModel(modelType->second.get());
-                        QObject::connect(contentWidget,
-                                         &TableDetailsWidget::okPressed,
-                                         d->snapIn,
-                                         &gpui::PreferencesSnapInPrivate::onDataSave);
-                        QObject::connect(contentWidget,
-                                         &TableDetailsWidget::okPressed,
-                                         this,
-                                         &PreferencesTreeProxyModel::savePolicyChanges);
+                        return contentWidget;
                     }
+
+                    auto modelType = models->end();
+                    for (const auto &type : types)
+                    {
+                        modelType = models->find(type.first);
+                        if (modelType != models->end())
+                        {
+                            break;
+                        }
+                    }
+
+                    if (modelType == models->end())
+                    {
+                        return contentWidget;
+                    }
+
+                    contentWidget->onItemTypeChange(types);
+                    contentWidget->setModel(modelType->second.get());
+                    QObject::connect(contentWidget,
+                                     &TableDetailsWidget::okPressed,
+                                     d->snapIn,
+                                     &gpui::PreferencesSnapInPrivate::onDataSave);
+                    QObject::connect(contentWidget,
+                                     &TableDetailsWidget::okPressed,
+                                     this,
+                                     &PreferencesTreeProxyModel::savePolicyChanges);
                 }
             }
             return contentWidget;
