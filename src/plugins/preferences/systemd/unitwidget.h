@@ -6,16 +6,15 @@
 #include <QtWidgets>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class SystemdWidget; }
+namespace Ui
+{
+class SystemdWidget;
+}
 QT_END_NAMESPACE
-
-class QDataWidgetMapper;
 
 namespace ModelView
 {
-    class ViewModel;
-    class ViewModelDelegate;
-    class SessionItem;
+class SessionItem;
 }
 
 namespace preferences
@@ -29,13 +28,11 @@ public:
     Q_OBJECT
 
 public:
-    explicit SystemdWidget(QWidget* parent = nullptr, SystemdItem* item = nullptr);
+    explicit SystemdWidget(QWidget *parent = nullptr, SystemdItem *item = nullptr);
     ~SystemdWidget() override;
 
     void setItem(ModelView::SessionItem *item) override;
-
     bool validate() override;
-
     QString name() const override;
 
 private slots:
@@ -51,29 +48,26 @@ public slots:
     void on_dependRemoveButton_clicked();
 
 private:
-    SystemdWidget(const SystemdWidget&)            = delete;   // copy ctor
-    SystemdWidget(SystemdWidget&&)                 = delete;   // move ctor
-    SystemdWidget& operator=(const SystemdWidget&) = delete;   // copy assignment
-    SystemdWidget& operator=(SystemdWidget&&)      = delete;   // move assignment
+    SystemdWidget(const SystemdWidget &) = delete;
+    SystemdWidget(SystemdWidget &&) = delete;
+    SystemdWidget &operator=(const SystemdWidget &) = delete;
+    SystemdWidget &operator=(SystemdWidget &&) = delete;
 
-private:
     void readEditTable();
     void writeEditTable();
 
     void readDependencyTable();
     void writeDependencyTable();
 
-private:
-    //!< Underlying item of this view.
-    SystemdItem* m_item {nullptr};
+    void updateUiForUnitType();
+    void updateStateControls();
+    void updateEditControls();
+    void updateDependencyControls();
 
-    std::unique_ptr<ModelView::ViewModel> view_model;
-    std::unique_ptr<ModelView::ViewModelDelegate> delegate;
-
-private:
-    Ui::SystemdWidget *ui {nullptr};
+    SystemdItem *m_item{nullptr};
+    Ui::SystemdWidget *ui{nullptr};
 };
 
-}
+} // namespace preferences
 
 #endif // GPUI_SYSTEMD_WIDGET_H

@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SystemdWidget</class>
+ <widget class="QWidget" name="SystemdWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>471</width>
+    <height>471</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Systemd Group Policy</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QGroupBox" name="unitGroupBox">
+     <property name="title">
+
+      <string>Service</string>
+     </property>
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="unitNameLabel">
+        <property name="text">
+         <string>Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="unitNameHBoxLayout">
+        <item>
+         <widget class="QLineEdit" name="unitNameLineEdit">
+          <property name="placeholderText">
+           <string>nginx</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="unitTypeLabel">
+          <property name="text">
+           <string>.service</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="applyModeLabel">
+        <property name="text">
+         <string>Apply mode:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="applyModeComboBox">
+        <item>
+         <property name="text">
+          <string>Always apply</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Apply if unit exists</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Apply if unit missing</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="policyTargetLabel">
+        <property name="text">
+         <string>Apply for:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QComboBox" name="policyTargetComboBox">
+        <item>
+         <property name="text">
+          <string>Machine (system)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>User (--user)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="stateGroupBox">
+     <property name="title">
+      <string>Unit State</string>
+     </property>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QCheckBox" name="changeUnitStateCheckBox">
+        <property name="text">
+         <string>Change state</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="changeUnitStateComboBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <item>
+         <property name="text">
+          <string>Enable</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Disable</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Mask</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Unmask</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Preset</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="nowCheckBox">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Apply immediately (--now)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="policyGroupBox">
+     <property name="title">
+      <string>Unit Configuration (Drop-in)</string>
+     </property>
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QCheckBox" name="editUnitFileCheckBox">
+        <property name="text">
+         <string>Modify configuration</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="editModeHBoxLayout">
+        <item>
+         <widget class="QLabel" name="editModeLabel">
+          <property name="text">
+           <string>Edit mode:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="unitEditModeComboBox">
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>Create</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Override (drop-in)</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Create or Override</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="dropInNameHBoxLayout">
+        <item>
+         <widget class="QLabel" name="dropInLabel">
+          <property name="text">
+           <string>Drop-in name:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="dropInNameLineEdit">
+          <property name="text">
+           <string>50-gpo.conf</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="conflictStrategyHBoxLayout">
+        <item>
+         <widget class="QLabel" name="conflictLabel">
+          <property name="text">
+           <string>Conflict strategy:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="conflictStrategyComboBox">
+          <item>
+           <property name="text">
+            <string>Replace</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Append</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Merge</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Ignore if exists</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="actionsTableWidget">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>220</height>
+         </size>
+        </property>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Section</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Key</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Value</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="policyControlHBoxLayout">
+        <item>
+         <spacer name="policyControlSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearActionsPushButton">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeActionPushButton">
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addActionPushButton">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="dependGroupBox">
+     <property name="title">
+      <string>Restart Triggers (Dependencies)</string>
+     </property>
+     <layout class="QVBoxLayout">
+      <item>
+       <widget class="QTableWidget" name="dependenciesTableWidget">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>220</height>
+         </size>
+        </property>
+        <column>
+         <property name="text">
+          <string>Type</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Path</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="dependControlHBoxLayout">
+        <item>
+         <spacer name="denendSpacerHBoxLayout">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearDependsPushButton">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeDependPushButton">
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="addDependPushButton">
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

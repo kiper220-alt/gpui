@@ -177,7 +177,7 @@ set(HEADERS
     systemd/systemdmodelbuilder.h
     systemd/systemdpreferencereader.h
     systemd/systemdpreferencewriter.h
-    systemd/systemdwidget.h
+    systemd/unitwidget.h
 
     shares/sharesitem.h
     shares/sharespreferencereader.h
@@ -357,8 +357,8 @@ set(SOURCES
     systemd/systemdmodelbuilder.cpp
     systemd/systemdpreferencereader.cpp
     systemd/systemdpreferencewriter.cpp
-    systemd/systemdwidget.cpp
-    systemd/systemdwidgetslots.cpp
+    systemd/unitwidget.cpp
+    systemd/unitwidgetslots.cpp
 
     registry/registrycontaineritem.cpp
     registry/registrypreferencereader.cpp
@@ -465,7 +465,7 @@ set(UI_FORMS
     start_menu/startvistawidget.ui
     start_menu/startwinxpwidget.ui
 
-    systemd/systemdwidget.ui
+    systemd/unitwidget.ui
 
     shares/shareswidget.ui
 

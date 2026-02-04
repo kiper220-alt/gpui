@@ -1,165 +1,251 @@
 #include "systemdcontaineritem.h"
-#include "common/commonitem.h"
-#include "systemditem.h"
-#include "common/defaultactions.h"
 
 #include <mvvm/signals/itemmapper.h>
-#include <iostream>
 
-namespace preferences 
+#include "common/commonitem.h"
+#include "systemditem.h"
+
+namespace
 {
 
-inline std::string stateName(int state) 
+std::string yesNoText(bool value)
 {
-    switch (static_cast<SystemdState>(state))
+    return value ? QObject::tr("Yes").toStdString() : QObject::tr("No").toStdString();
+}
+
+std::string stateToText(int state)
+{
+    switch (static_cast<preferences::SystemdState>(state))
     {
-        case SystemdState::Enable:
-            return "Enable";
-        case SystemdState::Disable:
-            return "Disable";
-        case SystemdState::Mask:
-            return "Mask";
-        case SystemdState::Unmask:
-            return "Unmask";
-        default:
-            return "Nothing";
+    case preferences::SystemdState::Enable:
+        return QObject::tr("Enable").toStdString();
+    case preferences::SystemdState::Disable:
+        return QObject::tr("Disable").toStdString();
+    case preferences::SystemdState::Mask:
+        return QObject::tr("Mask").toStdString();
+    case preferences::SystemdState::Unmask:
+        return QObject::tr("Unmask").toStdString();
+    case preferences::SystemdState::Preset:
+        return QObject::tr("Preset").toStdString();
+    case preferences::SystemdState::AsIs:
+    default:
+        return QObject::tr("As is").toStdString();
     }
-} 
+}
+
+std::string unitTypeToText(int unitType)
+{
+    using preferences::SystemdUnitType;
+
+    switch (static_cast<SystemdUnitType>(unitType))
+    {
+    case SystemdUnitType::Service:
+        return QObject::tr("Service").toStdString();
+    case SystemdUnitType::Socket:
+        return QObject::tr("Socket").toStdString();
+    case SystemdUnitType::Timer:
+        return QObject::tr("Timer").toStdString();
+    case SystemdUnitType::Path:
+        return QObject::tr("Path").toStdString();
+    case SystemdUnitType::Mount:
+        return QObject::tr("Mount").toStdString();
+    case SystemdUnitType::Automount:
+        return QObject::tr("Automount").toStdString();
+    case SystemdUnitType::Swap:
+        return QObject::tr("Swap").toStdString();
+    case SystemdUnitType::Target:
+        return QObject::tr("Target").toStdString();
+    case SystemdUnitType::Device:
+        return QObject::tr("Device").toStdString();
+    case SystemdUnitType::Slice:
+        return QObject::tr("Slice").toStdString();
+    case SystemdUnitType::Scope:
+        return QObject::tr("Scope").toStdString();
+    default:
+        return QObject::tr("Unit").toStdString();
+    }
+}
+
+} // namespace
+
+namespace preferences
+{
 
 SystemdContainerItem::SystemdContainerItem()
-    : ModelView::CompoundItem("SystemdContainerItem")
+    : SystemdContainerItem("SystemdContainerItem", static_cast<int>(SystemdUnitType::Service))
+{}
+
+SystemdContainerItem::SystemdContainerItem(const std::string &typeName, int unitType)
+    : ModelView::CompoundItem(typeName)
 {
-    addProperty(NAME, "")->setDisplayName(
-        QObject::tr("Name").toStdString()
-    )->setEditable(false);
-    addProperty(STATE, "")->setDisplayName(
-        QObject::tr("Change Unit State").toStdString()
-    )->setEditable(false);
-    addProperty(EDIT, QObject::tr("No").toStdString())->setDisplayName(
-        QObject::tr("Edit").toStdString()
-    )->setEditable(false);
-    addProperty(DEPENDENCY, QObject::tr("No").toStdString())->setDisplayName(
-        QObject::tr("Dependencies").toStdString()
-    )->setEditable(false);
+    addProperty(NAME, "")->setDisplayName(QObject::tr("Name").toStdString())->setEditable(false);
+    addProperty(TYPE, unitTypeToText(static_cast<int>(SystemdUnitType::Service)))
+        ->setDisplayName(QObject::tr("Type").toStdString())
+        ->setEditable(false);
+    addProperty(STATE, stateToText(static_cast<int>(SystemdState::AsIs)))
+        ->setDisplayName(QObject::tr("State").toStdString())
+        ->setEditable(false);
+    addProperty(EDIT, QObject::tr("No").toStdString())
+        ->setDisplayName(QObject::tr("Edit").toStdString())
+        ->setEditable(false);
+    addProperty(DEPENDENCY, QObject::tr("No").toStdString())
+        ->setDisplayName(QObject::tr("Dependencies").toStdString())
+        ->setEditable(false);
 
     addProperty<CommonItem>(COMMON)->setVisible(false);
     addProperty<SystemdItem>(SYSTEMD)->setVisible(false);
+
+    auto *systemdItem = getSystemd();
+    systemdItem->setProperty(SystemdItem::UNIT_TYPE, unitType);
+    systemdItem->setProperty(SystemdItem::HAS_DEPENDENCIES, SystemdItem::unitTypeHasFileDependencies(unitType));
 }
-/**
- * Returns the CommonItem of this SystemdContainerItem.
- *
- * This item will be used to represent the unit in the editor.
- *
- * The item will contain the name, order, and action of the unit.
- *
- * @return The CommonItem of this unit.
- */
+
 CommonItem *SystemdContainerItem::getCommon() const
 {
-    return static_cast<CommonItem*>(children()[childrenCount() - 2]);
+    return static_cast<CommonItem *>(children()[childrenCount() - 2]);
 }
-/**
- * Sets the CommonItem of this SystemdContainerItem.
- *
- * @param item The CommonItem to be set.
- *
- * This method sets the CommonItem of this SystemdContainerItem. The CommonItem
- * contains the name, order, and action of the unit.
- *
- * The item will be used to represent the unit in the editor.
- */
+
 void SystemdContainerItem::setCommon(const CommonItem &item)
 {
     setProperty(COMMON, item);
 }
-/**
- * Returns the SystemdItem of this SystemdContainerItem.
- *
- * This item will be used to represent the systemd item in the editor.
- *
- * The item will contain the unit name, state, and edit state of the systemd item.
- *
- * @return The SystemdItem of this systemd item.
- */
-SystemdItem *SystemdContainerItem::getSystemds() const
+
+SystemdItem *SystemdContainerItem::getSystemd() const
 {
-    return static_cast<SystemdItem*>(children().back());
+    return static_cast<SystemdItem *>(children().back());
 }
-/**
- * Sets the SystemdItem of this SystemdContainerItem.
- *
- * @param item The Systemditem to be set.
- *
- * This method sets the Systemditem of this SystemdContainerItem. The Systemditem
- * contains the unit name, state, and edit state of the systemd item.
- *
- * The item will be used to represent the systemd item in the editor.
- */
-void SystemdContainerItem::setSystemds(const SystemdItem &item)
+
+void SystemdContainerItem::setSystemd(const SystemdItem &item)
 {
     setProperty(SYSTEMD, item);
 }
-/**
- * Sets up listeners for the SystemdContainerItem.
- *
- * This method sets up listeners for the CommonItem and SystemdItem of this
- * SystemdContainerItem. The listeners will be called when the CommonItem or
- * SystemdItem changes. The listeners are used to update the display of the
- * systemd item in the editor.
- *
- * This method is called on construction of the SystemdContainerItem.
- */
+
 void SystemdContainerItem::setupListeners()
 {
-    auto onChildPropertyChange = [&](SessionItem *item, std::string property) 
-    {
-        if (auto systemdItem = dynamic_cast<SystemdItem *>(item))
+    auto onChildPropertyChange = [&](SessionItem *item, std::string property) {
+        auto systemdItem = dynamic_cast<SystemdItem *>(item);
+        if (!systemdItem)
         {
-            if (property == SystemdItem::UNIT)
-            {
-                setProperty(NAME, systemdItem->property<std::string>(SystemdItem::UNIT));
-            }
+            return;
+        }
 
-            if (property == SystemdItem::STATE)
-            {
-                setProperty(STATE, stateName(systemdItem->property<int>(SystemdItem::STATE)));
-            }
+        if (property == SystemdItem::UNIT)
+        {
+            setProperty(NAME, systemdItem->property<std::string>(SystemdItem::UNIT));
+        }
 
-            if (property == SystemdItem::EDIT)
-            {
-                setProperty(EDIT, 
-                    systemdItem->property<bool>(SystemdItem::EDIT)?
-                    QObject::tr("Yes").toStdString():
-                    QObject::tr("No").toStdString()
-                );
-            }
+        if (property == SystemdItem::UNIT_TYPE)
+        {
+            setProperty(TYPE, unitTypeToText(systemdItem->property<int>(SystemdItem::UNIT_TYPE)));
+        }
 
-            if (property == SystemdItem::DEPENDENCY)
+        if (property == SystemdItem::STATE)
+        {
+            setProperty(STATE, stateToText(systemdItem->property<int>(SystemdItem::STATE)));
+        }
+
+        if (property == SystemdItem::EDIT)
+        {
+            setProperty(EDIT, yesNoText(systemdItem->property<bool>(SystemdItem::EDIT)));
+        }
+
+        if (property == SystemdItem::DEPENDENCY || property == SystemdItem::HAS_DEPENDENCIES)
+        {
+            if (!systemdItem->property<bool>(SystemdItem::HAS_DEPENDENCIES))
             {
-                setProperty(DEPENDENCY, 
-                    systemdItem->property<bool>(SystemdItem::DEPENDENCY)?
-                    QObject::tr("Yes").toStdString():
-                    QObject::tr("No").toStdString()
-                );
+                setProperty(DEPENDENCY, QObject::tr("N/A").toStdString());
+            }
+            else
+            {
+                setProperty(DEPENDENCY, yesNoText(systemdItem->property<bool>(SystemdItem::DEPENDENCY)));
             }
         }
     };
 
-    this->mapper()->setOnChildPropertyChange(onChildPropertyChange, nullptr);
+    mapper()->setOnChildPropertyChange(onChildPropertyChange, nullptr);
+
+    // Synchronize summary columns for default values too (e.g. Service type).
+    auto *systemdItem = getSystemd();
+    setProperty(NAME, systemdItem->property<std::string>(SystemdItem::UNIT));
+    setProperty(TYPE, unitTypeToText(systemdItem->property<int>(SystemdItem::UNIT_TYPE)));
+    setProperty(STATE, stateToText(systemdItem->property<int>(SystemdItem::STATE)));
+    setProperty(EDIT, yesNoText(systemdItem->property<bool>(SystemdItem::EDIT)));
+
+    if (!systemdItem->property<bool>(SystemdItem::HAS_DEPENDENCIES))
+    {
+        setProperty(DEPENDENCY, QObject::tr("N/A").toStdString());
+    }
+    else
+    {
+        setProperty(DEPENDENCY, yesNoText(systemdItem->property<bool>(SystemdItem::DEPENDENCY)));
+    }
 }
 
-/** 
- * @brief Translates the strings of this SystemdContainerItem.
- *
- * This method translates the action, name, state, and edit state of the SystemdContainerItem.
- *
- * The method is called on construction of the SystemdContainerItem.
- *
- * The translated strings will be used to display the SystemdContainerItem in the editor.
- */ 
 void SystemdContainerItem::retranslateStrings()
 {
-    // TODO: Implement retranslate
+    children()[0]->setDisplayName(QObject::tr("Name").toStdString());
+    children()[1]->setDisplayName(QObject::tr("Type").toStdString());
+    children()[2]->setDisplayName(QObject::tr("State").toStdString());
+    children()[3]->setDisplayName(QObject::tr("Edit").toStdString());
+    children()[4]->setDisplayName(QObject::tr("Dependencies").toStdString());
+
+    auto *systemdItem = getSystemd();
+    setProperty(TYPE, unitTypeToText(systemdItem->property<int>(SystemdItem::UNIT_TYPE)));
+    setProperty(STATE, stateToText(systemdItem->property<int>(SystemdItem::STATE)));
+    setProperty(EDIT, yesNoText(systemdItem->property<bool>(SystemdItem::EDIT)));
+
+    if (!systemdItem->property<bool>(SystemdItem::HAS_DEPENDENCIES))
+    {
+        setProperty(DEPENDENCY, QObject::tr("N/A").toStdString());
+    }
+    else
+    {
+        setProperty(DEPENDENCY, yesNoText(systemdItem->property<bool>(SystemdItem::DEPENDENCY)));
+    }
 }
+
+SystemdServiceContainerItem::SystemdServiceContainerItem()
+    : SystemdContainerItem("SystemdServiceContainerItem", static_cast<int>(SystemdUnitType::Service))
+{}
+
+SystemdSocketContainerItem::SystemdSocketContainerItem()
+    : SystemdContainerItem("SystemdSocketContainerItem", static_cast<int>(SystemdUnitType::Socket))
+{}
+
+SystemdTimerContainerItem::SystemdTimerContainerItem()
+    : SystemdContainerItem("SystemdTimerContainerItem", static_cast<int>(SystemdUnitType::Timer))
+{}
+
+SystemdPathContainerItem::SystemdPathContainerItem()
+    : SystemdContainerItem("SystemdPathContainerItem", static_cast<int>(SystemdUnitType::Path))
+{}
+
+SystemdMountContainerItem::SystemdMountContainerItem()
+    : SystemdContainerItem("SystemdMountContainerItem", static_cast<int>(SystemdUnitType::Mount))
+{}
+
+SystemdAutomountContainerItem::SystemdAutomountContainerItem()
+    : SystemdContainerItem("SystemdAutomountContainerItem", static_cast<int>(SystemdUnitType::Automount))
+{}
+
+SystemdSwapContainerItem::SystemdSwapContainerItem()
+    : SystemdContainerItem("SystemdSwapContainerItem", static_cast<int>(SystemdUnitType::Swap))
+{}
+
+SystemdTargetContainerItem::SystemdTargetContainerItem()
+    : SystemdContainerItem("SystemdTargetContainerItem", static_cast<int>(SystemdUnitType::Target))
+{}
+
+SystemdDeviceContainerItem::SystemdDeviceContainerItem()
+    : SystemdContainerItem("SystemdDeviceContainerItem", static_cast<int>(SystemdUnitType::Device))
+{}
+
+SystemdSliceContainerItem::SystemdSliceContainerItem()
+    : SystemdContainerItem("SystemdSliceContainerItem", static_cast<int>(SystemdUnitType::Slice))
+{}
+
+SystemdScopeContainerItem::SystemdScopeContainerItem()
+    : SystemdContainerItem("SystemdScopeContainerItem", static_cast<int>(SystemdUnitType::Scope))
+{}
 
 } // namespace preferences
