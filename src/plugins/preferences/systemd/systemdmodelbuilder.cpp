@@ -1,6 +1,7 @@
 #include "systemdmodelbuilder.h"
 
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <type_traits>
 
@@ -10,6 +11,8 @@
 
 namespace
 {
+
+const std::string GENERATED_EDITS_HEADER = "# GPUI-GENERATED: edits-from-table";
 
 std::string unitSuffix(preferences::SystemdUnitType type)
 {
@@ -152,25 +155,200 @@ int fromSchemaEditMode(const UnitEditMode_t &mode)
     return static_cast<int>(static_cast<UnitEditMode_t::Value>(mode));
 }
 
-ConflictStrategy_t toSchemaConflictStrategy(int strategy)
+UnitFileMode_t toSchemaUnitFileMode(int mode)
 {
-    switch (static_cast<preferences::SystemdConflictStrategy>(strategy))
+    switch (static_cast<preferences::SystemdUnitFileMode>(mode))
     {
-    case preferences::SystemdConflictStrategy::Append:
-        return ConflictStrategy_t(ConflictStrategy_t::append);
-    case preferences::SystemdConflictStrategy::Merge:
-        return ConflictStrategy_t(ConflictStrategy_t::merge);
-    case preferences::SystemdConflictStrategy::IgnoreIfExists:
-        return ConflictStrategy_t(ConflictStrategy_t::ignore_if_exists);
-    case preferences::SystemdConflictStrategy::Replace:
+    case preferences::SystemdUnitFileMode::Text:
+        return UnitFileMode_t(UnitFileMode_t::text);
+    case preferences::SystemdUnitFileMode::Table:
     default:
-        return ConflictStrategy_t(ConflictStrategy_t::replace);
+        return UnitFileMode_t(UnitFileMode_t::table);
     }
 }
 
-int fromSchemaConflictStrategy(const ConflictStrategy_t &strategy)
+int fromSchemaUnitFileMode(const UnitFileMode_t &mode)
 {
-    return static_cast<int>(static_cast<ConflictStrategy_t::Value>(strategy));
+    return static_cast<int>(static_cast<UnitFileMode_t::Value>(mode));
+}
+
+std::string trim(const std::string &value)
+{
+    const auto begin = value.find_first_not_of(" \t\r\n");
+    if (begin == std::string::npos)
+    {
+        return "";
+    }
+
+    const auto end = value.find_last_not_of(" \t\r\n");
+    return value.substr(begin, end - begin + 1);
+}
+
+std::string buildGeneratedUnitFile(const std::vector<preferences::SystemdEditItem *> &editItems)
+{
+    struct EditLine
+    {
+        std::string section;
+        std::string key;
+        std::string value;
+        preferences::SystemdConflictStrategy strategy;
+        size_t sourceIndex;
+    };
+
+    std::ostringstream fileText;
+    fileText << GENERATED_EDITS_HEADER << "\n";
+
+    std::vector<EditLine> lines;
+    lines.reserve(editItems.size());
+
+    for (size_t i = 0; i < editItems.size(); ++i)
+    {
+        const auto *editItem = editItems.at(i);
+        const auto section = trim(editItem->property<std::string>(preferences::SystemdEditItem::SECTION));
+        const auto key = trim(editItem->property<std::string>(preferences::SystemdEditItem::KEY));
+        if (section.empty() || key.empty())
+        {
+            continue;
+        }
+
+        const auto value = editItem->property<std::string>(preferences::SystemdEditItem::VALUE);
+        const auto strategy = static_cast<preferences::SystemdConflictStrategy>(
+            editItem->property<int>(preferences::SystemdEditItem::STRATEGY));
+        lines.push_back(EditLine{section, key, value, strategy, i});
+    }
+
+    std::sort(lines.begin(), lines.end(), [](const EditLine &lhs, const EditLine &rhs) {
+        if (lhs.section != rhs.section)
+        {
+            return lhs.section < rhs.section;
+        }
+        if (lhs.key != rhs.key)
+        {
+            return lhs.key < rhs.key;
+        }
+        return lhs.sourceIndex < rhs.sourceIndex;
+    });
+
+    std::string currentSection;
+    bool firstSection = true;
+    for (const auto &line : lines)
+    {
+        if (line.section != currentSection)
+        {
+            currentSection = line.section;
+            if (!firstSection)
+            {
+                fileText << "\n";
+            }
+            fileText << "[" << currentSection << "]\n";
+            firstSection = false;
+        }
+
+        switch (line.strategy)
+        {
+        case preferences::SystemdConflictStrategy::ReplaceValue:
+            fileText << line.key << "=\n";
+            if (!line.value.empty())
+            {
+                fileText << line.key << "=" << line.value << "\n";
+            }
+            break;
+        case preferences::SystemdConflictStrategy::ResetKey:
+            fileText << line.key << "=\n";
+            break;
+        case preferences::SystemdConflictStrategy::AddValue:
+        default:
+            fileText << line.key << "=" << line.value << "\n";
+            break;
+        }
+    }
+
+    return fileText.str();
+}
+
+void appendParsedEdits(preferences::SystemdItem *item, const std::string &unitFileText)
+{
+    struct ParsedLine
+    {
+        std::string section;
+        std::string key;
+        std::string value;
+    };
+
+    std::istringstream stream(unitFileText);
+    std::string currentSection;
+    std::vector<ParsedLine> parsedLines;
+
+    std::string line;
+    while (std::getline(stream, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+        {
+            line.pop_back();
+        }
+
+        const auto normalizedLine = trim(line);
+        if (normalizedLine.empty() || normalizedLine.rfind("#", 0) == 0 || normalizedLine.rfind(";", 0) == 0)
+        {
+            continue;
+        }
+
+        if (normalizedLine.front() == '[' && normalizedLine.back() == ']')
+        {
+            currentSection = trim(normalizedLine.substr(1, normalizedLine.size() - 2));
+            continue;
+        }
+
+        const auto equalsPos = normalizedLine.find('=');
+        if (equalsPos == std::string::npos || currentSection.empty())
+        {
+            continue;
+        }
+
+        ParsedLine parsed;
+        parsed.section = currentSection;
+        parsed.key = trim(normalizedLine.substr(0, equalsPos));
+        parsed.value = normalizedLine.substr(equalsPos + 1);
+        if (!parsed.key.empty())
+        {
+            parsedLines.push_back(parsed);
+        }
+    }
+
+    for (size_t i = 0; i < parsedLines.size();)
+    {
+        const auto &current = parsedLines.at(i);
+        auto *editItem = item->insertItem<preferences::SystemdEditItem>(preferences::SystemdItem::EDIT_ITEM_TAG);
+        editItem->setProperty(preferences::SystemdEditItem::SECTION, current.section);
+        editItem->setProperty(preferences::SystemdEditItem::KEY, current.key);
+
+        if (current.value.empty())
+        {
+            const bool hasReplaceSecondLine = (i + 1) < parsedLines.size()
+                && parsedLines.at(i + 1).section == current.section
+                && parsedLines.at(i + 1).key == current.key;
+
+            if (hasReplaceSecondLine)
+            {
+                editItem->setProperty(preferences::SystemdEditItem::VALUE, parsedLines.at(i + 1).value);
+                editItem->setProperty(preferences::SystemdEditItem::STRATEGY,
+                                      static_cast<int>(preferences::SystemdConflictStrategy::ReplaceValue));
+                i += 2;
+                continue;
+            }
+
+            editItem->setProperty(preferences::SystemdEditItem::VALUE, std::string());
+            editItem->setProperty(preferences::SystemdEditItem::STRATEGY,
+                                  static_cast<int>(preferences::SystemdConflictStrategy::ResetKey));
+            ++i;
+            continue;
+        }
+
+        editItem->setProperty(preferences::SystemdEditItem::VALUE, current.value);
+        editItem->setProperty(preferences::SystemdEditItem::STRATEGY,
+                              static_cast<int>(preferences::SystemdConflictStrategy::AddValue));
+        ++i;
+    }
 }
 
 FileDependencyMode_t toSchemaDependencyMode(int mode)
@@ -200,35 +378,30 @@ void fillModelFromUnitProperties(preferences::SystemdItem *item,
     item->setProperty(preferences::SystemdItem::STATE_NOW, static_cast<bool>(properties.now()));
     item->setProperty(preferences::SystemdItem::APPLY_MODE, fromSchemaApplyMode(properties.applyMode()));
     item->setProperty(preferences::SystemdItem::POLICY_TARGET, fromSchemaPolicyTarget(properties.policyTarget()));
-    item->setProperty(preferences::SystemdItem::IDEMPOTENT, static_cast<bool>(properties.idempotent()));
+    item->setProperty(preferences::SystemdItem::EDIT_MODE, fromSchemaEditMode(properties.editMode()));
+    item->setProperty(preferences::SystemdItem::DROP_IN_NAME, properties.dropInName().present()
+                                                            ? properties.dropInName().get().c_str()
+                                                            : std::string());
 }
 
 template<typename PropertiesType>
 void fillModelEdits(preferences::SystemdItem *item, const PropertiesType &properties)
 {
-    if (!properties.Edits().present())
+    if (!properties.UnitFile().present())
     {
         item->setProperty(preferences::SystemdItem::EDIT, false);
+        item->setProperty(preferences::SystemdItem::UNIT_FILE_TEXT, std::string());
+        item->setProperty(preferences::SystemdItem::UNIT_FILE_MODE,
+                          static_cast<int>(preferences::SystemdUnitFileMode::Table));
         return;
     }
 
-    const auto &edits = properties.Edits().get();
-
     item->setProperty(preferences::SystemdItem::EDIT, true);
-    item->setProperty(preferences::SystemdItem::EDIT_MODE, fromSchemaEditMode(edits.editMode()));
-    item->setProperty(preferences::SystemdItem::DROP_IN_NAME, edits.dropInName().present()
-                                                            ? edits.dropInName().get().c_str()
-                                                            : std::string());
-    item->setProperty(preferences::SystemdItem::CONFLICT_STRATEGY, fromSchemaConflictStrategy(edits.conflictStrategy()));
-
-    for (const auto &editSchema : edits.Edit())
-    {
-        auto *editItem = item->insertItem<preferences::SystemdEditItem>(preferences::SystemdItem::EDIT_ITEM_TAG);
-        editItem->setProperty(preferences::SystemdEditItem::SECTION, editSchema.section().c_str());
-        editItem->setProperty(preferences::SystemdEditItem::KEY, editSchema.key().c_str());
-        editItem->setProperty(preferences::SystemdEditItem::VALUE,
-                              editSchema.value().present() ? editSchema.value().get().c_str() : std::string());
-    }
+    const auto &unitFile = properties.UnitFile().get();
+    item->setProperty(preferences::SystemdItem::UNIT_FILE_MODE, fromSchemaUnitFileMode(unitFile.mode()));
+    item->setProperty(preferences::SystemdItem::UNIT_FILE_TEXT, static_cast<std::string>(unitFile));
+    item->editLength(0);
+    appendParsedEdits(item, static_cast<std::string>(unitFile));
 }
 
 void fillModelDependencies(preferences::SystemdItem *item, const UnitWithEditsAndFileDeps_t &properties)
@@ -283,41 +456,16 @@ void appendPoliciesToModel(const xsd::cxx::tree::sequence<PolicyType> &policies,
     }
 }
 
-Edits_t createSchemaEdits(const preferences::SystemdItem *systemdItem)
+UnitFile_t createSchemaUnitFile(const preferences::SystemdItem *systemdItem)
 {
-    Edits_t edits(toSchemaEditMode(systemdItem->property<int>(preferences::SystemdItem::EDIT_MODE)));
-
-    const auto dropInName = systemdItem->property<std::string>(preferences::SystemdItem::DROP_IN_NAME);
-    if (!dropInName.empty())
-    {
-        edits.dropInName(dropInName);
-    }
-
-    edits.conflictStrategy(
-        toSchemaConflictStrategy(systemdItem->property<int>(preferences::SystemdItem::CONFLICT_STRATEGY))
-    );
-
-    for (const auto *editItem : systemdItem->editItems())
-    {
-        const auto section = editItem->property<std::string>(preferences::SystemdEditItem::SECTION);
-        const auto key = editItem->property<std::string>(preferences::SystemdEditItem::KEY);
-        if (section.empty() || key.empty())
-        {
-            continue;
-        }
-
-        UnitEdit_t edit(section, key);
-
-        const auto value = editItem->property<std::string>(preferences::SystemdEditItem::VALUE);
-        if (!value.empty())
-        {
-            edit.value(value);
-        }
-
-        edits.Edit().push_back(edit);
-    }
-
-    return edits;
+    const auto mode = static_cast<preferences::SystemdUnitFileMode>(
+        systemdItem->property<int>(preferences::SystemdItem::UNIT_FILE_MODE));
+    const auto unitFileText = mode == preferences::SystemdUnitFileMode::Text
+                            ? systemdItem->property<std::string>(preferences::SystemdItem::UNIT_FILE_TEXT)
+                            : buildGeneratedUnitFile(systemdItem->editItems());
+    UnitFile_t unitFile(unitFileText);
+    unitFile.mode(toSchemaUnitFileMode(static_cast<int>(mode)));
+    return unitFile;
 }
 
 FileDependencies_t createSchemaDependencies(const preferences::SystemdItem *systemdItem)
@@ -349,11 +497,16 @@ UnitWithEdits_t createEditsOnlyProperties(const preferences::SystemdItem *system
     properties.now(systemdItem->property<bool>(preferences::SystemdItem::STATE_NOW));
     properties.applyMode(toSchemaApplyMode(systemdItem->property<int>(preferences::SystemdItem::APPLY_MODE)));
     properties.policyTarget(toSchemaPolicyTarget(systemdItem->property<int>(preferences::SystemdItem::POLICY_TARGET)));
-    properties.idempotent(systemdItem->property<bool>(preferences::SystemdItem::IDEMPOTENT));
+    properties.editMode(toSchemaEditMode(systemdItem->property<int>(preferences::SystemdItem::EDIT_MODE)));
+    const auto dropInName = systemdItem->property<std::string>(preferences::SystemdItem::DROP_IN_NAME);
+    if (!dropInName.empty())
+    {
+        properties.dropInName(dropInName);
+    }
 
     if (systemdItem->property<bool>(preferences::SystemdItem::EDIT))
     {
-        properties.Edits(createSchemaEdits(systemdItem));
+        properties.UnitFile(createSchemaUnitFile(systemdItem));
     }
 
     return properties;
@@ -366,11 +519,16 @@ UnitWithEditsAndFileDeps_t createFileDepsProperties(const preferences::SystemdIt
     properties.now(systemdItem->property<bool>(preferences::SystemdItem::STATE_NOW));
     properties.applyMode(toSchemaApplyMode(systemdItem->property<int>(preferences::SystemdItem::APPLY_MODE)));
     properties.policyTarget(toSchemaPolicyTarget(systemdItem->property<int>(preferences::SystemdItem::POLICY_TARGET)));
-    properties.idempotent(systemdItem->property<bool>(preferences::SystemdItem::IDEMPOTENT));
+    properties.editMode(toSchemaEditMode(systemdItem->property<int>(preferences::SystemdItem::EDIT_MODE)));
+    const auto dropInName = systemdItem->property<std::string>(preferences::SystemdItem::DROP_IN_NAME);
+    if (!dropInName.empty())
+    {
+        properties.dropInName(dropInName);
+    }
 
     if (systemdItem->property<bool>(preferences::SystemdItem::EDIT))
     {
-        properties.Edits(createSchemaEdits(systemdItem));
+        properties.UnitFile(createSchemaUnitFile(systemdItem));
     }
 
     if (systemdItem->property<bool>(preferences::SystemdItem::DEPENDENCY))

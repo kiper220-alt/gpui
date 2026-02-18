@@ -47,6 +47,12 @@ enum class SystemdPolicyTarget
     User,
 };
 
+enum class SystemdUnitFileMode
+{
+    Table = 0,
+    Text,
+};
+
 enum class SystemdEditMode
 {
     Create = 0,
@@ -56,10 +62,9 @@ enum class SystemdEditMode
 
 enum class SystemdConflictStrategy
 {
-    Replace = 0,
-    Append,
-    Merge,
-    IgnoreIfExists,
+    ReplaceValue = 0,
+    AddValue,
+    ResetKey,
 };
 
 class SystemdItem : public ModelView::CompoundItem
@@ -71,12 +76,12 @@ public:
     static inline const std::string STATE_NOW = "state_now";
     static inline const std::string APPLY_MODE = "apply_mode";
     static inline const std::string POLICY_TARGET = "policy_target";
-    static inline const std::string IDEMPOTENT = "idempotent";
 
     static inline const std::string EDIT = "edit";
     static inline const std::string EDIT_MODE = "edit_mode";
     static inline const std::string DROP_IN_NAME = "drop_in_name";
-    static inline const std::string CONFLICT_STRATEGY = "conflict_strategy";
+    static inline const std::string UNIT_FILE_MODE = "unit_file_mode";
+    static inline const std::string UNIT_FILE_TEXT = "unit_file_text";
 
     static inline const std::string DEPENDENCY = "dependency";
     static inline const std::string HAS_DEPENDENCIES = "has_dependencies";

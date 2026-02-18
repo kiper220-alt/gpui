@@ -14,12 +14,12 @@ SystemdItem::SystemdItem()
     addProperty(STATE_NOW, false);
     addProperty(APPLY_MODE, static_cast<int>(SystemdApplyMode::Always));
     addProperty(POLICY_TARGET, static_cast<int>(SystemdPolicyTarget::Machine));
-    addProperty(IDEMPOTENT, true);
 
     addProperty(EDIT, false);
     addProperty(EDIT_MODE, static_cast<int>(SystemdEditMode::Override));
     addProperty(DROP_IN_NAME, "50-gpo.conf");
-    addProperty(CONFLICT_STRATEGY, static_cast<int>(SystemdConflictStrategy::Replace));
+    addProperty(UNIT_FILE_MODE, static_cast<int>(SystemdUnitFileMode::Table));
+    addProperty(UNIT_FILE_TEXT, "");
 
     addProperty(DEPENDENCY, false);
     addProperty(HAS_DEPENDENCIES, true);
@@ -37,12 +37,12 @@ SystemdItem::SystemdItem(const SystemdItem &other)
     addProperty(STATE_NOW, other.property<bool>(STATE_NOW));
     addProperty(APPLY_MODE, other.property<int>(APPLY_MODE));
     addProperty(POLICY_TARGET, other.property<int>(POLICY_TARGET));
-    addProperty(IDEMPOTENT, other.property<bool>(IDEMPOTENT));
 
     addProperty(EDIT, other.property<bool>(EDIT));
     addProperty(EDIT_MODE, other.property<int>(EDIT_MODE));
     addProperty(DROP_IN_NAME, other.property<std::string>(DROP_IN_NAME));
-    addProperty(CONFLICT_STRATEGY, other.property<int>(CONFLICT_STRATEGY));
+    addProperty(UNIT_FILE_MODE, other.property<int>(UNIT_FILE_MODE));
+    addProperty(UNIT_FILE_TEXT, other.property<std::string>(UNIT_FILE_TEXT));
 
     addProperty(DEPENDENCY, other.property<bool>(DEPENDENCY));
     addProperty(HAS_DEPENDENCIES, other.property<bool>(HAS_DEPENDENCIES));

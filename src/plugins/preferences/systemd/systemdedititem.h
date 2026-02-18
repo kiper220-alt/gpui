@@ -12,6 +12,7 @@ public:
     static inline const std::string SECTION = "section";
     static inline const std::string KEY = "key";
     static inline const std::string VALUE = "value";
+    static inline const std::string STRATEGY = "strategy";
 
     SystemdEditItem();
     SystemdEditItem(const SystemdEditItem &other);

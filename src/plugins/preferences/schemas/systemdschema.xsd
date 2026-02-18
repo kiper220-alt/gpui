@@ -38,12 +38,10 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="ConflictStrategy_t">
+    <xs:simpleType name="UnitFileMode_t">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="replace"/>
-            <xs:enumeration value="append"/>
-            <xs:enumeration value="merge"/>
-            <xs:enumeration value="ignore_if_exists"/>
+            <xs:enumeration value="table"/>
+            <xs:enumeration value="text"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -68,23 +66,12 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="UnitEdit_t">
-        <xs:attribute name="section" type="xs:string" use="required"/>
-        <xs:attribute name="key" type="xs:string" use="required"/>
-        <xs:attribute name="value" type="xs:string" use="optional"/>
-    </xs:complexType>
-
-    <xs:complexType name="Edits_t">
-        <xs:sequence>
-            <xs:element name="Edit"
-                        type="UnitEdit_t"
-                        minOccurs="0"
-                        maxOccurs="unbounded"/>
-        </xs:sequence>
-        <xs:attribute name="editMode" type="UnitEditMode_t" use="required"/>
-        <xs:attribute name="dropInName" type="xs:string" use="optional"/>
-        <xs:attribute name="conflictStrategy" type="ConflictStrategy_t"
-                      use="optional" default="replace"/>
+    <xs:complexType name="UnitFile_t">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="mode" type="UnitFileMode_t" use="optional" default="table"/>
+            </xs:extension>
+        </xs:simpleContent>
     </xs:complexType>
 
     <xs:complexType name="BaseUnitProperties_t">
@@ -99,16 +86,16 @@
         <xs:attribute name="policyTarget" type="UnitPolicyTarget_t"
                       use="optional" default="machine"/>
 
-        <xs:attribute name="idempotent" type="xs:boolean"
-                      use="optional" default="true"/>
+        <xs:attribute name="editMode" type="UnitEditMode_t" use="optional" default="override"/>
+        <xs:attribute name="dropInName" type="xs:string" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="UnitWithEdits_t">
         <xs:complexContent>
             <xs:extension base="BaseUnitProperties_t">
                 <xs:sequence>
-                    <xs:element name="Edits"
-                                type="Edits_t"
+                    <xs:element name="UnitFile"
+                                type="UnitFile_t"
                                 minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
@@ -119,8 +106,8 @@
         <xs:complexContent>
             <xs:extension base="BaseUnitProperties_t">
                 <xs:sequence>
-                    <xs:element name="Edits"
-                                type="Edits_t"
+                    <xs:element name="UnitFile"
+                                type="UnitFile_t"
                                 minOccurs="0"/>
                     <xs:element name="FileDependencies"
                                 type="FileDependencies_t"
