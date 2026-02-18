@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SystemdWidget</class>
+ <widget class="QWidget" name="SystemdWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>620</width>
+    <height>638</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Systemd Group Policy</string>
+  </property>
+  <layout class="QVBoxLayout" name="mainLayout">
+   <item>
+    <widget class="QTabWidget" name="mainTabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="generalTab">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="generalTabLayout">
+       <item>
+        <widget class="QGroupBox" name="unitGroupBox">
+         <property name="title">
+          <string>Service</string>
+         </property>
+         <layout class="QGridLayout" name="unitGridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="unitNameLabel">
+            <property name="text">
+             <string>Name *:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="unitNameHBoxLayout">
+            <item>
+             <widget class="QLineEdit" name="unitNameLineEdit"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="unitTypeLabel">
+              <property name="text">
+               <string>.service</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="applyModeLabel">
+            <property name="text">
+             <string>Apply mode:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="applyModeComboBox">
+            <item>
+             <property name="text">
+              <string>Always apply</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Apply if unit exists</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Apply if unit missing</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="policyTargetLabel">
+            <property name="text">
+             <string>Apply for:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="policyTargetComboBox">
+            <item>
+             <property name="text">
+              <string>Machines</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Users (--global)</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="policyTargetHintLabel">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="stateGroupBox">
+         <property name="title">
+          <string>Unit State</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="1">
+           <widget class="QComboBox" name="changeUnitStateComboBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <item>
+             <property name="text">
+              <string>Enable</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Disable</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Mask</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Unmask</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Preset</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="nowCheckBox">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Apply immediately (--now)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="changeUnitStateCheckBox">
+            <property name="text">
+             <string>Change state</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="generalBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="configTab">
+      <attribute name="title">
+       <string>Configuration</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="configTabLayout">
+       <item>
+        <widget class="QGroupBox" name="policyGroupBox">
+         <property name="title">
+          <string>Unit Configuration (Drop-in)</string>
+         </property>
+         <layout class="QVBoxLayout" name="policyGroupLayout">
+          <item>
+           <widget class="QCheckBox" name="editUnitFileCheckBox">
+            <property name="text">
+             <string>Modify configuration</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="editModeHBoxLayout">
+            <item>
+             <widget class="QLabel" name="editModeLabel">
+              <property name="text">
+               <string>Edit mode:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="unitEditModeComboBox">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Create</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Override (drop-in)</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Create or Override</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="editModeHintLabel">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="dropInNameHBoxLayout">
+            <item>
+             <widget class="QLabel" name="dropInLabel">
+              <property name="text">
+               <string>Drop-in name:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="dropInNameLineEdit">
+              <property name="text">
+               <string>50-gpo.conf</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="actionsTableWidget">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>140</height>
+             </size>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <column>
+             <property name="text">
+              <string>Strategy</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Section *</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Key *</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Value *</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="unitFileTextEdit">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>180</height>
+             </size>
+            </property>
+            <property name="lineWrapMode">
+             <enum>QPlainTextEdit::NoWrap</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="policyControlHBoxLayout">
+            <item>
+             <spacer name="policyControlSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="actionMoveUpButton">
+              <property name="toolTip">
+               <string>Move selected rows up</string>
+              </property>
+              <property name="text">
+               <string>↑</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="actionMoveDownButton">
+              <property name="toolTip">
+               <string>Move selected rows down</string>
+              </property>
+              <property name="text">
+               <string>↓</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clearActionsPushButton">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="removeActionPushButton">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="addActionPushButton">
+              <property name="text">
+               <string>Add</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="switchEditorModeHBoxLayout">
+            <item>
+             <spacer name="switchEditorModeSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="switchEditorModePushButton">
+              <property name="text">
+               <string>Switch to text mode</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="depsTab">
+      <attribute name="title">
+       <string>Dependencies</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="depsTabLayout">
+       <item>
+        <widget class="QGroupBox" name="dependGroupBox">
+         <property name="title">
+          <string>Restart Triggers (Dependencies)</string>
+         </property>
+         <layout class="QVBoxLayout" name="dependGroupLayout">
+          <item>
+           <widget class="QTableWidget" name="dependenciesTableWidget">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>140</height>
+             </size>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <column>
+             <property name="text">
+              <string>Type</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Path</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="dependControlHBoxLayout">
+            <item>
+             <spacer name="denendSpacerHBoxLayout">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="dependMoveUpButton">
+              <property name="toolTip">
+               <string>Move selected rows up</string>
+              </property>
+              <property name="text">
+               <string>↑</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="dependMoveDownButton">
+              <property name="toolTip">
+               <string>Move selected rows down</string>
+              </property>
+              <property name="text">
+               <string>↓</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clearDependsPushButton">
+              <property name="text">
+               <string>Clear</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="removeDependPushButton">
+              <property name="text">
+               <string>Remove</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="addDependPushButton">
+              <property name="text">
+               <string>Add</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="depsBottomSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

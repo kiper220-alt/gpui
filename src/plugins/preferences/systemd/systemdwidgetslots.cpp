@@ -1,8 +1,8 @@
-#include "unitwidget.h"
+#include "systemdwidget.h"
 
 #include <algorithm>
 
-#include "ui_unitwidget.h"
+#include "ui_systemdwidget.h"
 
 #include "systemditem.h"
 
@@ -43,9 +43,25 @@ void SystemdWidget::submit()
     m_item->setProperty(SystemdItem::EDIT, ui->editUnitFileCheckBox->isChecked());
     m_item->setProperty(SystemdItem::EDIT_MODE, ui->unitEditModeComboBox->currentIndex());
     m_item->setProperty(SystemdItem::DROP_IN_NAME, ui->dropInNameLineEdit->text().toStdString());
-    m_item->setProperty(SystemdItem::CONFLICT_STRATEGY, ui->conflictStrategyComboBox->currentIndex());
-
-    writeEditTable();
+    if (ui->editUnitFileCheckBox->isChecked())
+    {
+        if (m_textEditorMode)
+        {
+            m_item->setProperty(SystemdItem::UNIT_FILE_MODE, static_cast<int>(SystemdUnitFileMode::Text));
+            m_item->setProperty(SystemdItem::UNIT_FILE_TEXT, ui->unitFileTextEdit->toPlainText().toStdString());
+        }
+        else
+        {
+            m_item->setProperty(SystemdItem::UNIT_FILE_MODE, static_cast<int>(SystemdUnitFileMode::Table));
+            writeEditTable();
+            m_item->setProperty(SystemdItem::UNIT_FILE_TEXT, buildUnitFileTextFromTable(true).toStdString());
+        }
+    }
+    else
+    {
+        m_item->setProperty(SystemdItem::UNIT_FILE_MODE, static_cast<int>(SystemdUnitFileMode::Table));
+        m_item->setProperty(SystemdItem::UNIT_FILE_TEXT, std::string());
+    }
 
     if (m_item->property<bool>(SystemdItem::HAS_DEPENDENCIES))
     {
@@ -61,10 +77,12 @@ void SystemdWidget::submit()
     emit dataChanged();
 }
 
-void SystemdWidget::on_actionAddButton_clicked() const
+void SystemdWidget::on_actionAddButton_clicked()
 {
     const int rows = ui->actionsTableWidget->rowCount();
     ui->actionsTableWidget->insertRow(rows);
+    attachStrategyComboBox(rows);
+    applyStrategyStateToRow(rows);
 }
 
 void SystemdWidget::on_actionsClearButton_clicked()
@@ -77,7 +95,7 @@ void SystemdWidget::on_actionRemoveButton_clicked()
     auto *table = ui->actionsTableWidget;
 
     QSet<int> rows;
-    for (const auto &index : table->selectionModel()->selectedRows())
+    for (const auto &index : table->selectionModel()->selectedIndexes())
     {
         rows.insert(index.row());
     }
@@ -108,7 +126,7 @@ void SystemdWidget::on_dependRemoveButton_clicked()
     auto *table = ui->dependenciesTableWidget;
 
     QSet<int> rows;
-    for (const auto &index : table->selectionModel()->selectedRows())
+    for (const auto &index : table->selectionModel()->selectedIndexes())
     {
         rows.insert(index.row());
     }

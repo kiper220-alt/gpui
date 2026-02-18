@@ -21,6 +21,7 @@ namespace preferences
 {
 
 class SystemdItem;
+enum class SystemdEditMode;
 
 class SystemdWidget : public BasePreferenceWidget
 {
@@ -37,9 +38,14 @@ public:
 
 private slots:
     void submit() override;
+    void on_switchEditorModePushButton_clicked();
+    void on_actionMoveUpButton_clicked();
+    void on_actionMoveDownButton_clicked();
+    void on_dependMoveUpButton_clicked();
+    void on_dependMoveDownButton_clicked();
 
 public slots:
-    void on_actionAddButton_clicked() const;
+    void on_actionAddButton_clicked();
     void on_actionsClearButton_clicked();
     void on_actionRemoveButton_clicked();
 
@@ -60,12 +66,25 @@ private:
     void writeDependencyTable();
 
     void updateUiForUnitType();
+    void updatePolicyTargetControls();
     void updateStateControls();
     void updateEditControls();
     void updateDependencyControls();
+    void updateEditModeAvailability();
+    void updateEditorModeUi();
+    void attachStrategyComboBox(int row);
+    void applyStrategyStateToRow(int row) const;
+    QString buildUnitFileTextFromTable(bool with_header) const;
+    void fillTableFromUnitFileText(const QString &unitFileText);
+    bool validateTableMode(QString &errorText) const;
+    bool isUserPolicyContext() const;
+    QList<int> allowedEditModesForApplyMode() const;
+    void ensureValidEditModeSelection();
+    QString editModeHintForCurrentSelection() const;
 
     SystemdItem *m_item{nullptr};
     Ui::SystemdWidget *ui{nullptr};
+    bool m_textEditorMode{false};
 };
 
 } // namespace preferences
