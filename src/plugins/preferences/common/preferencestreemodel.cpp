@@ -127,17 +127,17 @@ void PreferencesTreeModel::populateModel()
 
     std::map<std::string, QString> deviceTypeIds{{"DeviceContainerItem", QObject::tr("Device")}};
 
-    std::map<std::string, QString> systemdTypeIds{{"SystemdContainerItem", QObject::tr("Service Unit")},
-                                                  {"SystemdSocketContainerItem", QObject::tr("Socket Unit")},
-                                                  {"SystemdTimerContainerItem", QObject::tr("Timer Unit")},
-                                                  {"SystemdPathContainerItem", QObject::tr("Path Unit")},
-                                                  {"SystemdMountContainerItem", QObject::tr("Mount Unit")},
-                                                  {"SystemdAutomountContainerItem", QObject::tr("Automount Unit")},
-                                                  {"SystemdSwapContainerItem", QObject::tr("Swap Unit")},
-                                                  {"SystemdTargetContainerItem", QObject::tr("Target Unit")},
-                                                  {"SystemdDeviceContainerItem", QObject::tr("Device Unit")},
-                                                  {"SystemdSliceContainerItem", QObject::tr("Slice Unit")},
-                                                  {"SystemdScopeContainerItem", QObject::tr("Scope Unit")}};
+    std::map<std::string, QString> systemdTypeIds{{"SystemdAutomountContainerItem", QObject::tr(".automount")},
+                                                  {"SystemdDeviceContainerItem", QObject::tr(".device")},
+                                                  {"SystemdMountContainerItem", QObject::tr(".mount")},
+                                                  {"SystemdPathContainerItem", QObject::tr(".path")},
+                                                  {"SystemdScopeContainerItem", QObject::tr(".scope")},
+                                                  {"SystemdContainerItem", QObject::tr(".service")},
+                                                  {"SystemdSliceContainerItem", QObject::tr(".slice")},
+                                                  {"SystemdSocketContainerItem", QObject::tr(".socket")},
+                                                  {"SystemdSwapContainerItem", QObject::tr(".swap")},
+                                                  {"SystemdTargetContainerItem", QObject::tr(".target")},
+                                                  {"SystemdTimerContainerItem", QObject::tr(".timer")}};
 
 
     std::map<std::string, QString> localGroupTypeIds{{typeid(LocalGroupContainerItem<LocalGroupItem>).name(),

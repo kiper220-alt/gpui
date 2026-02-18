@@ -33,6 +33,9 @@
 #include <mvvm/viewmodel/viewitem.h>
 #include <mvvm/viewmodel/viewmodeldelegate.h>
 
+#include <algorithm>
+#include <vector>
+
 #include <QDebug>
 
 namespace preferences
@@ -129,7 +132,12 @@ void TableDetailsWidget::on_treeView_customContextMenuRequested(const QPoint &po
     };
     connect(helpAction, &QAction::triggered, show_help);
 
-    for (const auto &itemType : itemTypes)
+    std::vector<std::pair<std::string, QString>> sortedTypes(itemTypes.begin(), itemTypes.end());
+    std::sort(sortedTypes.begin(),
+              sortedTypes.end(),
+              [](const auto &lhs, const auto &rhs) { return lhs.second.localeAwareCompare(rhs.second) < 0; });
+
+    for (const auto &itemType : sortedTypes)
     {
         auto addItemAction = newMenuItem->addAction(itemType.second);
         auto add_item      = [this, itemType]() {

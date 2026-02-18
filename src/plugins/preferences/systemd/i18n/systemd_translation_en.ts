@@ -8,8 +8,24 @@
         <translation>Systemd Group Policy</translation>
     </message>
     <message>
+        <source>General</source>
+        <translation>General</translation>
+    </message>
+    <message>
+        <source>Configuration</source>
+        <translation>Configuration</translation>
+    </message>
+    <message>
+        <source>Dependencies</source>
+        <translation>Dependencies</translation>
+    </message>
+    <message>
         <source>Name:</source>
         <translation>Name:</translation>
+    </message>
+    <message>
+        <source>Name *:</source>
+        <translation>Name *:</translation>
     </message>
     <message>
         <source>Apply mode:</source>
@@ -32,12 +48,16 @@
         <translation>Apply for:</translation>
     </message>
     <message>
-        <source>Machine (system)</source>
-        <translation>Machine (system)</translation>
+        <source>Machines</source>
+        <translation>Machines</translation>
     </message>
     <message>
-        <source>User (--user)</source>
-        <translation>User (--user)</translation>
+        <source>Users (--global)</source>
+        <translation>Users (--global)</translation>
+    </message>
+    <message>
+        <source>Applies to user units.</source>
+        <translation>Applies to user units.</translation>
     </message>
     <message>
         <source>Unit State</source>
@@ -100,36 +120,52 @@
         <translation>Drop-in name:</translation>
     </message>
     <message>
-        <source>Conflict strategy:</source>
-        <translation>Conflict strategy:</translation>
-    </message>
-    <message>
-        <source>Replace</source>
-        <translation>Replace</translation>
-    </message>
-    <message>
-        <source>Append</source>
-        <translation>Append</translation>
-    </message>
-    <message>
-        <source>Merge</source>
-        <translation>Merge</translation>
-    </message>
-    <message>
-        <source>Ignore if exists</source>
-        <translation>Ignore if exists</translation>
-    </message>
-    <message>
         <source>Section</source>
         <translation>Section</translation>
+    </message>
+    <message>
+        <source>Section *</source>
+        <translation>Section *</translation>
     </message>
     <message>
         <source>Key</source>
         <translation>Key</translation>
     </message>
     <message>
+        <source>Key *</source>
+        <translation>Key *</translation>
+    </message>
+    <message>
         <source>Value</source>
         <translation>Value</translation>
+    </message>
+    <message>
+        <source>Value *</source>
+        <translation>Value *</translation>
+    </message>
+    <message>
+        <source>Strategy</source>
+        <translation>Strategy</translation>
+    </message>
+    <message>
+        <source>Replace value</source>
+        <translation>Replace value</translation>
+    </message>
+    <message>
+        <source>Add value</source>
+        <translation>Add value</translation>
+    </message>
+    <message>
+        <source>Reset key</source>
+        <translation>Reset key</translation>
+    </message>
+    <message>
+        <source>Unit will be overridden using a drop-in.</source>
+        <translation>Unit will be overridden using a drop-in.</translation>
+    </message>
+    <message>
+        <source>Unit will be created.</source>
+        <translation>Unit will be created.</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -163,52 +199,100 @@
         <source>Unit name is required.</source>
         <translation>Unit name is required.</translation>
     </message>
+    <message>
+        <source>Switch to text mode</source>
+        <translation>Switch to text mode</translation>
+    </message>
+    <message>
+        <source>Switch to table mode</source>
+        <translation>Switch to table mode</translation>
+    </message>
+    <message>
+        <source>Move selected rows up</source>
+        <translation>Move selected rows up</translation>
+    </message>
+    <message>
+        <source>Move selected rows down</source>
+        <translation>Move selected rows down</translation>
+    </message>
+    <message>
+        <source>Row %1: Section is required.</source>
+        <translation>Row %1: Section is required.</translation>
+    </message>
+    <message>
+        <source>Row %1: Key is required.</source>
+        <translation>Row %1: Key is required.</translation>
+    </message>
+    <message>
+        <source>Row %1: Value is required for add/replace strategy.</source>
+        <translation>Row %1: Value is required for add/replace strategy.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': replace strategy can be used only once.</source>
+        <translation>Section [%1], key '%2': replace strategy can be used only once.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': reset strategy can be used only once.</source>
+        <translation>Section [%1], key '%2': reset strategy can be used only once.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': reset and replace cannot be combined.</source>
+        <translation>Section [%1], key '%2': reset and replace cannot be combined.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': reset and add cannot be combined.</source>
+        <translation>Section [%1], key '%2': reset and add cannot be combined.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': add rows cannot be placed before replace.</source>
+        <translation>Section [%1], key '%2': add rows cannot be placed before replace.</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Service Unit</source>
-        <translation>Service Unit</translation>
+        <source>.service</source>
+        <translation>.service</translation>
     </message>
     <message>
-        <source>Socket Unit</source>
-        <translation>Socket Unit</translation>
+        <source>.socket</source>
+        <translation>.socket</translation>
     </message>
     <message>
-        <source>Timer Unit</source>
-        <translation>Timer Unit</translation>
+        <source>.timer</source>
+        <translation>.timer</translation>
     </message>
     <message>
-        <source>Path Unit</source>
-        <translation>Path Unit</translation>
+        <source>.path</source>
+        <translation>.path</translation>
     </message>
     <message>
-        <source>Mount Unit</source>
-        <translation>Mount Unit</translation>
+        <source>.mount</source>
+        <translation>.mount</translation>
     </message>
     <message>
-        <source>Automount Unit</source>
-        <translation>Automount Unit</translation>
+        <source>.automount</source>
+        <translation>.automount</translation>
     </message>
     <message>
-        <source>Swap Unit</source>
-        <translation>Swap Unit</translation>
+        <source>.swap</source>
+        <translation>.swap</translation>
     </message>
     <message>
-        <source>Target Unit</source>
-        <translation>Target Unit</translation>
+        <source>.target</source>
+        <translation>.target</translation>
     </message>
     <message>
-        <source>Device Unit</source>
-        <translation>Device Unit</translation>
+        <source>.device</source>
+        <translation>.device</translation>
     </message>
     <message>
-        <source>Slice Unit</source>
-        <translation>Slice Unit</translation>
+        <source>.slice</source>
+        <translation>.slice</translation>
     </message>
     <message>
-        <source>Scope Unit</source>
-        <translation>Scope Unit</translation>
+        <source>.scope</source>
+        <translation>.scope</translation>
     </message>
     <message>
         <source>Systemd units settings.</source>

@@ -8,8 +8,24 @@
         <translation>Политика Systemd</translation>
     </message>
     <message>
+        <source>General</source>
+        <translation>Общее</translation>
+    </message>
+    <message>
+        <source>Configuration</source>
+        <translation>Конфигурация</translation>
+    </message>
+    <message>
+        <source>Dependencies</source>
+        <translation>Зависимости</translation>
+    </message>
+    <message>
         <source>Name:</source>
         <translation>Имя:</translation>
+    </message>
+    <message>
+        <source>Name *:</source>
+        <translation>Имя *:</translation>
     </message>
     <message>
         <source>Apply mode:</source>
@@ -32,12 +48,16 @@
         <translation>Применять для:</translation>
     </message>
     <message>
-        <source>Machine (system)</source>
-        <translation>Машины (system)</translation>
+        <source>Machines</source>
+        <translation>Машины</translation>
     </message>
     <message>
-        <source>User (--user)</source>
-        <translation>Пользователя (--user)</translation>
+        <source>Users (--global)</source>
+        <translation>Пользователи (--global)</translation>
+    </message>
+    <message>
+        <source>Applies to user units.</source>
+        <translation>Применяется для юнитов пользователей.</translation>
     </message>
     <message>
         <source>Unit State</source>
@@ -100,36 +120,52 @@
         <translation>Имя drop-in:</translation>
     </message>
     <message>
-        <source>Conflict strategy:</source>
-        <translation>Стратегия конфликта:</translation>
-    </message>
-    <message>
-        <source>Replace</source>
-        <translation>Заменить</translation>
-    </message>
-    <message>
-        <source>Append</source>
-        <translation>Добавить</translation>
-    </message>
-    <message>
-        <source>Merge</source>
-        <translation>Объединить</translation>
-    </message>
-    <message>
-        <source>Ignore if exists</source>
-        <translation>Игнорировать, если уже есть</translation>
-    </message>
-    <message>
         <source>Section</source>
         <translation>Секция</translation>
+    </message>
+    <message>
+        <source>Section *</source>
+        <translation>Секция *</translation>
     </message>
     <message>
         <source>Key</source>
         <translation>Ключ</translation>
     </message>
     <message>
+        <source>Key *</source>
+        <translation>Ключ *</translation>
+    </message>
+    <message>
         <source>Value</source>
         <translation>Значение</translation>
+    </message>
+    <message>
+        <source>Value *</source>
+        <translation>Значение *</translation>
+    </message>
+    <message>
+        <source>Strategy</source>
+        <translation>Стратегия</translation>
+    </message>
+    <message>
+        <source>Replace value</source>
+        <translation>Заменить значение</translation>
+    </message>
+    <message>
+        <source>Add value</source>
+        <translation>Добавить значение</translation>
+    </message>
+    <message>
+        <source>Reset key</source>
+        <translation>Сбросить ключ</translation>
+    </message>
+    <message>
+        <source>Unit will be overridden using a drop-in.</source>
+        <translation>Юнит будет переопределён через drop-in.</translation>
+    </message>
+    <message>
+        <source>Unit will be created.</source>
+        <translation>Юнит будет создан.</translation>
     </message>
     <message>
         <source>Clear</source>
@@ -163,52 +199,100 @@
         <source>Unit name is required.</source>
         <translation>Нужно указать имя юнита.</translation>
     </message>
+    <message>
+        <source>Switch to text mode</source>
+        <translation>Переключить в текстовый режим</translation>
+    </message>
+    <message>
+        <source>Switch to table mode</source>
+        <translation>Переключить в табличный режим</translation>
+    </message>
+    <message>
+        <source>Move selected rows up</source>
+        <translation>Переместить выделенные строки вверх</translation>
+    </message>
+    <message>
+        <source>Move selected rows down</source>
+        <translation>Переместить выделенные строки вниз</translation>
+    </message>
+    <message>
+        <source>Row %1: Section is required.</source>
+        <translation>Строка %1: секция обязательна.</translation>
+    </message>
+    <message>
+        <source>Row %1: Key is required.</source>
+        <translation>Строка %1: ключ обязателен.</translation>
+    </message>
+    <message>
+        <source>Row %1: Value is required for add/replace strategy.</source>
+        <translation>Строка %1: значение обязательно для добавления или замены.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': replace strategy can be used only once.</source>
+        <translation>Секция [%1], ключ '%2': стратегия замены может использоваться только один раз.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': reset strategy can be used only once.</source>
+        <translation>Секция [%1], ключ '%2': стратегия сброса может использоваться только один раз.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': reset and replace cannot be combined.</source>
+        <translation>Секция [%1], ключ '%2': сброс и замена не могут использоваться одновременно.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': reset and add cannot be combined.</source>
+        <translation>Секция [%1], ключ '%2': сброс и добавление не могут использоваться одновременно.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': add rows cannot be placed before replace.</source>
+        <translation>Секция [%1], ключ '%2': строки добавления нельзя размещать перед заменой.</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Service Unit</source>
-        <translation>Юнит service</translation>
+        <source>.service</source>
+        <translation>.service</translation>
     </message>
     <message>
-        <source>Socket Unit</source>
-        <translation>Юнит socket</translation>
+        <source>.socket</source>
+        <translation>.socket</translation>
     </message>
     <message>
-        <source>Timer Unit</source>
-        <translation>Юнит timer</translation>
+        <source>.timer</source>
+        <translation>.timer</translation>
     </message>
     <message>
-        <source>Path Unit</source>
-        <translation>Юнит path</translation>
+        <source>.path</source>
+        <translation>.path</translation>
     </message>
     <message>
-        <source>Mount Unit</source>
-        <translation>Юнит mount</translation>
+        <source>.mount</source>
+        <translation>.mount</translation>
     </message>
     <message>
-        <source>Automount Unit</source>
-        <translation>Юнит automount</translation>
+        <source>.automount</source>
+        <translation>.automount</translation>
     </message>
     <message>
-        <source>Swap Unit</source>
-        <translation>Юнит swap</translation>
+        <source>.swap</source>
+        <translation>.swap</translation>
     </message>
     <message>
-        <source>Target Unit</source>
-        <translation>Юнит target</translation>
+        <source>.target</source>
+        <translation>.target</translation>
     </message>
     <message>
-        <source>Device Unit</source>
-        <translation>Юнит device</translation>
+        <source>.device</source>
+        <translation>.device</translation>
     </message>
     <message>
-        <source>Slice Unit</source>
-        <translation>Юнит slice</translation>
+        <source>.slice</source>
+        <translation>.slice</translation>
     </message>
     <message>
-        <source>Scope Unit</source>
-        <translation>Юнит scope</translation>
+        <source>.scope</source>
+        <translation>.scope</translation>
     </message>
     <message>
         <source>Systemd units settings.</source>
