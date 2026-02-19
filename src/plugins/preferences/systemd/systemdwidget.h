@@ -22,6 +22,8 @@ namespace preferences
 
 class SystemdItem;
 enum class SystemdEditMode;
+enum class SystemdConflictStrategy;
+enum class SystemdUnitType;
 
 class SystemdWidget : public BasePreferenceWidget
 {
@@ -72,7 +74,9 @@ private:
     void updateDependencyControls();
     void updateEditModeAvailability();
     void updateEditorModeUi();
+    void updateActionColumnsMinimumWidths();
     void attachStrategyComboBox(int row);
+    void attachDependencyTypeComboBox(int row, int typeIndex = 0);
     void applyStrategyStateToRow(int row) const;
     QString buildUnitFileTextFromTable(bool with_header) const;
     void fillTableFromUnitFileText(const QString &unitFileText);
@@ -81,6 +85,34 @@ private:
     QList<int> allowedEditModesForApplyMode() const;
     void ensureValidEditModeSelection();
     QString editModeHintForCurrentSelection() const;
+    SystemdUnitType currentUnitType() const;
+    SystemdEditMode currentEditMode() const;
+    bool mandatoryRulesActive() const;
+    void ensureActionRowItems(int row);
+    int appendActionRow(const QString &section,
+                        const QString &key,
+                        const QString &value,
+                        SystemdConflictStrategy strategy,
+                        bool scaffold = false,
+                        bool strictMandatory = false,
+                        const QString &groupId = QString());
+    void setActionRowMetadata(int row, bool scaffold, bool strictMandatory, const QString &groupId);
+    bool isScaffoldRow(int row) const;
+    bool isStrictMandatoryRow(int row) const;
+    QString scaffoldGroupId(int row) const;
+    QString sectionTextAtRow(int row) const;
+    QString keyTextAtRow(int row) const;
+    QString valueTextAtRow(int row) const;
+    QStringList oneOfGroupKeys(const QString &groupId) const;
+    QStringList keySuggestionsForRow(int row) const;
+    bool normalizeKeyForRow(int row, const QString &candidateKey, QString &normalizedKey) const;
+    void ensureScaffoldRows();
+    void refreshStrategyForAllRows();
+    bool canRemoveActionRows(const QSet<int> &rowsToRemove, QString &errorText) const;
+    bool isTruthySystemdValue(const QString &value) const;
+    void applyActionTableDelegates();
+    void moveActionRows(bool moveUp);
+    void moveDependencyRows(bool moveUp);
 
     SystemdItem *m_item{nullptr};
     Ui::SystemdWidget *ui{nullptr};

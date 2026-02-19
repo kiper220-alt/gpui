@@ -175,6 +175,7 @@ set(HEADERS
     systemd/systemdedititem.h
     systemd/systemditem.h
     systemd/systemdmodelbuilder.h
+    systemd/systemdmancatalog.h
     systemd/systemdpreferencereader.h
     systemd/systemdpreferencewriter.h
     systemd/systemdunitsyntaxhighlighter.h
@@ -356,6 +357,7 @@ set(SOURCES
     systemd/systemdedititem.cpp
     systemd/systemditem.cpp
     systemd/systemdmodelbuilder.cpp
+    systemd/systemdmancatalog.cpp
     systemd/systemdpreferencereader.cpp
     systemd/systemdpreferencewriter.cpp
     systemd/systemdunitsyntaxhighlighter.cpp

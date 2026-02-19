@@ -4,20 +4,8 @@
 
 #include "ui_systemdwidget.h"
 
+#include "systemdmancatalog.h"
 #include "systemditem.h"
-
-namespace
-{
-
-QWidget *createDependenceComboBox(QWidget *parent)
-{
-    auto *comboBox = new QComboBox(parent);
-    comboBox->addItem(QObject::tr("Changed"));
-    comboBox->addItem(QObject::tr("Presence Changed"));
-    return comboBox;
-}
-
-} // namespace
 
 namespace preferences
 {
@@ -79,15 +67,20 @@ void SystemdWidget::submit()
 
 void SystemdWidget::on_actionAddButton_clicked()
 {
-    const int rows = ui->actionsTableWidget->rowCount();
-    ui->actionsTableWidget->insertRow(rows);
-    attachStrategyComboBox(rows);
-    applyStrategyStateToRow(rows);
+    const auto defaultSectionKey = SystemdManCatalog::defaultSectionKey(currentUnitType());
+    appendActionRow(defaultSectionKey.first,
+                    defaultSectionKey.second,
+                    QString(),
+                    SystemdConflictStrategy::ReplaceValue,
+                    false,
+                    false,
+                    QString());
 }
 
 void SystemdWidget::on_actionsClearButton_clicked()
 {
     ui->actionsTableWidget->setRowCount(0);
+    ensureScaffoldRows();
 }
 
 void SystemdWidget::on_actionRemoveButton_clicked()
@@ -103,17 +96,28 @@ void SystemdWidget::on_actionRemoveButton_clicked()
     QList<int> rowsList = rows.values();
     std::sort(rowsList.begin(), rowsList.end(), std::greater<>());
 
+    QString removeError;
+    if (!canRemoveActionRows(rows, removeError))
+    {
+        QMessageBox::warning(this,
+                             QCoreApplication::translate("SystemdWidget", "Validation error"),
+                             removeError);
+        return;
+    }
+
     for (const int row : rowsList)
     {
         table->removeRow(row);
     }
+
+    ensureScaffoldRows();
 }
 
 void SystemdWidget::on_dependAddButton_clicked()
 {
     const int rows = ui->dependenciesTableWidget->rowCount();
     ui->dependenciesTableWidget->insertRow(rows);
-    ui->dependenciesTableWidget->setCellWidget(rows, 0, createDependenceComboBox(ui->dependenciesTableWidget));
+    attachDependencyTypeComboBox(rows);
 }
 
 void SystemdWidget::on_dependsClearButton_clicked()

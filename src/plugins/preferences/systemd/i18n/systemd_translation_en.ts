@@ -228,6 +228,18 @@
         <translation>Row %1: Value is required for add/replace strategy.</translation>
     </message>
     <message>
+        <source>Row %1: Mandatory key group metadata is invalid.</source>
+        <translation>Row %1: Mandatory key group metadata is invalid.</translation>
+    </message>
+    <message>
+        <source>Row %1: Section must be [%2] for mandatory key group.</source>
+        <translation>Row %1: Section must be [%2] for mandatory key group.</translation>
+    </message>
+    <message>
+        <source>Row %1: Key '%2' is not allowed for mandatory key group. Allowed keys: %3.</source>
+        <translation>Row %1: Key '%2' is not allowed for mandatory key group. Allowed keys: %3.</translation>
+    </message>
+    <message>
         <source>Section [%1], key '%2': replace strategy can be used only once.</source>
         <translation>Section [%1], key '%2': replace strategy can be used only once.</translation>
     </message>
@@ -246,6 +258,30 @@
     <message>
         <source>Section [%1], key '%2': add rows cannot be placed before replace.</source>
         <translation>Section [%1], key '%2': add rows cannot be placed before replace.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': value is required.</source>
+        <translation>Section [%1], key '%2': value is required.</translation>
+    </message>
+    <message>
+        <source>Section [%1]: at least one of keys is required: %2.</source>
+        <translation>Section [%1]: at least one of keys is required: %2.</translation>
+    </message>
+    <message>
+        <source>Section [Service]: RemainAfterExit must be true when using ExecStop without ExecStart.</source>
+        <translation>Section [Service]: RemainAfterExit must be true when using ExecStop without ExecStart.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2' is mandatory and cannot be removed.</source>
+        <translation>Section [%1], key '%2' is mandatory and cannot be removed.</translation>
+    </message>
+    <message>
+        <source>Scaffold rows cannot be removed. Use add/replace for value.</source>
+        <translation>Scaffold rows cannot be removed. Use add/replace for value.</translation>
+    </message>
+    <message>
+        <source>Section [%1]: at least one key from mandatory group must remain.</source>
+        <translation>Section [%1]: at least one key from mandatory group must remain.</translation>
     </message>
 </context>
 <context>

@@ -228,6 +228,18 @@
         <translation>Строка %1: значение обязательно для добавления или замены.</translation>
     </message>
     <message>
+        <source>Row %1: Mandatory key group metadata is invalid.</source>
+        <translation>Строка %1: метаданные обязательной группы ключей некорректны.</translation>
+    </message>
+    <message>
+        <source>Row %1: Section must be [%2] for mandatory key group.</source>
+        <translation>Строка %1: для обязательной группы ключей секция должна быть [%2].</translation>
+    </message>
+    <message>
+        <source>Row %1: Key '%2' is not allowed for mandatory key group. Allowed keys: %3.</source>
+        <translation>Строка %1: ключ '%2' недопустим для обязательной группы. Разрешённые ключи: %3.</translation>
+    </message>
+    <message>
         <source>Section [%1], key '%2': replace strategy can be used only once.</source>
         <translation>Секция [%1], ключ '%2': стратегия замены может использоваться только один раз.</translation>
     </message>
@@ -246,6 +258,30 @@
     <message>
         <source>Section [%1], key '%2': add rows cannot be placed before replace.</source>
         <translation>Секция [%1], ключ '%2': строки добавления нельзя размещать перед заменой.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2': value is required.</source>
+        <translation>Секция [%1], ключ '%2': значение обязательно.</translation>
+    </message>
+    <message>
+        <source>Section [%1]: at least one of keys is required: %2.</source>
+        <translation>Секция [%1]: нужно заполнить хотя бы один из ключей: %2.</translation>
+    </message>
+    <message>
+        <source>Section [Service]: RemainAfterExit must be true when using ExecStop without ExecStart.</source>
+        <translation>Секция [Service]: RemainAfterExit должен быть true при использовании ExecStop без ExecStart.</translation>
+    </message>
+    <message>
+        <source>Section [%1], key '%2' is mandatory and cannot be removed.</source>
+        <translation>Секция [%1], ключ '%2' обязательный и не может быть удалён.</translation>
+    </message>
+    <message>
+        <source>Scaffold rows cannot be removed. Use add/replace for value.</source>
+        <translation>Каркасные строки нельзя удалять. Используйте добавление или замену значения.</translation>
+    </message>
+    <message>
+        <source>Section [%1]: at least one key from mandatory group must remain.</source>
+        <translation>Секция [%1]: должен остаться хотя бы один ключ из обязательной группы.</translation>
     </message>
 </context>
 <context>

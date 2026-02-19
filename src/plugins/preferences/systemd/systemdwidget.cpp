@@ -3,11 +3,15 @@
 #include "ui_systemdwidget.h"
 
 #include <algorithm>
+#include <functional>
+#include <optional>
 #include <sstream>
+#include <utility>
 #include <vector>
 #include <QRegularExpression>
 
 #include "common/commonitem.h"
+#include "systemdmancatalog.h"
 #include "systemditem.h"
 #include "systemdunitsyntaxhighlighter.h"
 
@@ -15,6 +19,9 @@ namespace
 {
 
 const char *GENERATED_EDITS_HEADER = "# GPUI-GENERATED: edits-from-table";
+constexpr int EDIT_ROLE_SCAFFOLD = Qt::UserRole + 1;
+constexpr int EDIT_ROLE_STRICT_MANDATORY = Qt::UserRole + 2;
+constexpr int EDIT_ROLE_MANDATORY_GROUP = Qt::UserRole + 3;
 
 QString unitTypeLabel(preferences::SystemdUnitType type)
 {
@@ -82,12 +89,15 @@ QString unitTypeSuffix(preferences::SystemdUnitType type)
     }
 }
 
-QComboBox *createStrategyComboBox(QWidget *parent)
+QComboBox *createStrategyComboBox(QWidget *parent, bool allowReset)
 {
     auto *comboBox = new QComboBox(parent);
     comboBox->addItem(QCoreApplication::translate("SystemdWidget", "Replace value"));
     comboBox->addItem(QCoreApplication::translate("SystemdWidget", "Add value"));
-    comboBox->addItem(QCoreApplication::translate("SystemdWidget", "Reset key"));
+    if (allowReset)
+    {
+        comboBox->addItem(QCoreApplication::translate("SystemdWidget", "Reset key"));
+    }
     return comboBox;
 }
 
@@ -95,6 +105,95 @@ QString makeEditKey(const QString &section, const QString &key)
 {
     return section + QLatin1Char('\n') + key;
 }
+
+bool equalsInsensitive(const QString &lhs, const QString &rhs)
+{
+    return QString::compare(lhs.trimmed(), rhs.trimmed(), Qt::CaseInsensitive) == 0;
+}
+
+class ActionAutocompleteDelegate : public QStyledItemDelegate
+{
+public:
+    using Provider = std::function<QStringList(int)>;
+    using Normalizer = std::function<std::optional<QString>(int, const QString &)>;
+
+    explicit ActionAutocompleteDelegate(Provider provider, Normalizer normalizer = Normalizer(), QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+        , m_provider(std::move(provider))
+        , m_normalizer(std::move(normalizer))
+    {}
+
+    QWidget *createEditor(QWidget *parent,
+                          const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const override
+    {
+        Q_UNUSED(option)
+        auto *combo = new QComboBox(parent);
+        combo->setEditable(true);
+        combo->setInsertPolicy(QComboBox::NoInsert);
+        combo->addItems(m_provider ? m_provider(index.row()) : QStringList());
+        combo->setMaxVisibleItems(20);
+
+        if (auto *completer = combo->completer())
+        {
+            completer->setCaseSensitivity(Qt::CaseInsensitive);
+            completer->setFilterMode(Qt::MatchContains);
+            completer->setCompletionMode(QCompleter::PopupCompletion);
+        }
+
+        const QFontMetrics fm(combo->font());
+        int popupWidth = 0;
+        for (int i = 0; i < combo->count(); ++i)
+        {
+            popupWidth = std::max(popupWidth, fm.horizontalAdvance(combo->itemText(i)));
+        }
+        popupWidth += combo->style()->pixelMetric(QStyle::PM_ScrollBarExtent)
+                    + combo->style()->pixelMetric(QStyle::PM_FocusFrameHMargin) * 4;
+        if (auto *view = combo->view())
+        {
+            view->setMinimumWidth(std::max(view->minimumWidth(), popupWidth));
+        }
+
+        return combo;
+    }
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override
+    {
+        auto *combo = qobject_cast<QComboBox *>(editor);
+        if (!combo)
+        {
+            return;
+        }
+
+        const QString value = index.data(Qt::EditRole).toString();
+        combo->setEditText(value);
+    }
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
+    {
+        auto *combo = qobject_cast<QComboBox *>(editor);
+        if (!combo)
+        {
+            return;
+        }
+
+        QString value = combo->currentText().trimmed();
+        if (m_normalizer)
+        {
+            const auto normalized = m_normalizer(index.row(), value);
+            if (!normalized.has_value())
+            {
+                return;
+            }
+            value = normalized.value();
+        }
+        model->setData(index, value, Qt::EditRole);
+    }
+
+private:
+    Provider m_provider;
+    Normalizer m_normalizer;
+};
 
 QString stripInlineComment(const QString &value)
 {
@@ -168,42 +267,6 @@ QList<int> selectedRows(QTableWidget *table)
     return rows;
 }
 
-void swapRows(QTableWidget *table, int firstRow, int secondRow)
-{
-    if (!table || firstRow == secondRow || firstRow < 0 || secondRow < 0
-        || firstRow >= table->rowCount() || secondRow >= table->rowCount())
-    {
-        return;
-    }
-
-    for (int col = 0; col < table->columnCount(); ++col)
-    {
-        auto *firstItem = table->takeItem(firstRow, col);
-        auto *secondItem = table->takeItem(secondRow, col);
-        table->setItem(firstRow, col, secondItem);
-        table->setItem(secondRow, col, firstItem);
-
-        QWidget *firstWidget = table->cellWidget(firstRow, col);
-        QWidget *secondWidget = table->cellWidget(secondRow, col);
-        if (firstWidget)
-        {
-            table->removeCellWidget(firstRow, col);
-        }
-        if (secondWidget)
-        {
-            table->removeCellWidget(secondRow, col);
-        }
-        if (firstWidget)
-        {
-            table->setCellWidget(secondRow, col, firstWidget);
-        }
-        if (secondWidget)
-        {
-            table->setCellWidget(firstRow, col, secondWidget);
-        }
-    }
-}
-
 void selectRows(QTableWidget *table, const QList<int> &rows)
 {
     if (!table || !table->selectionModel())
@@ -212,40 +275,43 @@ void selectRows(QTableWidget *table, const QList<int> &rows)
     }
 
     table->clearSelection();
-    bool firstSelected = false;
     for (const int row : rows)
     {
         if (row >= 0 && row < table->rowCount())
         {
             const auto index = table->model()->index(row, 0);
             table->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
-            if (!firstSelected)
+        }
+    }
+}
+
+void closePersistentEditors(QTableWidget *table)
+{
+    if (!table)
+    {
+        return;
+    }
+
+    for (int row = 0; row < table->rowCount(); ++row)
+    {
+        for (int col = 0; col < table->columnCount(); ++col)
+        {
+            if (auto *item = table->item(row, col))
             {
-                table->setCurrentIndex(index);
-                firstSelected = true;
+                table->closePersistentEditor(item);
             }
         }
     }
 }
 
-void moveSelectedRows(QTableWidget *table, bool moveUp)
+QSet<int> moveRowIndexes(const QList<int> &rows, int rowCount, bool moveUp, const std::function<void(int, int)> &swapper)
 {
-    if (!table || table->rowCount() < 2)
-    {
-        return;
-    }
-
-    QList<int> rows = selectedRows(table);
-    if (rows.isEmpty())
-    {
-        return;
-    }
-
     QSet<int> selectedSet;
     for (const int row : rows)
     {
         selectedSet.insert(row);
     }
+
     if (moveUp)
     {
         for (const int row : rows)
@@ -255,7 +321,7 @@ void moveSelectedRows(QTableWidget *table, bool moveUp)
                 continue;
             }
 
-            swapRows(table, row, row - 1);
+            swapper(row, row - 1);
             selectedSet.remove(row);
             selectedSet.insert(row - 1);
         }
@@ -265,20 +331,18 @@ void moveSelectedRows(QTableWidget *table, bool moveUp)
         for (int i = rows.size() - 1; i >= 0; --i)
         {
             const int row = rows.at(i);
-            if (row == table->rowCount() - 1 || selectedSet.contains(row + 1))
+            if (row == rowCount - 1 || selectedSet.contains(row + 1))
             {
                 continue;
             }
 
-            swapRows(table, row, row + 1);
+            swapper(row, row + 1);
             selectedSet.remove(row);
             selectedSet.insert(row + 1);
         }
     }
 
-    rows = selectedSet.values();
-    std::sort(rows.begin(), rows.end());
-    selectRows(table, rows);
+    return selectedSet;
 }
 
 } // namespace
@@ -293,12 +357,13 @@ SystemdWidget::SystemdWidget(QWidget *parent, SystemdItem *item)
 {
     ui->setupUi(this);
     ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
+    ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
     ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     ui->dependenciesTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->dependenciesTableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     (void)new SystemdUnitSyntaxHighlighter(ui->unitFileTextEdit->document());
+    applyActionTableDelegates();
 
     connect(ui->addActionPushButton, SIGNAL(clicked()), this, SLOT(on_actionAddButton_clicked()));
     connect(ui->clearActionsPushButton, SIGNAL(clicked()), this, SLOT(on_actionsClearButton_clicked()));
@@ -379,26 +444,13 @@ void SystemdWidget::readEditTable()
 
     for (const auto *edit : m_item->editItems())
     {
-        const int row = ui->actionsTableWidget->rowCount();
-        ui->actionsTableWidget->insertRow(row);
-        ui->actionsTableWidget->setItem(
-            row,
-            1,
-            new QTableWidgetItem(QString::fromStdString(edit->property<std::string>(SystemdEditItem::SECTION))));
-        ui->actionsTableWidget->setItem(
-            row,
-            2,
-            new QTableWidgetItem(QString::fromStdString(edit->property<std::string>(SystemdEditItem::KEY))));
-        ui->actionsTableWidget->setItem(
-            row,
-            3,
-            new QTableWidgetItem(QString::fromStdString(edit->property<std::string>(SystemdEditItem::VALUE))));
-        attachStrategyComboBox(row);
-        if (auto *strategyComboBox = qobject_cast<QComboBox *>(ui->actionsTableWidget->cellWidget(row, 0)))
-        {
-            strategyComboBox->setCurrentIndex(edit->property<int>(SystemdEditItem::STRATEGY));
-        }
-        applyStrategyStateToRow(row);
+        appendActionRow(QString::fromStdString(edit->property<std::string>(SystemdEditItem::SECTION)),
+                        QString::fromStdString(edit->property<std::string>(SystemdEditItem::KEY)),
+                        QString::fromStdString(edit->property<std::string>(SystemdEditItem::VALUE)),
+                        static_cast<SystemdConflictStrategy>(edit->property<int>(SystemdEditItem::STRATEGY)),
+                        false,
+                        false,
+                        QString());
     }
 }
 
@@ -410,27 +462,48 @@ void SystemdWidget::writeEditTable()
     }
 
     auto *table = ui->actionsTableWidget;
-    m_item->editLength(table->rowCount());
-
-    const auto items = m_item->editItems();
-    const auto editMode = static_cast<SystemdEditMode>(ui->unitEditModeComboBox->currentIndex());
-    for (int i = 0; i < static_cast<int>(items.size()); ++i)
+    const auto editMode = currentEditMode();
+    QList<int> persistedRows;
+    for (int row = 0; row < table->rowCount(); ++row)
     {
-        const auto *sectionWidget = table->item(i, 1);
-        const auto *keyWidget = table->item(i, 2);
-        const auto *valueWidget = table->item(i, 3);
-        auto *strategyComboBox = qobject_cast<QComboBox *>(table->cellWidget(i, 0));
-
-        items.at(i)->setProperty(SystemdEditItem::SECTION,
-                                 sectionWidget ? sectionWidget->text().toStdString() : std::string());
-        items.at(i)->setProperty(SystemdEditItem::KEY,
-                                 keyWidget ? keyWidget->text().toStdString() : std::string());
-        items.at(i)->setProperty(SystemdEditItem::VALUE,
-                                 valueWidget ? valueWidget->text().toStdString() : std::string());
+        const QString section = sectionTextAtRow(row);
+        const QString key = keyTextAtRow(row);
+        const QString value = valueTextAtRow(row);
+        auto *strategyComboBox = qobject_cast<QComboBox *>(table->cellWidget(row, 0));
         const int strategy = editMode == SystemdEditMode::Create
                            ? static_cast<int>(SystemdConflictStrategy::AddValue)
                            : (strategyComboBox ? strategyComboBox->currentIndex()
                                                : static_cast<int>(SystemdConflictStrategy::ReplaceValue));
+
+        if (section.isEmpty() || key.isEmpty())
+        {
+            continue;
+        }
+
+        if (isScaffoldRow(row) && !isStrictMandatoryRow(row) && !scaffoldGroupId(row).isEmpty()
+            && strategy != static_cast<int>(SystemdConflictStrategy::ResetKey)
+            && value.trimmed().isEmpty())
+        {
+            continue;
+        }
+
+        persistedRows.push_back(row);
+    }
+
+    m_item->editLength(persistedRows.size());
+    const auto items = m_item->editItems();
+    for (int i = 0; i < persistedRows.size(); ++i)
+    {
+        const int row = persistedRows.at(i);
+        auto *strategyComboBox = qobject_cast<QComboBox *>(table->cellWidget(row, 0));
+        const int strategy = editMode == SystemdEditMode::Create
+                           ? static_cast<int>(SystemdConflictStrategy::AddValue)
+                           : (strategyComboBox ? strategyComboBox->currentIndex()
+                                               : static_cast<int>(SystemdConflictStrategy::ReplaceValue));
+
+        items.at(i)->setProperty(SystemdEditItem::SECTION, sectionTextAtRow(row).toStdString());
+        items.at(i)->setProperty(SystemdEditItem::KEY, keyTextAtRow(row).toStdString());
+        items.at(i)->setProperty(SystemdEditItem::VALUE, valueTextAtRow(row).toStdString());
         items.at(i)->setProperty(SystemdEditItem::STRATEGY, strategy);
     }
 }
@@ -446,13 +519,9 @@ void SystemdWidget::readDependencyTable()
 
     for (const auto *dep : m_item->depItems())
     {
-        on_dependAddButton_clicked();
-        const int row = ui->dependenciesTableWidget->rowCount() - 1;
-        auto *combo = qobject_cast<QComboBox *>(ui->dependenciesTableWidget->cellWidget(row, 0));
-        if (combo)
-        {
-            combo->setCurrentIndex(dep->property<int>(SystemdDependencyItem::TYPE));
-        }
+        const int row = ui->dependenciesTableWidget->rowCount();
+        ui->dependenciesTableWidget->insertRow(row);
+        attachDependencyTypeComboBox(row, dep->property<int>(SystemdDependencyItem::TYPE));
         ui->dependenciesTableWidget->setItem(
             row,
             1,
@@ -496,6 +565,7 @@ void SystemdWidget::updateUiForUnitType()
 
     const bool hasDependencies = m_item->property<bool>(SystemdItem::HAS_DEPENDENCIES);
     ui->dependGroupBox->setVisible(hasDependencies);
+    updateActionColumnsMinimumWidths();
 }
 
 void SystemdWidget::updateStateControls()
@@ -559,6 +629,7 @@ void SystemdWidget::updateEditModeAvailability()
     }
 
     ensureValidEditModeSelection();
+    ensureScaffoldRows();
     const bool editEnabled = ui->editUnitFileCheckBox->isChecked();
     const bool singleMode = allowedModes.size() == 1;
     ui->editModeLabel->setVisible(editEnabled && !singleMode);
@@ -591,6 +662,57 @@ void SystemdWidget::updateEditorModeUi()
         m_textEditorMode
             ? QCoreApplication::translate("SystemdWidget", "Switch to table mode")
             : QCoreApplication::translate("SystemdWidget", "Switch to text mode"));
+}
+
+void SystemdWidget::updateActionColumnsMinimumWidths()
+{
+    auto *table = ui->actionsTableWidget;
+    if (!table)
+    {
+        return;
+    }
+
+    const auto type = currentUnitType();
+    const auto sections = SystemdManCatalog::sectionsForUnitType(type);
+    const QFontMetrics fm(table->font());
+
+    int sectionWidth = 0;
+    for (const auto &section : sections)
+    {
+        sectionWidth = std::max(sectionWidth, fm.horizontalAdvance(section));
+    }
+
+    int keyWidth = 0;
+    for (const auto &section : sections)
+    {
+        const auto keys = SystemdManCatalog::keysFor(type, section);
+        for (const auto &key : keys)
+        {
+            keyWidth = std::max(keyWidth, fm.horizontalAdvance(key));
+        }
+    }
+
+    const auto profile = SystemdManCatalog::mandatoryProfile(type);
+    for (const auto &group : profile.oneOfGroups)
+    {
+        for (const auto &key : group.keys)
+        {
+            keyWidth = std::max(keyWidth, fm.horizontalAdvance(key));
+        }
+    }
+
+    const int extraPadding = table->style()->pixelMetric(QStyle::PM_FocusFrameHMargin) * 6 + 24;
+    sectionWidth += extraPadding;
+    keyWidth += extraPadding;
+
+    if (sectionWidth > 0)
+    {
+        table->horizontalHeader()->resizeSection(1, std::max(table->columnWidth(1), sectionWidth));
+    }
+    if (keyWidth > 0)
+    {
+        table->horizontalHeader()->resizeSection(2, std::max(table->columnWidth(2), keyWidth));
+    }
 }
 
 bool SystemdWidget::isUserPolicyContext() const
@@ -651,9 +773,466 @@ QString SystemdWidget::editModeHintForCurrentSelection() const
     }
 }
 
+SystemdUnitType SystemdWidget::currentUnitType() const
+{
+    if (!m_item)
+    {
+        return SystemdUnitType::Service;
+    }
+
+    return static_cast<SystemdUnitType>(m_item->property<int>(SystemdItem::UNIT_TYPE));
+}
+
+SystemdEditMode SystemdWidget::currentEditMode() const
+{
+    return static_cast<SystemdEditMode>(ui->unitEditModeComboBox->currentIndex());
+}
+
+bool SystemdWidget::mandatoryRulesActive() const
+{
+    if (m_textEditorMode)
+    {
+        return false;
+    }
+
+    const auto mode = currentEditMode();
+    return mode == SystemdEditMode::Create || mode == SystemdEditMode::CreateOrOverride;
+}
+
+void SystemdWidget::ensureActionRowItems(int row)
+{
+    if (row < 0 || row >= ui->actionsTableWidget->rowCount())
+    {
+        return;
+    }
+
+    if (!ui->actionsTableWidget->item(row, 1))
+    {
+        ui->actionsTableWidget->setItem(row, 1, new QTableWidgetItem());
+    }
+    if (!ui->actionsTableWidget->item(row, 2))
+    {
+        ui->actionsTableWidget->setItem(row, 2, new QTableWidgetItem());
+    }
+    if (!ui->actionsTableWidget->item(row, 3))
+    {
+        ui->actionsTableWidget->setItem(row, 3, new QTableWidgetItem());
+    }
+}
+
+void SystemdWidget::setActionRowMetadata(int row, bool scaffold, bool strictMandatory, const QString &groupId)
+{
+    ensureActionRowItems(row);
+
+    auto *sectionItem = ui->actionsTableWidget->item(row, 1);
+    auto *keyItem = ui->actionsTableWidget->item(row, 2);
+    if (!sectionItem || !keyItem)
+    {
+        return;
+    }
+
+    const bool oneOfScaffold = scaffold && !strictMandatory && !groupId.isEmpty();
+    Qt::ItemFlags sectionFlags = sectionItem->flags();
+    Qt::ItemFlags keyFlags = keyItem->flags();
+    sectionFlags |= Qt::ItemIsEditable;
+    keyFlags |= Qt::ItemIsEditable;
+
+    if (!scaffold)
+    {
+        // No-op: both fields remain editable for regular rows.
+    }
+    else if (strictMandatory)
+    {
+        sectionFlags &= ~Qt::ItemIsEditable;
+        keyFlags &= ~Qt::ItemIsEditable;
+    }
+    else if (oneOfScaffold)
+    {
+        sectionFlags &= ~Qt::ItemIsEditable;
+    }
+    else
+    {
+        sectionFlags &= ~Qt::ItemIsEditable;
+        keyFlags &= ~Qt::ItemIsEditable;
+    }
+
+    sectionItem->setFlags(sectionFlags);
+    keyItem->setFlags(keyFlags);
+
+    keyItem->setData(EDIT_ROLE_SCAFFOLD, scaffold);
+    keyItem->setData(EDIT_ROLE_STRICT_MANDATORY, strictMandatory);
+    keyItem->setData(EDIT_ROLE_MANDATORY_GROUP, groupId);
+}
+
+bool SystemdWidget::isScaffoldRow(int row) const
+{
+    const auto *keyItem = ui->actionsTableWidget->item(row, 2);
+    return keyItem && keyItem->data(EDIT_ROLE_SCAFFOLD).toBool();
+}
+
+bool SystemdWidget::isStrictMandatoryRow(int row) const
+{
+    const auto *keyItem = ui->actionsTableWidget->item(row, 2);
+    return keyItem && keyItem->data(EDIT_ROLE_STRICT_MANDATORY).toBool();
+}
+
+QString SystemdWidget::scaffoldGroupId(int row) const
+{
+    const auto *keyItem = ui->actionsTableWidget->item(row, 2);
+    return keyItem ? keyItem->data(EDIT_ROLE_MANDATORY_GROUP).toString() : QString();
+}
+
+QString SystemdWidget::sectionTextAtRow(int row) const
+{
+    const auto *item = ui->actionsTableWidget->item(row, 1);
+    return item ? item->text().trimmed() : QString();
+}
+
+QString SystemdWidget::keyTextAtRow(int row) const
+{
+    const auto *item = ui->actionsTableWidget->item(row, 2);
+    return item ? item->text().trimmed() : QString();
+}
+
+QString SystemdWidget::valueTextAtRow(int row) const
+{
+    const auto *item = ui->actionsTableWidget->item(row, 3);
+    return item ? item->text() : QString();
+}
+
+QStringList SystemdWidget::oneOfGroupKeys(const QString &groupId) const
+{
+    if (groupId.isEmpty())
+    {
+        return {};
+    }
+
+    const auto profile = SystemdManCatalog::mandatoryProfile(currentUnitType());
+    const auto groupIt = std::find_if(profile.oneOfGroups.cbegin(),
+                                      profile.oneOfGroups.cend(),
+                                      [&groupId](const auto &group) {
+                                          return group.id == groupId;
+                                      });
+    return groupIt != profile.oneOfGroups.cend() ? groupIt->keys : QStringList();
+}
+
+QStringList SystemdWidget::keySuggestionsForRow(int row) const
+{
+    const auto groupId = scaffoldGroupId(row);
+    if (!groupId.isEmpty())
+    {
+        const auto groupKeys = oneOfGroupKeys(groupId);
+        if (!groupKeys.isEmpty())
+        {
+            return groupKeys;
+        }
+    }
+
+    return SystemdManCatalog::keysFor(currentUnitType(), sectionTextAtRow(row));
+}
+
+bool SystemdWidget::normalizeKeyForRow(int row, const QString &candidateKey, QString &normalizedKey) const
+{
+    const QString trimmed = candidateKey.trimmed();
+    const auto groupId = scaffoldGroupId(row);
+    if (groupId.isEmpty())
+    {
+        normalizedKey = trimmed;
+        return true;
+    }
+
+    const auto groupKeys = oneOfGroupKeys(groupId);
+    const auto keyIt = std::find_if(groupKeys.cbegin(), groupKeys.cend(), [&trimmed](const auto &groupKey) {
+        return equalsInsensitive(trimmed, groupKey);
+    });
+    if (keyIt == groupKeys.cend())
+    {
+        return false;
+    }
+
+    normalizedKey = *keyIt;
+    return true;
+}
+
+int SystemdWidget::appendActionRow(const QString &section,
+                                   const QString &key,
+                                   const QString &value,
+                                   SystemdConflictStrategy strategy,
+                                   bool scaffold,
+                                   bool strictMandatory,
+                                   const QString &groupId)
+{
+    const int row = ui->actionsTableWidget->rowCount();
+    ui->actionsTableWidget->insertRow(row);
+    ensureActionRowItems(row);
+    ui->actionsTableWidget->item(row, 1)->setText(section);
+    ui->actionsTableWidget->item(row, 2)->setText(key);
+    ui->actionsTableWidget->item(row, 3)->setText(value);
+    setActionRowMetadata(row, scaffold, strictMandatory, groupId);
+    attachStrategyComboBox(row);
+    if (auto *combo = qobject_cast<QComboBox *>(ui->actionsTableWidget->cellWidget(row, 0)))
+    {
+        int strategyIndex = static_cast<int>(strategy);
+        if (combo->count() < 3 && strategy == SystemdConflictStrategy::ResetKey)
+        {
+            strategyIndex = static_cast<int>(SystemdConflictStrategy::ReplaceValue);
+        }
+        combo->setCurrentIndex(std::clamp(strategyIndex, 0, combo->count() - 1));
+    }
+    applyStrategyStateToRow(row);
+    return row;
+}
+
+void SystemdWidget::ensureScaffoldRows()
+{
+    if (m_textEditorMode)
+    {
+        return;
+    }
+
+    const bool active = mandatoryRulesActive();
+    if (!active)
+    {
+        for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
+        {
+            setActionRowMetadata(row, false, false, QString());
+        }
+        refreshStrategyForAllRows();
+        return;
+    }
+
+    const auto type = currentUnitType();
+    const auto profile = SystemdManCatalog::mandatoryProfile(type);
+
+    for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
+    {
+        setActionRowMetadata(row, false, false, QString());
+    }
+
+    auto findFirstExact = [this](const QString &section, const QString &key) -> int {
+        for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
+        {
+            if (equalsInsensitive(sectionTextAtRow(row), section) && equalsInsensitive(keyTextAtRow(row), key))
+            {
+                return row;
+            }
+        }
+        return -1;
+    };
+
+    auto rowsInGroup = [this](const MandatoryGroup &group) {
+        QList<int> rows;
+        for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
+        {
+            if (!equalsInsensitive(sectionTextAtRow(row), group.section))
+            {
+                continue;
+            }
+            const QString rowKey = keyTextAtRow(row);
+            const auto keyIt = std::find_if(group.keys.cbegin(), group.keys.cend(), [&rowKey](const auto &groupKey) {
+                return equalsInsensitive(rowKey, groupKey);
+            });
+            if (keyIt != group.keys.cend())
+            {
+                rows.push_back(row);
+            }
+        }
+        return rows;
+    };
+
+    for (const auto &strict : profile.strictKeys)
+    {
+        int row = findFirstExact(strict.first, strict.second);
+        if (row < 0)
+        {
+            row = appendActionRow(strict.first,
+                                  strict.second,
+                                  QString(),
+                                  SystemdConflictStrategy::ReplaceValue,
+                                  true,
+                                  true,
+                                  QString());
+        }
+        setActionRowMetadata(row, true, true, QString());
+    }
+
+    for (const auto &group : profile.oneOfGroups)
+    {
+        int scaffoldRow = !group.defaultKey.isEmpty() ? findFirstExact(group.section, group.defaultKey) : -1;
+        const auto existingRows = rowsInGroup(group);
+        if (scaffoldRow < 0 && !existingRows.isEmpty())
+        {
+            scaffoldRow = existingRows.first();
+        }
+        if (scaffoldRow < 0 && existingRows.isEmpty())
+        {
+            const QString defaultKey = !group.defaultKey.isEmpty() ? group.defaultKey : group.keys.value(0);
+            scaffoldRow = appendActionRow(group.section,
+                                          defaultKey,
+                                          QString(),
+                                          SystemdConflictStrategy::ReplaceValue,
+                                          true,
+                                          false,
+                                          group.id);
+        }
+
+        if (scaffoldRow >= 0)
+        {
+            setActionRowMetadata(scaffoldRow, true, false, group.id);
+        }
+    }
+
+    refreshStrategyForAllRows();
+}
+
+void SystemdWidget::refreshStrategyForAllRows()
+{
+    for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
+    {
+        attachStrategyComboBox(row);
+        applyStrategyStateToRow(row);
+    }
+}
+
+bool SystemdWidget::canRemoveActionRows(const QSet<int> &rowsToRemove, QString &errorText) const
+{
+    if (rowsToRemove.isEmpty() || !mandatoryRulesActive())
+    {
+        return true;
+    }
+
+    for (const int row : rowsToRemove)
+    {
+        if (isScaffoldRow(row))
+        {
+            errorText = QCoreApplication::translate("SystemdWidget",
+                                                    "Scaffold rows cannot be removed. Use add/replace for value.");
+            return false;
+        }
+    }
+
+    const auto profile = SystemdManCatalog::mandatoryProfile(currentUnitType());
+    for (const int row : rowsToRemove)
+    {
+        const QString section = sectionTextAtRow(row);
+        const QString key = keyTextAtRow(row);
+        const auto strictIt = std::find_if(
+            profile.strictKeys.cbegin(), profile.strictKeys.cend(), [&section, &key](const auto &strict) {
+                return equalsInsensitive(section, strict.first) && equalsInsensitive(key, strict.second);
+            });
+        if (strictIt != profile.strictKeys.cend())
+        {
+            errorText = QCoreApplication::translate("SystemdWidget",
+                                                    "Section [%1], key '%2' is mandatory and cannot be removed.")
+                            .arg(strictIt->first, strictIt->second);
+            return false;
+        }
+    }
+
+    QHash<QString, int> totalInGroup;
+    QHash<QString, int> removingInGroup;
+    for (const auto &group : profile.oneOfGroups)
+    {
+        totalInGroup[group.id] = 0;
+        removingInGroup[group.id] = 0;
+    }
+
+    for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
+    {
+        const QString section = sectionTextAtRow(row);
+        const QString key = keyTextAtRow(row);
+        for (const auto &group : profile.oneOfGroups)
+        {
+            if (!equalsInsensitive(section, group.section))
+            {
+                continue;
+            }
+
+            const auto keyIt = std::find_if(group.keys.cbegin(), group.keys.cend(), [&key](const auto &groupKey) {
+                return equalsInsensitive(key, groupKey);
+            });
+            if (keyIt == group.keys.cend())
+            {
+                continue;
+            }
+
+            totalInGroup[group.id] += 1;
+            if (rowsToRemove.contains(row))
+            {
+                removingInGroup[group.id] += 1;
+            }
+            break;
+        }
+    }
+
+    for (const auto &group : profile.oneOfGroups)
+    {
+        if (removingInGroup.value(group.id) > 0
+            && (totalInGroup.value(group.id) - removingInGroup.value(group.id)) <= 0)
+        {
+            errorText = QCoreApplication::translate(
+                "SystemdWidget",
+                "Section [%1]: at least one key from mandatory group must remain.").arg(group.section);
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool SystemdWidget::isTruthySystemdValue(const QString &value) const
+{
+    const auto normalized = value.trimmed().toLower();
+    return normalized == QStringLiteral("1")
+        || normalized == QStringLiteral("yes")
+        || normalized == QStringLiteral("true")
+        || normalized == QStringLiteral("on");
+}
+
+void SystemdWidget::applyActionTableDelegates()
+{
+    auto *table = ui->actionsTableWidget;
+    table->setItemDelegateForColumn(
+        1,
+        new ActionAutocompleteDelegate(
+            [this](int) { return SystemdManCatalog::sectionsForUnitType(currentUnitType()); },
+            ActionAutocompleteDelegate::Normalizer(),
+            table));
+    table->setItemDelegateForColumn(
+        2,
+        new ActionAutocompleteDelegate(
+            [this](int row) { return keySuggestionsForRow(row); },
+            [this](int row, const QString &rawKey) -> std::optional<QString> {
+                QString normalizedKey;
+                if (!normalizeKeyForRow(row, rawKey, normalizedKey))
+                {
+                    return std::nullopt;
+                }
+                return normalizedKey;
+            },
+            table));
+}
+
 void SystemdWidget::attachStrategyComboBox(int row)
 {
-    auto *strategyComboBox = createStrategyComboBox(ui->actionsTableWidget);
+    auto *table = ui->actionsTableWidget;
+    auto *existingComboBox = qobject_cast<QComboBox *>(table->cellWidget(row, 0));
+    int preferredStrategy = static_cast<int>(SystemdConflictStrategy::ReplaceValue);
+    if (existingComboBox)
+    {
+        preferredStrategy = existingComboBox->currentIndex();
+        table->removeCellWidget(row, 0);
+        existingComboBox->deleteLater();
+    }
+
+    const bool allowReset = !isScaffoldRow(row);
+    auto *strategyComboBox = createStrategyComboBox(ui->actionsTableWidget, allowReset);
+    if (!allowReset && preferredStrategy == static_cast<int>(SystemdConflictStrategy::ResetKey))
+    {
+        preferredStrategy = static_cast<int>(SystemdConflictStrategy::ReplaceValue);
+    }
+    preferredStrategy = std::clamp(preferredStrategy, 0, strategyComboBox->count() - 1);
+    strategyComboBox->setCurrentIndex(preferredStrategy);
     ui->actionsTableWidget->setCellWidget(row, 0, strategyComboBox);
     connect(strategyComboBox,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -670,8 +1249,34 @@ void SystemdWidget::attachStrategyComboBox(int row)
             });
 }
 
+void SystemdWidget::attachDependencyTypeComboBox(int row, int typeIndex)
+{
+    if (row < 0 || row >= ui->dependenciesTableWidget->rowCount())
+    {
+        return;
+    }
+
+    auto *existingComboBox = qobject_cast<QComboBox *>(ui->dependenciesTableWidget->cellWidget(row, 0));
+    if (existingComboBox)
+    {
+        ui->dependenciesTableWidget->removeCellWidget(row, 0);
+        existingComboBox->deleteLater();
+    }
+
+    auto *comboBox = new QComboBox(ui->dependenciesTableWidget);
+    comboBox->addItem(QCoreApplication::translate("SystemdWidget", "Changed"));
+    comboBox->addItem(QCoreApplication::translate("SystemdWidget", "Presence Changed"));
+    comboBox->setCurrentIndex(std::clamp(typeIndex, 0, comboBox->count() - 1));
+    ui->dependenciesTableWidget->setCellWidget(row, 0, comboBox);
+}
+
 void SystemdWidget::applyStrategyStateToRow(int row) const
 {
+    if (row < 0 || row >= ui->actionsTableWidget->rowCount())
+    {
+        return;
+    }
+
     auto *strategyComboBox = qobject_cast<QComboBox *>(ui->actionsTableWidget->cellWidget(row, 0));
     if (!strategyComboBox)
     {
@@ -720,15 +1325,11 @@ QString SystemdWidget::buildUnitFileTextFromTable(bool with_header) const
 
     for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
     {
-        const auto *sectionItem = ui->actionsTableWidget->item(row, 1);
-        const auto *keyItem = ui->actionsTableWidget->item(row, 2);
-        const auto *valueItem = ui->actionsTableWidget->item(row, 3);
         auto *strategyComboBox = qobject_cast<QComboBox *>(ui->actionsTableWidget->cellWidget(row, 0));
-
-        const std::string section = sectionItem ? sectionItem->text().trimmed().toStdString() : std::string();
-        const std::string key = keyItem ? keyItem->text().trimmed().toStdString() : std::string();
-        const std::string value = valueItem ? valueItem->text().toStdString() : std::string();
-        if (section.empty() || key.empty())
+        const QString section = sectionTextAtRow(row);
+        const QString key = keyTextAtRow(row);
+        const QString value = valueTextAtRow(row);
+        if (section.isEmpty() || key.isEmpty())
         {
             continue;
         }
@@ -738,7 +1339,13 @@ QString SystemdWidget::buildUnitFileTextFromTable(bool with_header) const
                             : static_cast<SystemdConflictStrategy>(
                                   strategyComboBox ? strategyComboBox->currentIndex()
                                                    : static_cast<int>(SystemdConflictStrategy::ReplaceValue));
-        lines.push_back(EditLine{section, key, value, strategy, row});
+        if (isScaffoldRow(row) && !isStrictMandatoryRow(row) && !scaffoldGroupId(row).isEmpty()
+            && strategy != SystemdConflictStrategy::ResetKey && value.trimmed().isEmpty())
+        {
+            continue;
+        }
+
+        lines.push_back(EditLine{section.toStdString(), key.toStdString(), value.toStdString(), strategy, row});
     }
 
     std::sort(lines.begin(), lines.end(), [](const EditLine &lhs, const EditLine &rhs) {
@@ -926,18 +1533,135 @@ void SystemdWidget::fillTableFromUnitFileText(const QString &unitFileText)
             continue;
         }
 
-        on_actionAddButton_clicked();
-        const int row = ui->actionsTableWidget->rowCount() - 1;
-        ui->actionsTableWidget->setItem(row, 1, new QTableWidgetItem(edit.section));
-        ui->actionsTableWidget->setItem(row, 2, new QTableWidgetItem(edit.key));
+        appendActionRow(edit.section, edit.key, edit.value, edit.strategy, false, false, QString());
+    }
+}
 
-        if (auto *combo = qobject_cast<QComboBox *>(ui->actionsTableWidget->cellWidget(row, 0)))
-        {
-            combo->setCurrentIndex(static_cast<int>(edit.strategy));
-        }
-        ui->actionsTableWidget->setItem(row, 3, new QTableWidgetItem(edit.value));
+void SystemdWidget::moveActionRows(bool moveUp)
+{
+    auto *table = ui->actionsTableWidget;
+    if (!table || table->rowCount() < 2)
+    {
+        return;
+    }
+
+    const QList<int> rows = selectedRows(table);
+    if (rows.isEmpty())
+    {
+        return;
+    }
+
+    struct ActionRowState
+    {
+        QString section;
+        QString key;
+        QString value;
+        SystemdConflictStrategy strategy{SystemdConflictStrategy::ReplaceValue};
+        bool scaffold{false};
+        bool strictMandatory{false};
+        QString groupId;
+    };
+
+    QList<ActionRowState> states;
+    states.reserve(table->rowCount());
+    for (int row = 0; row < table->rowCount(); ++row)
+    {
+        auto *strategyComboBox = qobject_cast<QComboBox *>(table->cellWidget(row, 0));
+        const auto strategy = strategyComboBox
+                            ? static_cast<SystemdConflictStrategy>(strategyComboBox->currentIndex())
+                            : SystemdConflictStrategy::ReplaceValue;
+        states.push_back(ActionRowState{
+            sectionTextAtRow(row),
+            keyTextAtRow(row),
+            valueTextAtRow(row),
+            strategy,
+            isScaffoldRow(row),
+            isStrictMandatoryRow(row),
+            scaffoldGroupId(row),
+        });
+    }
+
+    closePersistentEditors(table);
+    table->clearFocus();
+    table->setCurrentIndex(QModelIndex());
+    const QSet<int> selectedSet = moveRowIndexes(rows, states.size(), moveUp, [&states](int lhs, int rhs) {
+        std::swap(states[lhs], states[rhs]);
+    });
+
+    table->setUpdatesEnabled(false);
+    table->setRowCount(0);
+    for (const auto &state : states)
+    {
+        appendActionRow(state.section,
+                        state.key,
+                        state.value,
+                        state.strategy,
+                        state.scaffold,
+                        state.strictMandatory,
+                        state.groupId);
+    }
+    table->setUpdatesEnabled(true);
+
+    QList<int> movedRows = selectedSet.values();
+    std::sort(movedRows.begin(), movedRows.end());
+    selectRows(table, movedRows);
+    for (int row = 0; row < table->rowCount(); ++row)
+    {
         applyStrategyStateToRow(row);
     }
+}
+
+void SystemdWidget::moveDependencyRows(bool moveUp)
+{
+    auto *table = ui->dependenciesTableWidget;
+    if (!table || table->rowCount() < 2)
+    {
+        return;
+    }
+
+    const QList<int> rows = selectedRows(table);
+    if (rows.isEmpty())
+    {
+        return;
+    }
+
+    struct DependencyRowState
+    {
+        int type{0};
+        QString path;
+    };
+
+    QList<DependencyRowState> states;
+    states.reserve(table->rowCount());
+    for (int row = 0; row < table->rowCount(); ++row)
+    {
+        auto *combo = qobject_cast<QComboBox *>(table->cellWidget(row, 0));
+        states.push_back(DependencyRowState{
+            combo ? combo->currentIndex() : 0,
+            table->item(row, 1) ? table->item(row, 1)->text() : QString(),
+        });
+    }
+
+    closePersistentEditors(table);
+    table->clearFocus();
+    table->setCurrentIndex(QModelIndex());
+    const QSet<int> selectedSet = moveRowIndexes(rows, states.size(), moveUp, [&states](int lhs, int rhs) {
+        std::swap(states[lhs], states[rhs]);
+    });
+
+    table->setUpdatesEnabled(false);
+    table->setRowCount(0);
+    for (int row = 0; row < states.size(); ++row)
+    {
+        table->insertRow(row);
+        attachDependencyTypeComboBox(row, states.at(row).type);
+        table->setItem(row, 1, new QTableWidgetItem(states.at(row).path));
+    }
+    table->setUpdatesEnabled(true);
+
+    QList<int> movedRows = selectedSet.values();
+    std::sort(movedRows.begin(), movedRows.end());
+    selectRows(table, movedRows);
 }
 
 void SystemdWidget::on_switchEditorModePushButton_clicked()
@@ -946,6 +1670,7 @@ void SystemdWidget::on_switchEditorModePushButton_clicked()
     {
         fillTableFromUnitFileText(ui->unitFileTextEdit->toPlainText());
         m_textEditorMode = false;
+        ensureScaffoldRows();
     }
     else
     {
@@ -959,30 +1684,22 @@ void SystemdWidget::on_switchEditorModePushButton_clicked()
 
 void SystemdWidget::on_actionMoveUpButton_clicked()
 {
-    moveSelectedRows(ui->actionsTableWidget, true);
-    for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
-    {
-        applyStrategyStateToRow(row);
-    }
+    moveActionRows(true);
 }
 
 void SystemdWidget::on_actionMoveDownButton_clicked()
 {
-    moveSelectedRows(ui->actionsTableWidget, false);
-    for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
-    {
-        applyStrategyStateToRow(row);
-    }
+    moveActionRows(false);
 }
 
 void SystemdWidget::on_dependMoveUpButton_clicked()
 {
-    moveSelectedRows(ui->dependenciesTableWidget, true);
+    moveDependencyRows(true);
 }
 
 void SystemdWidget::on_dependMoveDownButton_clicked()
 {
-    moveSelectedRows(ui->dependenciesTableWidget, false);
+    moveDependencyRows(false);
 }
 
 void SystemdWidget::updateDependencyControls()
@@ -1040,18 +1757,28 @@ bool SystemdWidget::validateTableMode(QString &errorText) const
         SystemdConflictStrategy strategy{SystemdConflictStrategy::AddValue};
     };
 
+    QList<RowData> allRows;
     QHash<QString, QList<RowData>> rowsByKey;
-    const auto editMode = static_cast<SystemdEditMode>(ui->unitEditModeComboBox->currentIndex());
+    const auto editMode = currentEditMode();
+    const auto type = currentUnitType();
+    const bool mandatoryActive = mandatoryRulesActive();
+    const auto mandatoryProfile = SystemdManCatalog::mandatoryProfile(type);
+    QHash<QString, bool> mandatoryGroupsSatisfied;
+    for (const auto &group : mandatoryProfile.oneOfGroups)
+    {
+        mandatoryGroupsSatisfied[group.id] = false;
+    }
+
+    bool hasExecStartValue = false;
+    bool hasExecStopValue = false;
+    bool hasRemainAfterExitTrue = false;
+
     for (int row = 0; row < ui->actionsTableWidget->rowCount(); ++row)
     {
-        const auto *sectionItem = ui->actionsTableWidget->item(row, 1);
-        const auto *keyItem = ui->actionsTableWidget->item(row, 2);
-        const auto *valueItem = ui->actionsTableWidget->item(row, 3);
+        const QString section = sectionTextAtRow(row);
+        const QString key = keyTextAtRow(row);
+        const QString value = valueTextAtRow(row);
         auto *strategyComboBox = qobject_cast<QComboBox *>(ui->actionsTableWidget->cellWidget(row, 0));
-
-        const QString section = sectionItem ? sectionItem->text().trimmed() : QString();
-        const QString key = keyItem ? keyItem->text().trimmed() : QString();
-        const QString value = valueItem ? valueItem->text() : QString();
         const auto strategy = editMode == SystemdEditMode::Create
                             ? SystemdConflictStrategy::AddValue
                             : static_cast<SystemdConflictStrategy>(
@@ -1070,7 +1797,78 @@ bool SystemdWidget::validateTableMode(QString &errorText) const
             return false;
         }
 
-        if (strategy != SystemdConflictStrategy::ResetKey && value.trimmed().isEmpty())
+        bool strictMandatoryRow = false;
+        const auto strictMatch = std::find_if(
+            mandatoryProfile.strictKeys.cbegin(), mandatoryProfile.strictKeys.cend(), [&section, &key](const auto &strict) {
+                return equalsInsensitive(section, strict.first) && equalsInsensitive(key, strict.second);
+            });
+        strictMandatoryRow = strictMatch != mandatoryProfile.strictKeys.cend();
+
+        bool groupMandatoryRow = false;
+        QString groupId = scaffoldGroupId(row);
+        if (mandatoryActive && !groupId.isEmpty())
+        {
+            const auto groupIt = std::find_if(mandatoryProfile.oneOfGroups.cbegin(),
+                                              mandatoryProfile.oneOfGroups.cend(),
+                                              [&groupId](const auto &group) {
+                                                  return group.id == groupId;
+                                              });
+            if (groupIt == mandatoryProfile.oneOfGroups.cend())
+            {
+                errorText = QCoreApplication::translate("SystemdWidget",
+                                                        "Row %1: Mandatory key group metadata is invalid.")
+                                .arg(row + 1);
+                return false;
+            }
+
+            if (!equalsInsensitive(section, groupIt->section))
+            {
+                errorText = QCoreApplication::translate("SystemdWidget",
+                                                        "Row %1: Section must be [%2] for mandatory key group.")
+                                .arg(row + 1)
+                                .arg(groupIt->section);
+                return false;
+            }
+
+            const auto keyMatch = std::find_if(groupIt->keys.cbegin(), groupIt->keys.cend(), [&key](const auto &groupKey) {
+                return equalsInsensitive(key, groupKey);
+            });
+            if (keyMatch == groupIt->keys.cend())
+            {
+                errorText = QCoreApplication::translate(
+                    "SystemdWidget",
+                    "Row %1: Key '%2' is not allowed for mandatory key group. Allowed keys: %3.")
+                                .arg(row + 1)
+                                .arg(key)
+                                .arg(groupIt->keys.join(QStringLiteral(", ")));
+                return false;
+            }
+            groupMandatoryRow = true;
+        }
+        else
+        {
+            for (const auto &group : mandatoryProfile.oneOfGroups)
+            {
+                if (!equalsInsensitive(section, group.section))
+                {
+                    continue;
+                }
+
+                const auto keyMatch = std::find_if(group.keys.cbegin(), group.keys.cend(), [&key](const auto &groupKey) {
+                    return equalsInsensitive(key, groupKey);
+                });
+                if (keyMatch != group.keys.cend())
+                {
+                    groupMandatoryRow = true;
+                    groupId = group.id;
+                    break;
+                }
+            }
+        }
+
+        const bool valueRequired = strategy != SystemdConflictStrategy::ResetKey
+                                && (!mandatoryActive || strictMandatoryRow || !groupMandatoryRow);
+        if (valueRequired && value.trimmed().isEmpty())
         {
             errorText = QCoreApplication::translate("SystemdWidget",
                                                     "Row %1: Value is required for add/replace strategy.")
@@ -1078,7 +1876,31 @@ bool SystemdWidget::validateTableMode(QString &errorText) const
             return false;
         }
 
-        rowsByKey[makeEditKey(section, key)].push_back(RowData{row, section, key, value, strategy});
+        const auto rowData = RowData{row, section, key, value, strategy};
+        allRows.push_back(rowData);
+        rowsByKey[makeEditKey(section, key)].push_back(rowData);
+
+        if (mandatoryActive && groupMandatoryRow && strategy != SystemdConflictStrategy::ResetKey && !value.trimmed().isEmpty())
+        {
+            mandatoryGroupsSatisfied[groupId] = true;
+        }
+
+        if (mandatoryActive && type == SystemdUnitType::Service && equalsInsensitive(section, "Service")
+            && strategy != SystemdConflictStrategy::ResetKey && !value.trimmed().isEmpty())
+        {
+            if (equalsInsensitive(key, "ExecStart"))
+            {
+                hasExecStartValue = true;
+            }
+            if (equalsInsensitive(key, "ExecStop"))
+            {
+                hasExecStopValue = true;
+            }
+            if (equalsInsensitive(key, "RemainAfterExit") && isTruthySystemdValue(value))
+            {
+                hasRemainAfterExitTrue = true;
+            }
+        }
     }
 
     for (auto it = rowsByKey.begin(); it != rowsByKey.end(); ++it)
@@ -1156,6 +1978,52 @@ bool SystemdWidget::validateTableMode(QString &errorText) const
                 }
             }
         }
+    }
+
+    if (!mandatoryActive)
+    {
+        return true;
+    }
+
+    for (const auto &strict : mandatoryProfile.strictKeys)
+    {
+        const bool strictSatisfied = std::any_of(allRows.cbegin(),
+                                                 allRows.cend(),
+                                                 [&strict](const RowData &row) {
+                                                     return equalsInsensitive(row.section, strict.first)
+                                                         && equalsInsensitive(row.key, strict.second)
+                                                         && row.strategy != SystemdConflictStrategy::ResetKey
+                                                         && !row.value.trimmed().isEmpty();
+                                                 });
+        if (!strictSatisfied)
+        {
+            errorText = QCoreApplication::translate("SystemdWidget",
+                                                    "Section [%1], key '%2': value is required.")
+                            .arg(strict.first, strict.second);
+            return false;
+        }
+    }
+
+    for (const auto &group : mandatoryProfile.oneOfGroups)
+    {
+        if (mandatoryGroupsSatisfied.value(group.id))
+        {
+            continue;
+        }
+
+        errorText = QCoreApplication::translate("SystemdWidget",
+                                                "Section [%1]: at least one of keys is required: %2.")
+                        .arg(group.section, group.keys.join(QStringLiteral(", ")));
+        return false;
+    }
+
+    if (mandatoryProfile.requireServiceRemainAfterExitWithExecStopOnly
+        && hasExecStopValue && !hasExecStartValue && !hasRemainAfterExitTrue)
+    {
+        errorText = QCoreApplication::translate(
+            "SystemdWidget",
+            "Section [Service]: RemainAfterExit must be true when using ExecStop without ExecStart.");
+        return false;
     }
 
     return true;
