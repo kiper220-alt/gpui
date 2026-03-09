@@ -18,6 +18,13 @@ struct MandatoryGroup
 
 struct MandatoryProfile
 {
+    MandatoryProfile()
+        : strictKeys()
+        , oneOfGroups()
+        , requireServiceRemainAfterExitWithExecStopOnly(false)
+    {
+    }
+
     QList<QPair<QString, QString>> strictKeys;
     QList<MandatoryGroup> oneOfGroups;
     bool requireServiceRemainAfterExitWithExecStopOnly{false};

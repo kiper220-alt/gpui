@@ -1403,6 +1403,15 @@ void SystemdWidget::fillTableFromUnitFileText(const QString &unitFileText)
 
     struct ParsedEdit
     {
+        ParsedEdit()
+            : section()
+            , key()
+            , value()
+            , strategy(SystemdConflictStrategy::AddValue)
+            , removed(false)
+        {
+        }
+
         QString section;
         QString key;
         QString value;
@@ -1412,6 +1421,13 @@ void SystemdWidget::fillTableFromUnitFileText(const QString &unitFileText)
 
     struct PairState
     {
+        PairState()
+            : pendingReset(false)
+            , replaceIndex(-1)
+            , addIndexes()
+        {
+        }
+
         bool pendingReset{false};
         int replaceIndex{-1};
         QList<int> addIndexes;

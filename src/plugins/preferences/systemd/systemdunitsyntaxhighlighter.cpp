@@ -6,6 +6,9 @@
 
 SystemdUnitSyntaxHighlighter::SystemdUnitSyntaxHighlighter(QTextDocument *document)
     : QSyntaxHighlighter(document)
+    , m_sectionFormat()
+    , m_keyFormat()
+    , m_commentFormat()
 {
     const auto palette = QApplication::palette();
     m_sectionFormat.setFontWeight(QFont::DemiBold);

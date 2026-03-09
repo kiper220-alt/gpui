@@ -270,6 +270,13 @@ void appendParsedEdits(preferences::SystemdItem *item, const std::string &unitFi
 {
     struct ParsedLine
     {
+        ParsedLine()
+            : section()
+            , key()
+            , value()
+        {
+        }
+
         std::string section;
         std::string key;
         std::string value;
