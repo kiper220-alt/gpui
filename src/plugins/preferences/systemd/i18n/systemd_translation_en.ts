@@ -168,6 +168,22 @@
         <translation>Unit will be created.</translation>
     </message>
     <message>
+        <source>For computer policies targeting users (--global), immediate start is unavailable. The policy only changes default user unit files and cannot start user units right away.</source>
+        <translation>For computer policies targeting users (--global), immediate start is unavailable. The policy only changes default user unit files and cannot start user units right away.</translation>
+    </message>
+    <message>
+        <source>Apply the state immediately after the policy is processed.</source>
+        <translation>Apply the state immediately after the policy is processed.</translation>
+    </message>
+    <message>
+        <source>Applies to global user units in /etc/systemd/user. Immediate start (--now) is unavailable for this target.</source>
+        <translation>Applies to global user units in /etc/systemd/user. Immediate start (--now) is unavailable for this target.</translation>
+    </message>
+    <message>
+        <source>Configuration editing is required for this apply mode because the unit may need to be created.</source>
+        <translation>Configuration editing is required for this apply mode because the unit may need to be created.</translation>
+    </message>
+    <message>
         <source>Clear</source>
         <translation>Clear</translation>
     </message>

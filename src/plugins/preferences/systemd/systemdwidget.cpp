@@ -402,6 +402,7 @@ SystemdWidget::SystemdWidget(QWidget *parent, SystemdItem *item)
     : BasePreferenceWidget(parent)
     , m_item(item)
     , ui(new Ui::SystemdWidget())
+    , m_preferredFlexibleEditMode(static_cast<int>(SystemdEditMode::Override))
 {
     ui->setupUi(this);
     ui->dropInBaseNameLineEdit->setValidator(new QRegularExpressionValidator(
@@ -452,7 +453,13 @@ SystemdWidget::SystemdWidget(QWidget *parent, SystemdItem *item)
     connect(ui->unitEditModeComboBox,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
-            [this](int) { updateEditModeAvailability(); });
+            [this](int index) {
+                if (allowedEditModesForApplyMode().size() > 1)
+                {
+                    m_preferredFlexibleEditMode = index;
+                }
+                updateEditModeAvailability();
+            });
 }
 
 SystemdWidget::~SystemdWidget()
@@ -480,6 +487,10 @@ void SystemdWidget::setItem(ModelView::SessionItem *item)
 
     ui->editUnitFileCheckBox->setChecked(m_item->property<bool>(SystemdItem::EDIT));
     ui->unitEditModeComboBox->setCurrentIndex(m_item->property<int>(SystemdItem::EDIT_MODE));
+    if (allowedEditModesForApplyMode().size() > 1)
+    {
+        m_preferredFlexibleEditMode = ui->unitEditModeComboBox->currentIndex();
+    }
     setDropInName(QString::fromStdString(m_item->property<std::string>(SystemdItem::DROP_IN_NAME)));
     ui->unitFileTextEdit->setPlainText(QString::fromStdString(m_item->property<std::string>(SystemdItem::UNIT_FILE_TEXT)));
     m_textEditorMode = m_item->property<int>(SystemdItem::UNIT_FILE_MODE) == static_cast<int>(SystemdUnitFileMode::Text);
@@ -873,9 +884,35 @@ QList<int> SystemdWidget::allowedEditModesForApplyMode() const
 void SystemdWidget::ensureValidEditModeSelection()
 {
     const QList<int> allowedModes = allowedEditModesForApplyMode();
-    if (!allowedModes.contains(ui->unitEditModeComboBox->currentIndex()))
+    if (allowedModes.isEmpty())
     {
-        ui->unitEditModeComboBox->setCurrentIndex(allowedModes.first());
+        return;
+    }
+
+    int desiredMode = ui->unitEditModeComboBox->currentIndex();
+    if (allowedModes.size() > 1)
+    {
+        if (allowedModes.contains(m_preferredFlexibleEditMode))
+        {
+            desiredMode = m_preferredFlexibleEditMode;
+        }
+        else if (allowedModes.contains(static_cast<int>(SystemdEditMode::Override)))
+        {
+            desiredMode = static_cast<int>(SystemdEditMode::Override);
+        }
+        else
+        {
+            desiredMode = allowedModes.first();
+        }
+    }
+    else
+    {
+        desiredMode = allowedModes.first();
+    }
+
+    if (ui->unitEditModeComboBox->currentIndex() != desiredMode)
+    {
+        ui->unitEditModeComboBox->setCurrentIndex(desiredMode);
     }
 }
 

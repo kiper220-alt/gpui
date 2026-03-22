@@ -122,6 +122,7 @@ private:
     SystemdItem *m_item{nullptr};
     Ui::SystemdWidget *ui{nullptr};
     bool m_textEditorMode{false};
+    int m_preferredFlexibleEditMode{0};
 };
 
 } // namespace preferences
