@@ -22,6 +22,9 @@ const char *GENERATED_EDITS_HEADER = "# GPUI-GENERATED: edits-from-table";
 constexpr int EDIT_ROLE_SCAFFOLD = Qt::UserRole + 1;
 constexpr int EDIT_ROLE_STRICT_MANDATORY = Qt::UserRole + 2;
 constexpr int EDIT_ROLE_MANDATORY_GROUP = Qt::UserRole + 3;
+constexpr int DEFAULT_DROP_IN_PREFIX = 50;
+const char *DEFAULT_DROP_IN_BASE_NAME = "gpo";
+const char *DROP_IN_NAME_PATTERN = "^[A-Za-z0-9_.@-]{1,120}$";
 
 QString unitTypeLabel(preferences::SystemdUnitType type)
 {
@@ -109,6 +112,51 @@ QString makeEditKey(const QString &section, const QString &key)
 bool equalsInsensitive(const QString &lhs, const QString &rhs)
 {
     return QString::compare(lhs.trimmed(), rhs.trimmed(), Qt::CaseInsensitive) == 0;
+}
+
+struct DropInParts
+{
+    int prefix{DEFAULT_DROP_IN_PREFIX};
+    QString baseName{QString::fromLatin1(DEFAULT_DROP_IN_BASE_NAME)};
+};
+
+DropInParts splitDropInName(const QString &dropInName)
+{
+    DropInParts parts;
+    const QString trimmed = dropInName.trimmed();
+    if (trimmed.isEmpty())
+    {
+        return parts;
+    }
+
+    static const QRegularExpression fullPattern(QStringLiteral("^(\\d{1,3})-([A-Za-z0-9_.@-]{1,120})\\.conf$"));
+    const auto fullMatch = fullPattern.match(trimmed);
+    if (fullMatch.hasMatch())
+    {
+        parts.prefix = fullMatch.captured(1).toInt();
+        parts.baseName = fullMatch.captured(2);
+        return parts;
+    }
+
+    QString normalized = trimmed;
+    if (normalized.endsWith(QStringLiteral(".conf"), Qt::CaseInsensitive))
+    {
+        normalized.chop(5);
+    }
+
+    static const QRegularExpression legacyPattern(QStringLiteral("^(\\d{1,3})-(.+)$"));
+    const auto legacyMatch = legacyPattern.match(normalized);
+    if (legacyMatch.hasMatch())
+    {
+        parts.prefix = legacyMatch.captured(1).toInt();
+        parts.baseName = legacyMatch.captured(2);
+    }
+    else if (!normalized.isEmpty())
+    {
+        parts.baseName = normalized;
+    }
+
+    return parts;
 }
 
 class ActionAutocompleteDelegate : public QStyledItemDelegate
@@ -356,6 +404,9 @@ SystemdWidget::SystemdWidget(QWidget *parent, SystemdItem *item)
     , ui(new Ui::SystemdWidget())
 {
     ui->setupUi(this);
+    ui->dropInBaseNameLineEdit->setValidator(new QRegularExpressionValidator(
+        QRegularExpression(QString::fromLatin1(DROP_IN_NAME_PATTERN)),
+        ui->dropInBaseNameLineEdit));
     ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
     ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Interactive);
     ui->actionsTableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
@@ -384,7 +435,20 @@ SystemdWidget::SystemdWidget(QWidget *parent, SystemdItem *item)
     connect(ui->applyModeComboBox,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
-            [this](int) { updateEditModeAvailability(); });
+            [this](int) {
+                updateForcedOptions();
+                updateStateControls();
+                updateEditModeAvailability();
+                updateEditControls();
+            });
+    connect(ui->policyTargetComboBox,
+            QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this,
+            [this](int) {
+                updatePolicyTargetControls();
+                updateForcedOptions();
+                updateStateControls();
+            });
     connect(ui->unitEditModeComboBox,
             QOverload<int>::of(&QComboBox::currentIndexChanged),
             this,
@@ -416,7 +480,7 @@ void SystemdWidget::setItem(ModelView::SessionItem *item)
 
     ui->editUnitFileCheckBox->setChecked(m_item->property<bool>(SystemdItem::EDIT));
     ui->unitEditModeComboBox->setCurrentIndex(m_item->property<int>(SystemdItem::EDIT_MODE));
-    ui->dropInNameLineEdit->setText(QString::fromStdString(m_item->property<std::string>(SystemdItem::DROP_IN_NAME)));
+    setDropInName(QString::fromStdString(m_item->property<std::string>(SystemdItem::DROP_IN_NAME)));
     ui->unitFileTextEdit->setPlainText(QString::fromStdString(m_item->property<std::string>(SystemdItem::UNIT_FILE_TEXT)));
     m_textEditorMode = m_item->property<int>(SystemdItem::UNIT_FILE_MODE) == static_cast<int>(SystemdUnitFileMode::Text);
 
@@ -426,6 +490,7 @@ void SystemdWidget::setItem(ModelView::SessionItem *item)
 
     updateUiForUnitType();
     updatePolicyTargetControls();
+    updateForcedOptions();
     updateStateControls();
     updateEditModeAvailability();
     updateEditControls();
@@ -572,7 +637,24 @@ void SystemdWidget::updateStateControls()
 {
     const bool enabled = ui->changeUnitStateCheckBox->isChecked();
     ui->changeUnitStateComboBox->setEnabled(enabled);
-    ui->nowCheckBox->setEnabled(enabled);
+
+    const bool nowSupported = enabled && !isMachineGlobalUserTarget();
+    if (!nowSupported)
+    {
+        ui->nowCheckBox->setChecked(false);
+    }
+    ui->nowCheckBox->setEnabled(nowSupported);
+
+    const QString globalNowHint = QCoreApplication::translate(
+        "SystemdWidget",
+        "For computer policies targeting users (--global), immediate start is unavailable. "
+        "The policy only changes default user unit files and cannot start user units right away.");
+    const QString regularNowHint = QCoreApplication::translate(
+        "SystemdWidget",
+        "Apply the state immediately after the policy is processed.");
+    const QString nowHint = isMachineGlobalUserTarget() ? globalNowHint : regularNowHint;
+    ui->nowCheckBox->setToolTip(nowHint);
+    ui->nowCheckBox->setWhatsThis(nowHint);
 }
 
 void SystemdWidget::updatePolicyTargetControls()
@@ -593,16 +675,35 @@ void SystemdWidget::updatePolicyTargetControls()
     }
     else
     {
-        ui->policyTargetHintLabel->clear();
-        ui->policyTargetHintLabel->setVisible(false);
+        const bool globalUserTarget = static_cast<SystemdPolicyTarget>(ui->policyTargetComboBox->currentIndex())
+            == SystemdPolicyTarget::User;
+        if (globalUserTarget)
+        {
+            const QString hint = QCoreApplication::translate(
+                "SystemdWidget",
+                "Applies to global user units in /etc/systemd/user. "
+                "Immediate start (--now) is unavailable for this target.");
+            ui->policyTargetHintLabel->setText(hint);
+            ui->policyTargetHintLabel->setToolTip(hint);
+            ui->policyTargetHintLabel->setVisible(true);
+        }
+        else
+        {
+            ui->policyTargetHintLabel->clear();
+            ui->policyTargetHintLabel->setToolTip(QString());
+            ui->policyTargetHintLabel->setVisible(false);
+        }
     }
 }
 
 void SystemdWidget::updateEditControls()
 {
+    updateForcedOptions();
     const bool enabled = ui->editUnitFileCheckBox->isChecked();
 
-    ui->dropInNameLineEdit->setEnabled(enabled);
+    const bool dropInEnabled = enabled && currentEditMode() != SystemdEditMode::Create;
+    ui->dropInPrefixSpinBox->setEnabled(dropInEnabled);
+    ui->dropInBaseNameLineEdit->setEnabled(dropInEnabled);
     ui->actionsTableWidget->setEnabled(enabled);
     ui->addActionPushButton->setEnabled(enabled);
     ui->removeActionPushButton->setEnabled(enabled);
@@ -612,7 +713,6 @@ void SystemdWidget::updateEditControls()
     ui->unitFileTextEdit->setEnabled(enabled);
     ui->switchEditorModePushButton->setEnabled(enabled);
     ui->dropInLabel->setVisible(enabled);
-    ui->dropInNameLineEdit->setVisible(enabled);
     ui->editModeHintLabel->setVisible(false);
     updateEditModeAvailability();
     updateEditorModeUi();
@@ -641,7 +741,10 @@ void SystemdWidget::updateEditModeAvailability()
     const auto mode = static_cast<SystemdEditMode>(ui->unitEditModeComboBox->currentIndex());
     const bool showDropIn = editEnabled && mode != SystemdEditMode::Create;
     ui->dropInLabel->setVisible(showDropIn);
-    ui->dropInNameLineEdit->setVisible(showDropIn);
+    ui->dropInPrefixSpinBox->setVisible(showDropIn);
+    ui->dropInSeparatorLabel->setVisible(showDropIn);
+    ui->dropInBaseNameLineEdit->setVisible(showDropIn);
+    ui->dropInSuffixLabel->setVisible(showDropIn);
 
     const bool showStrategy = editEnabled && mode != SystemdEditMode::Create && !m_textEditorMode;
     ui->actionsTableWidget->setColumnHidden(0, !showStrategy);
@@ -732,6 +835,24 @@ bool SystemdWidget::isUserPolicyContext() const
     return parentChildren[parentChildren.size() - 2]->property<bool>(userContextProperty);
 }
 
+void SystemdWidget::updateForcedOptions()
+{
+    const bool forceEdit = isEditForcedByApplyMode();
+    if (forceEdit)
+    {
+        ui->editUnitFileCheckBox->setChecked(true);
+    }
+    ui->editUnitFileCheckBox->setEnabled(!forceEdit);
+
+    const QString editHint = forceEdit
+        ? QCoreApplication::translate(
+              "SystemdWidget",
+              "Configuration editing is required for this apply mode because the unit may need to be created.")
+        : QString();
+    ui->editUnitFileCheckBox->setToolTip(editHint);
+    ui->editUnitFileCheckBox->setWhatsThis(editHint);
+}
+
 QList<int> SystemdWidget::allowedEditModesForApplyMode() const
 {
     const auto applyMode = static_cast<SystemdApplyMode>(ui->applyModeComboBox->currentIndex());
@@ -786,6 +907,32 @@ SystemdUnitType SystemdWidget::currentUnitType() const
 SystemdEditMode SystemdWidget::currentEditMode() const
 {
     return static_cast<SystemdEditMode>(ui->unitEditModeComboBox->currentIndex());
+}
+
+bool SystemdWidget::isMachineGlobalUserTarget() const
+{
+    return !isUserPolicyContext()
+        && static_cast<SystemdPolicyTarget>(ui->policyTargetComboBox->currentIndex()) == SystemdPolicyTarget::User;
+}
+
+bool SystemdWidget::isEditForcedByApplyMode() const
+{
+    const auto applyMode = static_cast<SystemdApplyMode>(ui->applyModeComboBox->currentIndex());
+    return applyMode == SystemdApplyMode::Always || applyMode == SystemdApplyMode::IfMissing;
+}
+
+QString SystemdWidget::currentDropInName() const
+{
+    return QStringLiteral("%1-%2.conf")
+        .arg(ui->dropInPrefixSpinBox->value())
+        .arg(ui->dropInBaseNameLineEdit->text().trimmed());
+}
+
+void SystemdWidget::setDropInName(const QString &dropInName)
+{
+    const auto parts = splitDropInName(dropInName);
+    ui->dropInPrefixSpinBox->setValue(parts.prefix);
+    ui->dropInBaseNameLineEdit->setText(parts.baseName);
 }
 
 bool SystemdWidget::mandatoryRulesActive() const
@@ -1744,6 +1891,21 @@ bool SystemdWidget::validate()
                              QCoreApplication::translate("SystemdWidget", "Unit name is required."));
         ui->unitNameLineEdit->setFocus();
         return false;
+    }
+
+    if (ui->editUnitFileCheckBox->isChecked() && currentEditMode() != SystemdEditMode::Create)
+    {
+        const QString dropInBaseName = ui->dropInBaseNameLineEdit->text().trimmed();
+        const QRegularExpression validPattern(QString::fromLatin1(DROP_IN_NAME_PATTERN));
+        if (dropInBaseName.isEmpty() || !validPattern.match(dropInBaseName).hasMatch())
+        {
+            QMessageBox::warning(this,
+                                 QCoreApplication::translate("SystemdWidget", "Validation error"),
+                                 QCoreApplication::translate("SystemdWidget",
+                                                             "Drop-in name must contain only letters, digits, '.', '_', '@' or '-'."));
+            ui->dropInBaseNameLineEdit->setFocus();
+            return false;
+        }
     }
 
     if (ui->editUnitFileCheckBox->isChecked() && !m_textEditorMode)

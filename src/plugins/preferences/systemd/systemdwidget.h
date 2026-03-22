@@ -75,6 +75,7 @@ private:
     void updateEditModeAvailability();
     void updateEditorModeUi();
     void updateActionColumnsMinimumWidths();
+    void updateForcedOptions();
     void attachStrategyComboBox(int row);
     void attachDependencyTypeComboBox(int row, int typeIndex = 0);
     void applyStrategyStateToRow(int row) const;
@@ -87,6 +88,10 @@ private:
     QString editModeHintForCurrentSelection() const;
     SystemdUnitType currentUnitType() const;
     SystemdEditMode currentEditMode() const;
+    bool isMachineGlobalUserTarget() const;
+    bool isEditForcedByApplyMode() const;
+    QString currentDropInName() const;
+    void setDropInName(const QString &dropInName);
     bool mandatoryRulesActive() const;
     void ensureActionRowItems(int row);
     int appendActionRow(const QString &section,

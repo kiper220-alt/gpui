@@ -12,7 +12,7 @@ SystemdItem::SystemdItem()
     addProperty(UNIT_TYPE, static_cast<int>(SystemdUnitType::Service));
     addProperty(STATE, static_cast<int>(SystemdState::AsIs));
     addProperty(STATE_NOW, false);
-    addProperty(APPLY_MODE, static_cast<int>(SystemdApplyMode::Always));
+    addProperty(APPLY_MODE, static_cast<int>(SystemdApplyMode::IfExists));
     addProperty(POLICY_TARGET, static_cast<int>(SystemdPolicyTarget::Machine));
 
     addProperty(EDIT, false);

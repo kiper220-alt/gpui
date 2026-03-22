@@ -30,7 +30,7 @@ void SystemdWidget::submit()
 
     m_item->setProperty(SystemdItem::EDIT, ui->editUnitFileCheckBox->isChecked());
     m_item->setProperty(SystemdItem::EDIT_MODE, ui->unitEditModeComboBox->currentIndex());
-    m_item->setProperty(SystemdItem::DROP_IN_NAME, ui->dropInNameLineEdit->text().toStdString());
+    m_item->setProperty(SystemdItem::DROP_IN_NAME, currentDropInName().toStdString());
     if (ui->editUnitFileCheckBox->isChecked())
     {
         if (m_textEditorMode)
