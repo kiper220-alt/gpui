@@ -494,14 +494,29 @@ void MainWindow::updateStatusBar()
     ++d->machineVersion;
     ++d->userVersion;
 
+    bool ldapVersionUpdated = true;
     if (guid != "")
     {
-        d->ldapImpl->setExtensions(guid, machineExtensions, userExtensions, d->machineVersion, d->userVersion);
+        ldapVersionUpdated = d->ldapImpl->setExtensions(guid,
+                                                        machineExtensions,
+                                                        userExtensions,
+                                                        d->machineVersion,
+                                                        d->userVersion);
     }
 
     GptIniUtils gptUtils;
 
     gptUtils.onIniFileSave(d->options.path + "/gpt.ini", d->options.policyName, d->machineVersion, d->userVersion);
+
+    if (!ldapVersionUpdated)
+    {
+        QMessageBox messageBox(QMessageBox::Critical,
+                               tr("Error"),
+                               tr("Failed to update the GPO version in LDAP. Clients may keep a stale policy cache."),
+                               QMessageBox::Ok,
+                               this);
+        messageBox.exec();
+    }
 
     ui->statusbar->showMessage(tr("Applied changes for policy: ") + d->itemName);
 }

@@ -8,6 +8,28 @@
 
 namespace ldap {
 
+namespace
+{
+QHash<QString, AdObject> searchGpoByGuid(LDAPImpl *ldapImpl, AdConfig *adConfig, const QString &guid)
+{
+    const QString base = adConfig->policies_dn();
+    const SearchScope scope = SearchScope_All;
+
+    QString filter = ldapImpl->getFilterCondition(ldap::LDAPContract::Condition::Condition_Equals,
+                                                  ATTRIBUTE_OBJECT_CLASS,
+                                                  CLASS_GP_CONTAINER);
+    QString filter2 = ldapImpl->getFilterCondition(ldap::LDAPContract::Condition::Condition_Equals,
+                                                   ATTRIBUTE_GPC_FILE_SYS_PATH,
+                                                   "*" + guid + "*");
+
+    QList<QString> filtersList;
+    filtersList << filter << filter2;
+    QString commonFilter = ldapImpl->getFilter_AND(filtersList);
+
+    return ldapImpl->search(base, scope, commonFilter, QList<QString>());
+}
+}
+
 class LDAPImplPrivate {
 public:
     std::unique_ptr<AdInterface> adInterface;
@@ -39,18 +61,7 @@ bool LDAPImpl::initialize()
 
 QString LDAPImpl::getDisplayNameGPO(const QString &guid)
 {
-    const QString base = d->adConfig.get()->policies_dn();
-    const SearchScope scope = SearchScope_All;
-
-    QString filter = getFilterCondition(ldap::LDAPContract::Condition::Condition_Equals, ATTRIBUTE_OBJECT_CLASS, CLASS_GP_CONTAINER);
-    QString filter2 = getFilterCondition(ldap::LDAPContract::Condition::Condition_Equals, ATTRIBUTE_GPC_FILE_SYS_PATH, "*" + guid + "*");
-
-    QList<QString> filtersList;
-    filtersList << filter << filter2;
-    QString commonFilter = getFilter_AND(filtersList);
-
-    const QList<QString> attributes = QList<QString>();
-    const QHash<QString, AdObject> results = search(base, scope, commonFilter, attributes);
+    const QHash<QString, AdObject> results = searchGpoByGuid(this, d->adConfig.get(), guid);
 
     if(results.size() > 0)
     {
@@ -65,18 +76,7 @@ QString LDAPImpl::getDisplayNameGPO(const QString &guid)
 
 int LDAPImpl::getGPOVersion(const QString &guid)
 {
-    const QString base = d->adConfig.get()->policies_dn();
-    const SearchScope scope = SearchScope_All;
-
-    QString filter = getFilterCondition(ldap::LDAPContract::Condition::Condition_Equals, ATTRIBUTE_OBJECT_CLASS, CLASS_GP_CONTAINER);
-    QString filter2 = getFilterCondition(ldap::LDAPContract::Condition::Condition_Equals, ATTRIBUTE_GPC_FILE_SYS_PATH, "*" + guid + "*");
-
-    QList<QString> filtersList;
-    filtersList << filter << filter2;
-    QString commonFilter = getFilter_AND(filtersList);
-
-    const QList<QString> attributes = QList<QString>();
-    const QHash<QString, AdObject> results = search(base, scope, commonFilter, attributes);
+    const QHash<QString, AdObject> results = searchGpoByGuid(this, d->adConfig.get(), guid);
 
     if(results.size() > 0)
     {
@@ -103,17 +103,27 @@ const QHash<QString, AdObject> LDAPImpl::search(const QString &base, const Searc
 
 bool LDAPImpl::setExtensions(const QString &guid, const QString& machineExtensions, const QString& userExtensions, const int machineVersion, const int userVersion)
 {
-    const QString gpc_dn = QString("CN={%1},%2").arg(guid, d->adConfig->policies_dn());
+    const QHash<QString, AdObject> results = searchGpoByGuid(this, d->adConfig.get(), guid);
+    if (results.isEmpty())
+    {
+        return false;
+    }
+
+    const QString gpc_dn = results.keys()[0];
 
     const int version = (userVersion << 16) + machineVersion;
 
-    d->adInterface->attribute_replace_string(gpc_dn, ATTRIBUTE_GPC_MACHINE_EXTENSION_NAMES, machineExtensions);
+    const bool machineExtensionsUpdated = d->adInterface->attribute_replace_string(gpc_dn,
+                                                                                   ATTRIBUTE_GPC_MACHINE_EXTENSION_NAMES,
+                                                                                   machineExtensions);
 
-    d->adInterface->attribute_replace_string(gpc_dn, ATTRIBUTE_GPC_USER_EXTENSION_NAMES, userExtensions);
+    const bool userExtensionsUpdated = d->adInterface->attribute_replace_string(gpc_dn,
+                                                                                ATTRIBUTE_GPC_USER_EXTENSION_NAMES,
+                                                                                userExtensions);
 
-    d->adInterface->attribute_replace_int(gpc_dn, ATTRIBUTE_VERSION_NUMBER, version);
+    const bool versionUpdated = d->adInterface->attribute_replace_int(gpc_dn, ATTRIBUTE_VERSION_NUMBER, version);
 
-    return true;
+    return machineExtensionsUpdated && userExtensionsUpdated && versionUpdated;
 }
 
 AdConfig* LDAPImpl::getAdConfig()
