@@ -142,10 +142,13 @@ QVariant PreferencesTreeProxyModel::data(const QModelIndex &proxyIndex, int role
 
                     contentWidget->onItemTypeChange(types);
                     contentWidget->setModel(modelType->second.get());
-                    QObject::connect(contentWidget,
-                                     &TableDetailsWidget::okPressed,
-                                     d->snapIn,
-                                     &gpui::PreferencesSnapInPrivate::onDataSave);
+                    if (d->snapIn)
+                    {
+                        QObject::connect(contentWidget,
+                                         &TableDetailsWidget::okPressed,
+                                         d->snapIn,
+                                         &gpui::PreferencesSnapInPrivate::onDataSave);
+                    }
                     QObject::connect(contentWidget,
                                      &TableDetailsWidget::okPressed,
                                      this,

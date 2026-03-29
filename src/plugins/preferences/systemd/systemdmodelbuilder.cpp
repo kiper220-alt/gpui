@@ -588,7 +588,7 @@ std::unique_ptr<PreferencesModel> SystemdModelBuilder::schemaToModel(std::unique
     return model;
 }
 
-std::unique_ptr<Systemds> SystemdModelBuilder::modelToSchema(std::unique_ptr<PreferencesModel> &model)
+std::unique_ptr<Systemds> SystemdModelBuilder::modelToSchema(const std::unique_ptr<PreferencesModel> &model)
 {
     auto systemds = std::make_unique<Systemds>("{48ABBD05-0169-4696-8F2C-E1E42A499ADF}");
 

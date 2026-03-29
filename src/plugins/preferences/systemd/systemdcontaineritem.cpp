@@ -1,5 +1,7 @@
 #include "systemdcontaineritem.h"
 
+#include <cassert>
+
 #include <mvvm/signals/itemmapper.h>
 
 #include "common/commonitem.h"
@@ -102,6 +104,7 @@ SystemdContainerItem::SystemdContainerItem(const std::string &typeName, int unit
 
 CommonItem *SystemdContainerItem::getCommon() const
 {
+    assert(childrenCount() >= 2);
     return static_cast<CommonItem *>(children()[childrenCount() - 2]);
 }
 
@@ -112,6 +115,7 @@ void SystemdContainerItem::setCommon(const CommonItem &item)
 
 SystemdItem *SystemdContainerItem::getSystemd() const
 {
+    assert(childrenCount() >= 1);
     return static_cast<SystemdItem *>(children().back());
 }
 
@@ -183,6 +187,7 @@ void SystemdContainerItem::setupListeners()
 
 void SystemdContainerItem::retranslateStrings()
 {
+    assert(childrenCount() >= 5);
     children()[0]->setDisplayName(QObject::tr("Name").toStdString());
     children()[1]->setDisplayName(QObject::tr("Type").toStdString());
     children()[2]->setDisplayName(QObject::tr("State").toStdString());

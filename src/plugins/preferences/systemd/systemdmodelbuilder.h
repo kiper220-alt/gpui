@@ -16,7 +16,7 @@ public:
     SystemdModelBuilder();
 
     std::unique_ptr<PreferencesModel> schemaToModel(std::unique_ptr<Systemds> &systemds);
-    std::unique_ptr<Systemds> modelToSchema(std::unique_ptr<PreferencesModel> &model);
+    std::unique_ptr<Systemds> modelToSchema(const std::unique_ptr<PreferencesModel> &model);
 };
 
 } // namespace preferences
