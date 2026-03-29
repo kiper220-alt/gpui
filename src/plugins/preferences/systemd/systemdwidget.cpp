@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 #include <QRegularExpression>
+#include <QTextCursor>
 
 #include "common/commonitem.h"
 #include "systemdmancatalog.h"
@@ -492,7 +493,9 @@ void SystemdWidget::setItem(ModelView::SessionItem *item)
         m_preferredFlexibleEditMode = ui->unitEditModeComboBox->currentIndex();
     }
     setDropInName(QString::fromStdString(m_item->property<std::string>(SystemdItem::DROP_IN_NAME)));
-    ui->unitFileTextEdit->setPlainText(QString::fromStdString(m_item->property<std::string>(SystemdItem::UNIT_FILE_TEXT)));
+    ui->unitFileTextEdit->document()->setPlainText(
+        QString::fromStdString(m_item->property<std::string>(SystemdItem::UNIT_FILE_TEXT)));
+    ui->unitFileTextEdit->moveCursor(QTextCursor::Start);
     m_textEditorMode = m_item->property<int>(SystemdItem::UNIT_FILE_MODE) == static_cast<int>(SystemdUnitFileMode::Text);
 
     readEditTable();
@@ -1874,7 +1877,8 @@ void SystemdWidget::on_switchEditorModePushButton_clicked()
     }
     else
     {
-        ui->unitFileTextEdit->setPlainText(buildUnitFileTextFromTable(false));
+        ui->unitFileTextEdit->document()->setPlainText(buildUnitFileTextFromTable(false));
+        ui->unitFileTextEdit->moveCursor(QTextCursor::Start);
         m_textEditorMode = true;
     }
 

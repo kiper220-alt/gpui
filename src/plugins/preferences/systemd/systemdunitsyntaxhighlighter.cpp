@@ -17,7 +17,8 @@ SystemdUnitSyntaxHighlighter::SystemdUnitSyntaxHighlighter(QTextDocument *docume
     m_keyFormat.setFontWeight(QFont::DemiBold);
     m_keyFormat.setForeground(palette.brush(QPalette::Text));
 
-    m_commentFormat.setForeground(palette.brush(QPalette::PlaceholderText));
+    const bool isDark = palette.color(QPalette::Window).lightness() < 128;
+    m_commentFormat.setForeground(QColor(isDark ? QStringLiteral("#7ca668") : QStringLiteral("#4a7c3f")));
     m_commentFormat.setFontItalic(true);
 }
 
