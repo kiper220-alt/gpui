@@ -858,11 +858,18 @@ void SystemdWidget::updateForcedOptions()
     }
     ui->editUnitFileCheckBox->setEnabled(!forceEdit);
 
-    const QString editHint = forceEdit
-        ? QCoreApplication::translate(
-              "SystemdWidget",
-              "Configuration editing is required for this apply mode because the unit may need to be created.")
-        : QString();
+    QString editHint;
+    if (forceEdit)
+    {
+        const auto applyMode = static_cast<SystemdApplyMode>(ui->applyModeComboBox->currentIndex());
+        editHint = (applyMode == SystemdApplyMode::IfMissing)
+            ? QCoreApplication::translate(
+                  "SystemdWidget",
+                  "Configuration editing is required for this apply mode because the unit needs to be created.")
+            : QCoreApplication::translate(
+                  "SystemdWidget",
+                  "Configuration editing is required for this apply mode because the unit may need to be created.");
+    }
     ui->editUnitFileCheckBox->setToolTip(editHint);
     ui->editUnitFileCheckBox->setWhatsThis(editHint);
 }
@@ -878,9 +885,7 @@ QList<int> SystemdWidget::allowedEditModesForApplyMode() const
         return {static_cast<int>(SystemdEditMode::Create)};
     case SystemdApplyMode::Always:
     default:
-        return {static_cast<int>(SystemdEditMode::Create),
-                static_cast<int>(SystemdEditMode::Override),
-                static_cast<int>(SystemdEditMode::CreateOrOverride)};
+        return {static_cast<int>(SystemdEditMode::CreateOrOverride)};
     }
 }
 
@@ -930,7 +935,7 @@ QString SystemdWidget::editModeHintForCurrentSelection() const
         return QCoreApplication::translate("SystemdWidget", "Unit will be created.");
     case SystemdApplyMode::Always:
     default:
-        return QString();
+        return QCoreApplication::translate("SystemdWidget", "Unit will be created or overridden using a drop-in.");
     }
 }
 

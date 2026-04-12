@@ -136,23 +136,18 @@ int fromSchemaPolicyTarget(const UnitPolicyTarget_t &policyTarget)
     return static_cast<int>(static_cast<UnitPolicyTarget_t::Value>(policyTarget));
 }
 
-UnitEditMode_t toSchemaEditMode(int editMode)
+int editModeFromApplyMode(int applyMode)
 {
-    switch (static_cast<preferences::SystemdEditMode>(editMode))
+    switch (static_cast<preferences::SystemdApplyMode>(applyMode))
     {
-    case preferences::SystemdEditMode::Override:
-        return UnitEditMode_t(UnitEditMode_t::override);
-    case preferences::SystemdEditMode::CreateOrOverride:
-        return UnitEditMode_t(UnitEditMode_t::create_or_override);
-    case preferences::SystemdEditMode::Create:
+    case preferences::SystemdApplyMode::IfExists:
+        return static_cast<int>(preferences::SystemdEditMode::Override);
+    case preferences::SystemdApplyMode::IfMissing:
+        return static_cast<int>(preferences::SystemdEditMode::Create);
+    case preferences::SystemdApplyMode::Always:
     default:
-        return UnitEditMode_t(UnitEditMode_t::create);
+        return static_cast<int>(preferences::SystemdEditMode::CreateOrOverride);
     }
-}
-
-int fromSchemaEditMode(const UnitEditMode_t &mode)
-{
-    return static_cast<int>(static_cast<UnitEditMode_t::Value>(mode));
 }
 
 UnitFileMode_t toSchemaUnitFileMode(int mode)
@@ -385,7 +380,8 @@ void fillModelFromUnitProperties(preferences::SystemdItem *item,
     item->setProperty(preferences::SystemdItem::STATE_NOW, static_cast<bool>(properties.now()));
     item->setProperty(preferences::SystemdItem::APPLY_MODE, fromSchemaApplyMode(properties.applyMode()));
     item->setProperty(preferences::SystemdItem::POLICY_TARGET, fromSchemaPolicyTarget(properties.policyTarget()));
-    item->setProperty(preferences::SystemdItem::EDIT_MODE, fromSchemaEditMode(properties.editMode()));
+    item->setProperty(preferences::SystemdItem::EDIT_MODE,
+                      editModeFromApplyMode(fromSchemaApplyMode(properties.applyMode())));
     item->setProperty(preferences::SystemdItem::DROP_IN_NAME, properties.dropInName().present()
                                                             ? properties.dropInName().get().c_str()
                                                             : std::string());
@@ -504,7 +500,6 @@ UnitWithEdits_t createEditsOnlyProperties(const preferences::SystemdItem *system
     properties.now(systemdItem->property<bool>(preferences::SystemdItem::STATE_NOW));
     properties.applyMode(toSchemaApplyMode(systemdItem->property<int>(preferences::SystemdItem::APPLY_MODE)));
     properties.policyTarget(toSchemaPolicyTarget(systemdItem->property<int>(preferences::SystemdItem::POLICY_TARGET)));
-    properties.editMode(toSchemaEditMode(systemdItem->property<int>(preferences::SystemdItem::EDIT_MODE)));
     const auto dropInName = systemdItem->property<std::string>(preferences::SystemdItem::DROP_IN_NAME);
     if (!dropInName.empty())
     {
@@ -526,7 +521,6 @@ UnitWithEditsAndFileDeps_t createFileDepsProperties(const preferences::SystemdIt
     properties.now(systemdItem->property<bool>(preferences::SystemdItem::STATE_NOW));
     properties.applyMode(toSchemaApplyMode(systemdItem->property<int>(preferences::SystemdItem::APPLY_MODE)));
     properties.policyTarget(toSchemaPolicyTarget(systemdItem->property<int>(preferences::SystemdItem::POLICY_TARGET)));
-    properties.editMode(toSchemaEditMode(systemdItem->property<int>(preferences::SystemdItem::EDIT_MODE)));
     const auto dropInName = systemdItem->property<std::string>(preferences::SystemdItem::DROP_IN_NAME);
     if (!dropInName.empty())
     {

@@ -30,14 +30,6 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="UnitEditMode_t">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="create"/>
-            <xs:enumeration value="override"/>
-            <xs:enumeration value="create_or_override"/>
-        </xs:restriction>
-    </xs:simpleType>
-
     <xs:simpleType name="UnitFileMode_t">
         <xs:restriction base="xs:string">
             <xs:enumeration value="table"/>
@@ -86,7 +78,6 @@
         <xs:attribute name="policyTarget" type="UnitPolicyTarget_t"
                       use="optional" default="machine"/>
 
-        <xs:attribute name="editMode" type="UnitEditMode_t" use="optional" default="override"/>
         <xs:attribute name="dropInName" type="xs:string" use="optional"/>
     </xs:complexType>
 
