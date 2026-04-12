@@ -82,6 +82,7 @@ private:
     QString buildUnitFileTextFromTable(bool with_header) const;
     void fillTableFromUnitFileText(const QString &unitFileText);
     bool validateTableMode(QString &errorText) const;
+    bool validateIniSyntax(const QString &text, QString &errorText) const;
     bool isUserPolicyContext() const;
     QList<int> allowedEditModesForApplyMode() const;
     void ensureValidEditModeSelection();

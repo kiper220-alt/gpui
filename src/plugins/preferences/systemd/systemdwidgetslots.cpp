@@ -116,6 +116,14 @@ void SystemdWidget::on_actionRemoveButton_clicked()
 void SystemdWidget::on_dependAddButton_clicked()
 {
     const int rows = ui->dependenciesTableWidget->rowCount();
+    if (rows >= 32)
+    {
+        QMessageBox::warning(this,
+                             QCoreApplication::translate("SystemdWidget", "Validation error"),
+                             QCoreApplication::translate("SystemdWidget",
+                                                         "Maximum number of dependencies (32) has been reached."));
+        return;
+    }
     ui->dependenciesTableWidget->insertRow(rows);
     attachDependencyTypeComboBox(rows);
 }

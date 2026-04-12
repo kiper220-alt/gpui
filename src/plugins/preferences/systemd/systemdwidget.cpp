@@ -1871,6 +1871,14 @@ void SystemdWidget::on_switchEditorModePushButton_clicked()
 {
     if (m_textEditorMode)
     {
+        QString iniError;
+        if (!validateIniSyntax(ui->unitFileTextEdit->toPlainText(), iniError))
+        {
+            QMessageBox::warning(this,
+                                 QCoreApplication::translate("SystemdWidget", "Validation error"),
+                                 iniError);
+            return;
+        }
         fillTableFromUnitFileText(ui->unitFileTextEdit->toPlainText());
         m_textEditorMode = false;
         ensureScaffoldRows();
@@ -2243,6 +2251,66 @@ bool SystemdWidget::validateTableMode(QString &errorText) const
             "SystemdWidget",
             "Section [Service]: RemainAfterExit must be true when using ExecStop without ExecStart.");
         return false;
+    }
+
+    return true;
+}
+
+bool SystemdWidget::validateIniSyntax(const QString &text, QString &errorText) const
+{
+    const QStringList lines = text.split(QLatin1Char('\n'));
+    QString currentSection;
+
+    for (int i = 0; i < lines.size(); ++i)
+    {
+        const QString line = lines.at(i).trimmed();
+        const int lineNumber = i + 1;
+
+        if (line.isEmpty() || line.startsWith(QLatin1Char('#')) || line.startsWith(QLatin1Char(';')))
+        {
+            continue;
+        }
+
+        if (line.startsWith(QLatin1Char('[')))
+        {
+            if (!line.endsWith(QLatin1Char(']')))
+            {
+                errorText = QCoreApplication::translate(
+                    "SystemdWidget", "Line %1: unclosed section header.").arg(lineNumber);
+                return false;
+            }
+            const QString sectionName = line.mid(1, line.size() - 2).trimmed();
+            if (sectionName.isEmpty())
+            {
+                errorText = QCoreApplication::translate(
+                    "SystemdWidget", "Line %1: section name is empty.").arg(lineNumber);
+                return false;
+            }
+            currentSection = sectionName;
+            continue;
+        }
+
+        if (!line.contains(QLatin1Char('=')))
+        {
+            errorText = QCoreApplication::translate(
+                "SystemdWidget", "Line %1: expected key=value pair or section header.").arg(lineNumber);
+            return false;
+        }
+
+        if (currentSection.isEmpty())
+        {
+            errorText = QCoreApplication::translate(
+                "SystemdWidget", "Line %1: key=value pair outside of any section.").arg(lineNumber);
+            return false;
+        }
+
+        const QString key = line.left(line.indexOf(QLatin1Char('='))).trimmed();
+        if (key.isEmpty())
+        {
+            errorText = QCoreApplication::translate(
+                "SystemdWidget", "Line %1: key name is empty.").arg(lineNumber);
+            return false;
+        }
     }
 
     return true;
