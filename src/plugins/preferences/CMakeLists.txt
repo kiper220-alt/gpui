@@ -1,4 +1,4 @@
-find_package(Qt5 COMPONENTS Widgets Qml LinguistTools REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Qml Xml LinguistTools REQUIRED)
 
 find_package(GPUI COMPONENTS core io REQUIRED)
 
@@ -87,6 +87,42 @@ set(HEADERS
 
     interfaces/preferencesreaderinterface.h
     interfaces/preferenceswriterinterface.h
+
+    item_level_targeting/filtersbridge.h
+    item_level_targeting/targetingcontainer.h
+    item_level_targeting/targetingdialog.h
+    item_level_targeting/targetingfilteritem.h
+    item_level_targeting/targetingfilterwidget.h
+    item_level_targeting/targetingicons.h
+    item_level_targeting/targetingmodel.h
+    item_level_targeting/targetingwidgetfactory.h
+    item_level_targeting/batterypresentwidget.h
+    item_level_targeting/pcmciapresentwidget.h
+    item_level_targeting/sitefilterwidget.h
+    item_level_targeting/cpuspeedwidget.h
+    item_level_targeting/ramfilterwidget.h
+    item_level_targeting/computernamewidget.h
+    item_level_targeting/domainfilterwidget.h
+    item_level_targeting/environmentvariablewidget.h
+    item_level_targeting/ipaddressrangewidget.h
+    item_level_targeting/macaddressrangewidget.h
+    item_level_targeting/timerangefilterwidget.h
+    item_level_targeting/userfilterwidget.h
+    item_level_targeting/organizationunitwidget.h
+    item_level_targeting/securitygroupwidget.h
+    item_level_targeting/diskspacewidget.h
+    item_level_targeting/portablecomputerwidget.h
+    item_level_targeting/processingmodewidget.h
+    item_level_targeting/ldapfilterwidget.h
+    item_level_targeting/wmiquerywidget.h
+    item_level_targeting/languagewidget.h
+    item_level_targeting/networkconnectionwidget.h
+    item_level_targeting/operatingsystemwidget.h
+    item_level_targeting/datematchwidget.h
+    item_level_targeting/filematchwidget.h
+    item_level_targeting/msiquerywidget.h
+    item_level_targeting/registrymatchwidget.h
+    item_level_targeting/terminalsessionwidget.h
 
     local_users_and_groups/baselocalitem.h
     local_users_and_groups/groupmemberdialog.h
@@ -274,6 +310,42 @@ set(SOURCES
     ini/iniwidget.cpp
     ini/iniwidgetslots.cpp
 
+    item_level_targeting/filtersbridge.cpp
+    item_level_targeting/targetingcontainer.cpp
+    item_level_targeting/targetingdialog.cpp
+    item_level_targeting/targetingfilteritem.cpp
+    item_level_targeting/targetingfilterwidget.cpp
+    item_level_targeting/targetingicons.cpp
+    item_level_targeting/targetingmodel.cpp
+    item_level_targeting/targetingwidgetfactory.cpp
+    item_level_targeting/batterypresentwidget.cpp
+    item_level_targeting/pcmciapresentwidget.cpp
+    item_level_targeting/sitefilterwidget.cpp
+    item_level_targeting/cpuspeedwidget.cpp
+    item_level_targeting/ramfilterwidget.cpp
+    item_level_targeting/computernamewidget.cpp
+    item_level_targeting/domainfilterwidget.cpp
+    item_level_targeting/environmentvariablewidget.cpp
+    item_level_targeting/ipaddressrangewidget.cpp
+    item_level_targeting/macaddressrangewidget.cpp
+    item_level_targeting/timerangefilterwidget.cpp
+    item_level_targeting/userfilterwidget.cpp
+    item_level_targeting/organizationunitwidget.cpp
+    item_level_targeting/securitygroupwidget.cpp
+    item_level_targeting/diskspacewidget.cpp
+    item_level_targeting/portablecomputerwidget.cpp
+    item_level_targeting/processingmodewidget.cpp
+    item_level_targeting/ldapfilterwidget.cpp
+    item_level_targeting/wmiquerywidget.cpp
+    item_level_targeting/languagewidget.cpp
+    item_level_targeting/networkconnectionwidget.cpp
+    item_level_targeting/operatingsystemwidget.cpp
+    item_level_targeting/datematchwidget.cpp
+    item_level_targeting/filematchwidget.cpp
+    item_level_targeting/msiquerywidget.cpp
+    item_level_targeting/registrymatchwidget.cpp
+    item_level_targeting/terminalsessionwidget.cpp
+
     local_users_and_groups/baselocalitem.cpp
     local_users_and_groups/groupmemberdialog.cpp
     local_users_and_groups/groupmemberitem.cpp
@@ -403,6 +475,35 @@ set(UI_FORMS
 
     ini/iniwidget.ui
 
+    item_level_targeting/targetingdialog.ui
+    item_level_targeting/batterypresentwidget.ui
+    item_level_targeting/pcmciawidget.ui
+    item_level_targeting/sitewidget.ui
+    item_level_targeting/cpuspeedwidget.ui
+    item_level_targeting/ramwidget.ui
+    item_level_targeting/computernamewidget.ui
+    item_level_targeting/domainwidget.ui
+    item_level_targeting/environmentwidget.ui
+    item_level_targeting/ipaddressrangewidget.ui
+    item_level_targeting/macaddressrangewidget.ui
+    item_level_targeting/timerangewidget.ui
+    item_level_targeting/userwidget.ui
+    item_level_targeting/organizationuniitwidget.ui
+    item_level_targeting/securitygroupwidget.ui
+    item_level_targeting/diskspacewidget.ui
+    item_level_targeting/portablecomputerwidget.ui
+    item_level_targeting/processingmodewidget.ui
+    item_level_targeting/ldapwidget.ui
+    item_level_targeting/wmiquerywidget.ui
+    item_level_targeting/languagewidget.ui
+    item_level_targeting/networkconnectionwidget.ui
+    item_level_targeting/operatingsystemwidget.ui
+    item_level_targeting/datematchwidget.ui
+    item_level_targeting/filematchwidget.ui
+    item_level_targeting/msiquerywidget.ui
+    item_level_targeting/registrymatchwidget.ui
+    item_level_targeting/terminalsessionwidget.ui
+
     local_users_and_groups/groupmemberswidget.ui
     local_users_and_groups/groupmemberdialog.ui
     local_users_and_groups/localuserwidget.ui
@@ -489,7 +590,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 set(PLUGIN_NAME preferences-plugin)
 
 add_library(preferences_static STATIC ${SOURCES})
-target_link_libraries(preferences_static Qt5::Core Qt5::Widgets)
+target_link_libraries(preferences_static Qt5::Core Qt5::Widgets Qt5::Xml)
 target_link_libraries(preferences_static ${GPUI_LIBRARIES})
 target_link_libraries(preferences_static ${MVVM_LIBRARIES})
 
