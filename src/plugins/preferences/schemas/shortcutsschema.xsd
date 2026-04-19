@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+<xs:include schemaLocation="targetingschema.xsd"/>
+
 <xs:complexType name="ShortcutsProperties_t">
     <xs:attribute name="pidl" type="xs:string" use="optional" />
     <xs:attribute name="targetType" type="xs:string" use="required" />
@@ -20,6 +22,7 @@
 <xs:complexType name="Shortcut_t">
     <xs:sequence>
        <xs:element name="Properties" type="ShortcutsProperties_t" maxOccurs="unbounded"/>
+       <xs:element minOccurs="0" name="Filters" type="Filters_t"/>
     </xs:sequence>
     <xs:attribute name="clsid" type="xs:string" use="required" />
     <xs:attribute name="name" type="xs:string" use="required" />

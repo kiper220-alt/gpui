@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+<xs:include schemaLocation="targetingschema.xsd"/>
+
 <xs:complexType name="UserProperties_t">
    <xs:attribute name="action" type="xs:string" use="optional" />
    <xs:attribute name="newName"
@@ -28,6 +30,7 @@
 <xs:complexType name="User_t">
    <xs:sequence>
       <xs:element name="Properties" type="UserProperties_t" maxOccurs="unbounded" />
+      <xs:element minOccurs="0" name="Filters" type="Filters_t"/>
    </xs:sequence>
    <xs:attribute name="clsid" type="xs:string" use="required" />
    <xs:attribute name="name" type="xs:string" use="required" />
@@ -85,6 +88,7 @@
 <xs:complexType name="Group_t">
    <xs:sequence>
       <xs:element name="Properties" type="GroupProperties_t" maxOccurs="unbounded"/>
+      <xs:element minOccurs="0" name="Filters" type="Filters_t"/>
    </xs:sequence>
    <xs:attribute name="clsid" type="xs:string" use="required" />
    <xs:attribute name="name" type="xs:string" use="required" />

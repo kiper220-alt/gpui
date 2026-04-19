@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:include schemaLocation="targetingschema.xsd"/>
 <xs:complexType name="SharedPrinterProperties_t">
    <xs:attribute name="action" type="xs:string" use="optional" />
    <xs:attribute name="comment" type="xs:string" use="optional" />
@@ -19,6 +20,7 @@
 <xs:complexType name="SharedPrinter_t">
    <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Properties" type="SharedPrinterProperties_t" />
+      <xs:element minOccurs="0" name="Filters" type="Filters_t"/>
    </xs:sequence>
    <xs:attribute name="clsid" type="xs:string" use="required" />
    <xs:attribute name="name" type="xs:string" use="required" />
@@ -56,6 +58,7 @@
 <xs:complexType name="PortPrinter_t">
    <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Properties" type="PortPrinterProperties_t" />
+      <xs:element minOccurs="0" name="Filters" type="Filters_t"/>
    </xs:sequence>
    <xs:attribute name="clsid" type="xs:string" use="required" />
    <xs:attribute name="name" type="xs:string" use="required" />
@@ -84,6 +87,7 @@
 <xs:complexType name="LocalPrinter_t">
    <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Properties" type="LocalPrinterProperties_t" />
+      <xs:element minOccurs="0" name="Filters" type="Filters_t"/>
    </xs:sequence>
    <xs:attribute name="clsid" type="xs:string" use="required" />
    <xs:attribute name="name" type="xs:string" use="required" />
