@@ -2,6 +2,23 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
+    <name>BatteryPresent</name>
+    <message>
+        <location filename="../batterypresent.ui" line="20"/>
+        <source>Form</source>
+        <translation type="unfinished">Форма</translation>
+    </message>
+    <message>
+        <location filename="../batterypresent.ui" line="38"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;A Battery Present targeting item allows a preference item to be applied to computers or users only if one or more batteries are present in the processing computer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BatteryPresentWidget</name>
     <message>
         <location filename="../batterypresentwidget.ui" line="26"/>
@@ -16,6 +33,69 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;A Battery Present targeting item allows a preference item to be applied to computers or users only if one or more batteries are present in the processing computer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>CPUSpeed</name>
+    <message>
+        <location filename="../cpuspeed.ui" line="20"/>
+        <source>Form</source>
+        <translation type="unfinished">Форма</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="26"/>
+        <source>A CPU Speed targeting item allows a preference item to be applied to computers or users only if the processing computer&apos;s CPU speed is greater than or equal to the value specified in the targeting item.</source>
+        <translation type="unfinished">Таргетинг на скорость ЦП позволяет применять предпочтения к компьютерам или пользователям только в том случае, если скорость ЦП обрабатывающего компьютера больше или равна значению, указанному в целевом элементе.</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="36"/>
+        <source>MHz</source>
+        <translation type="unfinished">МГц</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="57"/>
+        <source>500</source>
+        <translation type="unfinished">500</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="62"/>
+        <source>1000</source>
+        <translation type="unfinished">1000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="67"/>
+        <source>2000</source>
+        <translation type="unfinished">2000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="72"/>
+        <source>3000</source>
+        <translation type="unfinished">3000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="77"/>
+        <source>4000</source>
+        <translation type="unfinished">4000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="82"/>
+        <source>5000</source>
+        <translation type="unfinished">5000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="87"/>
+        <source>6000</source>
+        <translation type="unfinished">6000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="92"/>
+        <source>7000</source>
+        <translation type="unfinished">7000</translation>
+    </message>
+    <message>
+        <location filename="../cpuspeed.ui" line="106"/>
+        <source>Greater then or equal to:</source>
+        <translation type="unfinished">Больше или равно:</translation>
     </message>
 </context>
 <context>
@@ -974,10 +1054,6 @@ p, li { white-space: pre-wrap; }
         <translation>Таргетинг на переносной компьютер позволяет применять редпочтения к компьютерам или пользователям только в том случае, если обрабатывающий компьютер идентифицируется как переносной компьютер в текущем профиле оборудования на обрабатывающем компьютере или если обрабатывающий компьютер идентифицируется как переносной компьютер со стыковочным устройством. состояние, указанное в элементе.</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A Portable Computer targeting item allows a preference item to be applied to computers or users only if the processing computer is indentified as a portable computer in the current hardware profile on the processing computer or if the processing computer is indentified as a portable computer with the docking state specified in the targeting item.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="vanished">Таргетинг на переносной компьютер позволяет применять предпочтения к компьютерам или пользователям только в том случае, если обрабатывающий компьютер идентифицируется как переносной компьютер в текущем профиле оборудования на обрабатывающем компьютере или если обрабатывающий компьютер идентифицируется как переносной компьютер со стыковочным устройством. состояние, указанное в элементе таргетинга.</translation>
-    </message>
-    <message>
         <location filename="../portablecomputerwidget.ui" line="75"/>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
@@ -1405,6 +1481,22 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>TargetingDialog</name>
+    <message>
+        <location filename="../targetingdialog.ui" line="14"/>
+        <source>Targeting Editor</source>
+        <translation>Редактор таргетинга</translation>
+    </message>
+</context>
+<context>
+    <name>TargetingFilterItem</name>
+    <message>
+        <location filename="../targetingfilteritem.cpp" line="175"/>
+        <source>Collection</source>
+        <translation>Группа</translation>
+    </message>
+</context>
+<context>
     <name>TerminalSessionTCPWidget</name>
     <message>
         <location filename="../terminalsessiontcpwidget.ui" line="14"/>
@@ -1599,6 +1691,39 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>computerName</name>
+    <message>
+        <location filename="../computername.ui" line="20"/>
+        <source>Form</source>
+        <translation type="unfinished">Форма</translation>
+    </message>
+    <message>
+        <location filename="../computername.ui" line="26"/>
+        <source>Computer name</source>
+        <translation type="unfinished">Имя компьютера</translation>
+    </message>
+    <message>
+        <location filename="../computername.ui" line="54"/>
+        <source>...</source>
+        <translation type="unfinished">...</translation>
+    </message>
+    <message>
+        <location filename="../computername.ui" line="61"/>
+        <source>NetBIOS</source>
+        <translation type="unfinished">NetBIOS</translation>
+    </message>
+    <message>
+        <location filename="../computername.ui" line="71"/>
+        <source>DNS</source>
+        <translation type="unfinished">DNS</translation>
+    </message>
+    <message>
+        <location filename="../computername.ui" line="78"/>
+        <source>A Computer name targeting item allows a preference item to be applied to computers or users only if the computer&apos;s name matches the specified computer name in the targeting item.</source>
+        <translation type="unfinished">Nаргетинг имени компьютера позволяет применять предпочтения к компьютерам или пользователям только в том случае, если имя компьютера совпадает с именем компьютера, указанным в целевом элементе.</translation>
+    </message>
+</context>
+<context>
     <name>computerNameWidget</name>
     <message>
         <location filename="../computernamewidget.ui" line="26"/>
@@ -1629,6 +1754,98 @@ p, li { white-space: pre-wrap; }
         <location filename="../computernamewidget.ui" line="84"/>
         <source>A Computer name targeting item allows a preference item to be applied to computers or users only if the computer&apos;s name matches the specified computer name in the targeting item.</source>
         <translation>Nаргетинг имени компьютера позволяет применять предпочтения к компьютерам или пользователям только в том случае, если имя компьютера совпадает с именем компьютера, указанным в целевом элементе.</translation>
+    </message>
+</context>
+<context>
+    <name>preferences::TargetingDialog</name>
+    <message>
+        <location filename="../targetingdialog.cpp" line="205"/>
+        <source>New Item</source>
+        <translation>Новый элемент</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="217"/>
+        <location filename="../targetingdialog.cpp" line="714"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="221"/>
+        <source>Up</source>
+        <translation>Вверх</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="222"/>
+        <source>Down</source>
+        <translation>Вниз</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="227"/>
+        <location filename="../targetingdialog.cpp" line="703"/>
+        <source>Cut</source>
+        <translation>Вырезать</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="228"/>
+        <location filename="../targetingdialog.cpp" line="704"/>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="229"/>
+        <location filename="../targetingdialog.cpp" line="705"/>
+        <source>Paste</source>
+        <translation>Вставить</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="235"/>
+        <location filename="../targetingdialog.cpp" line="707"/>
+        <source>Wrap in Collection</source>
+        <translation>Сгруппировать</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="236"/>
+        <location filename="../targetingdialog.cpp" line="708"/>
+        <source>Unwrap Collection</source>
+        <translation>Разгруппировать</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="241"/>
+        <location filename="../targetingdialog.cpp" line="712"/>
+        <source>Negate</source>
+        <translation>Отрицание</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="245"/>
+        <location filename="../targetingdialog.cpp" line="710"/>
+        <source>AND</source>
+        <translation>И</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="246"/>
+        <location filename="../targetingdialog.cpp" line="711"/>
+        <source>OR</source>
+        <translation>ИЛИ</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="253"/>
+        <source>Options...</source>
+        <translation>Свойства...</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="656"/>
+        <source>Targeting Editor</source>
+        <translation>Редактор таргетинга</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="657"/>
+        <source>No editor is registered for %1.</source>
+        <translation>Редактор для %1 не зарегистрирован.</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="700"/>
+        <source>Edit...</source>
+        <translation>Изменить...</translation>
     </message>
 </context>
 </TS>
