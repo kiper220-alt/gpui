@@ -22,6 +22,7 @@
 #include "ui_commonview.h"
 
 #include "commonitem.h"
+#include "item_level_targeting/targetingdialog.h"
 
 #include <mvvm/factories/viewmodelfactory.h>
 #include <mvvm/viewmodel/viewmodeldelegate.h>
@@ -36,6 +37,8 @@ CommonView::CommonView(QWidget *parent)
     , delegate(std::make_unique<ModelView::ViewModelDelegate>())
 {
     ui->setupUi(this);
+
+    connect(ui->targetingToolButton, &QToolButton::clicked, this, &CommonView::onTargetingClicked);
 }
 
 CommonView::~CommonView()
@@ -45,6 +48,8 @@ CommonView::~CommonView()
 
 void CommonView::setItem(ModelView::SessionItem *item)
 {
+    m_item = dynamic_cast<CommonItem*>(item);
+
     view_model = ModelView::Factory::CreatePropertyFlatViewModel(item->model());
     view_model->setRootSessionItem(item);
 
@@ -61,6 +66,8 @@ void CommonView::setItem(ModelView::SessionItem *item)
     mapper->addMapping(ui->stopOnErrorCheckBox, CommonItem::propertyToInt(CommonItem::BYPASS_ERRORS));
     mapper->addMapping(ui->userContextCheckBox, CommonItem::propertyToInt(CommonItem::USER_CONTEXT));
     mapper->addMapping(ui->removeThisCheckBox,  CommonItem::propertyToInt(CommonItem::REMOVE_POLICY));
+    mapper->addMapping(ui->applyOnceCheckBox,   CommonItem::propertyToInt(CommonItem::APPLY_ONCE));
+    mapper->addMapping(ui->itemLevelCheckBox,   CommonItem::propertyToInt(CommonItem::ITEM_LEVEL_TARGETING));
 
     mapper->setCurrentModelIndex(view_model->index(0, 1));
 }
@@ -68,6 +75,22 @@ void CommonView::setItem(ModelView::SessionItem *item)
 QString CommonView::name() const
 {
     return tr("Common");
+}
+
+void CommonView::onTargetingClicked()
+{
+    if (!m_item)
+        return;
+
+    mapper->submit();
+
+    TargetingDialog dialog(this);
+    dialog.setContainer(m_item->filters());
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        m_item->setFilters(dialog.container());
+    }
 }
 
 }

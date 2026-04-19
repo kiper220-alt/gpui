@@ -37,6 +37,8 @@ namespace ModelView
 namespace preferences
 {
 
+class CommonItem;
+
 class CommonView : public BasePreferenceWidget
 {
 public:
@@ -50,6 +52,9 @@ public:
 
     QString name() const override;
 
+private slots:
+    void onTargetingClicked();
+
 private:
     CommonView(const CommonView&)            = delete;   // copy ctor
     CommonView(CommonView&&)                 = delete;   // move ctor
@@ -62,6 +67,9 @@ private:
 private:
     std::unique_ptr<ModelView::ViewModel> view_model;
     std::unique_ptr<ModelView::ViewModelDelegate> delegate;
+
+    //! Raw pointer into the SessionItem tree; we do not own it.
+    CommonItem *m_item {nullptr};
 };
 
 }

@@ -60,9 +60,6 @@ context (user policy option)</string>
       </item>
       <item>
        <widget class="QCheckBox" name="applyOnceCheckBox">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="font">
          <font>
           <pointsize>10</pointsize>
@@ -77,9 +74,6 @@ context (user policy option)</string>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QCheckBox" name="itemLevelCheckBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="font">
            <font>
             <pointsize>10</pointsize>
@@ -92,11 +86,8 @@ context (user policy option)</string>
         </item>
         <item>
          <widget class="QToolButton" name="targetingToolButton">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
-           <string>Targetting...</string>
+           <string>Targeting...</string>
           </property>
          </widget>
         </item>
