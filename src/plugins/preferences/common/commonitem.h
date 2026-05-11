@@ -89,7 +89,18 @@ public:
     //! when writing back to disk to get the same list with the
     //! `FilterRunOnce` entry re-injected at the head.
     TargetingContainer filters() const;
+
+    //! Pure setter used by the targeting-dialog accept path. Stores the
+    //! container as-is; never mutates `APPLY_ONCE` or `RUN_ONCE_ID`. The
+    //! dialog hides `FilterRunOnce` rows by design (it round-trips the
+    //! checkbox state through `filtersForSerialization`), so it never
+    //! hands a `FilterRunOnce` back here.
     void setFilters(TargetingContainer filters);
+
+    //! Load-side setter used by `BasePreferenceReader`. Strips any
+    //! `FilterRunOnce` entries, caches the first one's `id` into
+    //! `RUN_ONCE_ID`, and infers `APPLY_ONCE` from the marker's presence.
+    void setFiltersFromXml(TargetingContainer filters);
 
     //! Container as it should appear on disk: a leading `FilterRunOnce`
     //! when `applyOnce()` is true, otherwise identical to `filters()`.

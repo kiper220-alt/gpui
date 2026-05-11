@@ -20,8 +20,11 @@
 
 #include "variablespreferencewriter.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "schemas/variablesschema.h"
 #include "variablesmodelbuilder.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool VariablesPreferenceWriter::writeModel(std::ostream &output, const std::uniq
     auto modelBuilder = std::make_unique<VariablesModelBuilder>();
     auto variables    = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    EnvironmentVariables_(output, *variables.get(), map);
+
+    std::ostringstream tmp;
+    EnvironmentVariables_(tmp, *variables.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

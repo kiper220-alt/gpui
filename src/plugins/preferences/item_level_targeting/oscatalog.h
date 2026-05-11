@@ -1,6 +1,6 @@
 /***********************************************************************************************************************
 **
-** Copyright (C) 2022 BaseALT Ltd. <org@basealt.ru>
+** Copyright (C) 2026 BaseALT Ltd. <org@basealt.ru>
 **
 ** This program is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License
@@ -18,32 +18,43 @@
 **
 ***********************************************************************************************************************/
 
-#include "folderpreferencewriter.h"
+#ifndef GPUI_OS_CATALOG_H
+#define GPUI_OS_CATALOG_H
 
-#include "foldermodelbuilder.h"
-#include "item_level_targeting/filtersio.h"
-#include "schemas/foldersschema.h"
-
-#include <sstream>
+#include <QList>
+#include <QString>
 
 namespace preferences
 {
-FolderPreferenceWriter::FolderPreferenceWriter()
-    : BasePreferenceWriter("FolderContainerItem")
-{}
 
-bool FolderPreferenceWriter::writeModel(std::ostream &output, const std::unique_ptr<PreferencesModel> &model)
+struct OsChoice
 {
-    auto modelBuilder = std::make_unique<FolderModelBuilder>();
-    auto folder       = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
-    const ::xml_schema::NamespaceInfomap map;
+    QString label;
+    QString value;
+};
 
-    std::ostringstream tmp;
-    Folders_(tmp, *folder.get(), map);
+struct OsProduct
+{
+    QString label;
+    QString value;
+    QList<OsChoice> editions;
+    QList<OsChoice> servicePacks;
+    QList<OsChoice> roles;
+    bool visible{true};
+};
 
-    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
-    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
-    return true;
-}
+class OsCatalog
+{
+public:
+    static QList<OsProduct> products();
+    static QList<OsProduct> visibleProducts();
+    static QList<OsProduct> reservedProducts();
+    static OsProduct productByValue(const QString &value);
+
+    static OsChoice anyChoice();
+    static OsChoice noServicePacksChoice();
+};
 
 } // namespace preferences
+
+#endif // GPUI_OS_CATALOG_H

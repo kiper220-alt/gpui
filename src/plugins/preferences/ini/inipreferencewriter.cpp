@@ -21,7 +21,10 @@
 #include "inipreferencewriter.h"
 
 #include "inimodelbuilder.h"
+#include "item_level_targeting/filtersio.h"
 #include "schemas/inischema.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool IniPreferenceWriter::writeModel(std::ostream &output, const std::unique_ptr
     auto modelBuilder = std::make_unique<IniModelBuilder>();
     auto ini          = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    IniFiles_(output, *ini.get(), map);
+
+    std::ostringstream tmp;
+    IniFiles_(tmp, *ini.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

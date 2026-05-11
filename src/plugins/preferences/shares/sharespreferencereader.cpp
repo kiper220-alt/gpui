@@ -20,8 +20,11 @@
 
 #include "sharespreferencereader.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "schemas/sharesschema.h"
 #include "sharesmodelbuilder.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -31,9 +34,15 @@ SharesPreferenceReader::SharesPreferenceReader()
 
 std::unique_ptr<PreferencesModel> SharesPreferenceReader::createModel(std::istream &input)
 {
-    auto schema       = NetworkShareSettings_(input, ::xsd::cxx::tree::flags::dont_validate);
+    auto stripped = FiltersIO::stripFilters(input);
+    std::istringstream cleaned(stripped.cleanedXml);
+
+    auto schema       = NetworkShareSettings_(cleaned, ::xsd::cxx::tree::flags::dont_validate);
     auto modelBuilder = std::make_unique<SharesModelBuilder>();
-    return modelBuilder->schemaToModel(schema);
+    auto model        = modelBuilder->schemaToModel(schema);
+
+    FiltersIO::applyToModel(model.get(), stripped.filters);
+    return model;
 }
 
 } // namespace preferences

@@ -21,7 +21,10 @@
 #include "folderpreferencereader.h"
 
 #include "foldermodelbuilder.h"
+#include "item_level_targeting/filtersio.h"
 #include "schemas/foldersschema.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -31,9 +34,15 @@ FolderPreferenceReader::FolderPreferenceReader()
 
 std::unique_ptr<PreferencesModel> FolderPreferenceReader::createModel(std::istream &input)
 {
-    auto schema       = Folders_(input, ::xsd::cxx::tree::flags::dont_validate);
+    auto stripped = FiltersIO::stripFilters(input);
+    std::istringstream cleaned(stripped.cleanedXml);
+
+    auto schema       = Folders_(cleaned, ::xsd::cxx::tree::flags::dont_validate);
     auto modelBuilder = std::make_unique<FolderModelBuilder>();
-    return modelBuilder->schemaToModel(schema);
+    auto model        = modelBuilder->schemaToModel(schema);
+
+    FiltersIO::applyToModel(model.get(), stripped.filters);
+    return model;
 }
 
 } // namespace preferences

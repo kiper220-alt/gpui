@@ -89,7 +89,10 @@ set(HEADERS
     interfaces/preferenceswriterinterface.h
 
     item_level_targeting/filtersbridge.h
+    item_level_targeting/filtersio.h
+    item_level_targeting/oscatalog.h
     item_level_targeting/targetingcontainer.h
+    item_level_targeting/targetingrowformatter.h
     item_level_targeting/targetingdialog.h
     item_level_targeting/targetingfilteritem.h
     item_level_targeting/targetingfilterwidget.h
@@ -311,7 +314,10 @@ set(SOURCES
     ini/iniwidgetslots.cpp
 
     item_level_targeting/filtersbridge.cpp
+    item_level_targeting/filtersio.cpp
+    item_level_targeting/oscatalog.cpp
     item_level_targeting/targetingcontainer.cpp
+    item_level_targeting/targetingrowformatter.cpp
     item_level_targeting/targetingdialog.cpp
     item_level_targeting/targetingfilteritem.cpp
     item_level_targeting/targetingfilterwidget.cpp

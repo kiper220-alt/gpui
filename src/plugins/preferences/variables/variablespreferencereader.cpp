@@ -20,8 +20,11 @@
 
 #include "variablespreferencereader.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "schemas/variablesschema.h"
 #include "variablesmodelbuilder.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -31,9 +34,15 @@ VariablesPreferenceReader::VariablesPreferenceReader()
 
 std::unique_ptr<PreferencesModel> VariablesPreferenceReader::createModel(std::istream &input)
 {
-    auto schema       = EnvironmentVariables_(input, ::xsd::cxx::tree::flags::dont_validate);
+    auto stripped = FiltersIO::stripFilters(input);
+    std::istringstream cleaned(stripped.cleanedXml);
+
+    auto schema       = EnvironmentVariables_(cleaned, ::xsd::cxx::tree::flags::dont_validate);
     auto modelBuilder = std::make_unique<VariablesModelBuilder>();
-    return modelBuilder->schemaToModel(schema);
+    auto model        = modelBuilder->schemaToModel(schema);
+
+    FiltersIO::applyToModel(model.get(), stripped.filters);
+    return model;
 }
 
 } // namespace preferences

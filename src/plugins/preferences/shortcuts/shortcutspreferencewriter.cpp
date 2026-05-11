@@ -20,8 +20,11 @@
 
 #include "shortcutspreferencewriter.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "schemas/shortcutsschema.h"
 #include "shortcutsmodelbuilder.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool ShortcutsPreferenceWriter::writeModel(std::ostream &output, const std::uniq
     auto modelBuilder = std::make_unique<ShortcutsModelBuilder>();
     auto shortcuts    = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    Shortcuts_(output, *shortcuts.get(), map);
+
+    std::ostringstream tmp;
+    Shortcuts_(tmp, *shortcuts.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

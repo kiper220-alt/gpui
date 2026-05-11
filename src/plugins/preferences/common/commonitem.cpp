@@ -151,11 +151,21 @@ TargetingContainer CommonItem::filters() const
 
 void CommonItem::setFilters(TargetingContainer filters)
 {
-    // Apply-once is owned by the Common tab's checkbox. When the incoming
-    // container carries a FilterRunOnce entry (load path from XML), strip
-    // it, cache the id, and force APPLY_ONCE on. When the container has
-    // no FilterRunOnce (UI accept path), leave APPLY_ONCE / RUN_ONCE_ID
-    // alone — the checkbox state is authoritative.
+    // UI-side setter. The targeting dialog hides FilterRunOnce by design
+    // and round-trips the checkbox state through filtersForSerialization,
+    // so this overload never tries to discriminate apply-once from the
+    // payload — it just stores the container as the user authored it.
+    m_filters = std::move(filters);
+}
+
+void CommonItem::setFiltersFromXml(TargetingContainer filters)
+{
+    // Load-side setter. The XML reader hands us the on-disk filter list
+    // verbatim, including any FilterRunOnce marker. Strip the marker,
+    // cache its id, and infer both APPLY_ONCE (from FilterRunOnce
+    // presence) and ITEM_LEVEL_TARGETING (from any non-FilterRunOnce
+    // record being present) so the Common-tab checkboxes match what
+    // the file actually carries.
     bool seenRunOnce = false;
     QList<TargetingFilterRecord> kept;
     kept.reserve(filters.filters().size());
@@ -173,17 +183,8 @@ void CommonItem::setFilters(TargetingContainer filters)
         kept.append(record);
     }
 
-    if (seenRunOnce)
-    {
-        setApplyOnce(true);
-    }
-    else if (!filters.filters().isEmpty())
-    {
-        // Authoritative load with no FilterRunOnce → checkbox should be off.
-        // (If `filters` is empty we cannot tell load from a fresh edit, so
-        // the checkbox state is preserved.)
-        setApplyOnce(false);
-    }
+    setApplyOnce(seenRunOnce);
+    setItemLevelTargeting(!kept.isEmpty());
 
     TargetingContainer trimmed;
     trimmed.setFilters(std::move(kept));
@@ -192,7 +193,16 @@ void CommonItem::setFilters(TargetingContainer filters)
 
 TargetingContainer CommonItem::filtersForSerialization() const
 {
-    auto records = m_filters.filters();
+    // Item-level targeting checkbox is the gate: when off, drop the
+    // user-authored filter list from the output (m_filters is preserved
+    // in memory so a re-tick within the same session restores them, but
+    // a save-with-the-box-off erases them on disk). Apply-once stays
+    // orthogonal — its FilterRunOnce marker is emitted independently.
+    QList<TargetingFilterRecord> records;
+    if (itemLevelTargeting())
+    {
+        records = m_filters.filters();
+    }
     if (applyOnce())
     {
         TargetingFilterRecord runOnce;

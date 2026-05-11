@@ -20,8 +20,11 @@
 
 #include "shortcutspreferencereader.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "schemas/shortcutsschema.h"
 #include "shortcutsmodelbuilder.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -31,9 +34,15 @@ ShortcutsPreferenceReader::ShortcutsPreferenceReader()
 
 std::unique_ptr<PreferencesModel> ShortcutsPreferenceReader::createModel(std::istream &input)
 {
-    auto schema       = Shortcuts_(input, ::xsd::cxx::tree::flags::dont_validate);
+    auto stripped = FiltersIO::stripFilters(input);
+    std::istringstream cleaned(stripped.cleanedXml);
+
+    auto schema       = Shortcuts_(cleaned, ::xsd::cxx::tree::flags::dont_validate);
     auto modelBuilder = std::make_unique<ShortcutsModelBuilder>();
-    return modelBuilder->schemaToModel(schema);
+    auto model        = modelBuilder->schemaToModel(schema);
+
+    FiltersIO::applyToModel(model.get(), stripped.filters);
+    return model;
 }
 
 } // namespace preferences

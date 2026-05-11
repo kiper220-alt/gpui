@@ -20,8 +20,11 @@
 
 #include "sharespreferencewriter.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "schemas/sharesschema.h"
 #include "sharesmodelbuilder.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool SharesPreferenceWriter::writeModel(std::ostream &output, const std::unique_
     auto modelBuilder = std::make_unique<SharesModelBuilder>();
     auto shares       = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    NetworkShareSettings_(output, *shares.get(), map);
+
+    std::ostringstream tmp;
+    NetworkShareSettings_(tmp, *shares.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

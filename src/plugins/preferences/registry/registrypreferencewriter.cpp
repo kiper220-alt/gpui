@@ -20,8 +20,11 @@
 
 #include "registrypreferencewriter.h"
 
+#include "item_level_targeting/filtersio.h"
 #include "registrymodelbuilder.h"
 #include "schemas/registryschema.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool RegistryPreferenceWriter::writeModel(std::ostream &output, const std::uniqu
     auto modelBuilder = std::make_unique<RegistryModelBuilder>();
     auto registry     = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    RegistrySettings_(output, *registry.get(), map);
+
+    std::ostringstream tmp;
+    RegistrySettings_(tmp, *registry.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

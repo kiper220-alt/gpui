@@ -21,7 +21,10 @@
 #include "drivespreferencewriter.h"
 
 #include "drivesmodelbuilder.h"
+#include "item_level_targeting/filtersio.h"
 #include "schemas/drivesschema.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool DrivesPreferenceWriter::writeModel(std::ostream &output, const std::unique_
     auto modelBuilder = std::make_unique<DrivesModelBuilder>();
     auto drives       = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    Drives_(output, *drives.get(), map);
+
+    std::ostringstream tmp;
+    Drives_(tmp, *drives.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

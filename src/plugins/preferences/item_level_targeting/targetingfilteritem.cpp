@@ -20,12 +20,37 @@
 
 #include "targetingfilteritem.h"
 
+#include "targetingrowformatter.h"
+
 #include <mvvm/model/taginfo.h>
 
 #include <QCoreApplication>
 
 namespace preferences
 {
+
+namespace
+{
+
+QString localizedCombinator(const QString &value)
+{
+    if (value == QLatin1String("OR"))
+    {
+        return QCoreApplication::translate("TargetingFilterItem", "OR");
+    }
+    if (value == QLatin1String("AND"))
+    {
+        return QCoreApplication::translate("TargetingFilterItem", "AND");
+    }
+    return value;
+}
+
+QString localizedNegation()
+{
+    return QCoreApplication::translate("TargetingFilterItem", "NOT");
+}
+
+} // namespace
 
 const std::string TargetingFilterItem::kModelType      = "TargetingFilterItem";
 const std::string TargetingFilterItem::kPropName       = "name";
@@ -160,26 +185,48 @@ TargetingFilterRecord TargetingFilterItem::toRecord() const
 
 QString TargetingFilterItem::label() const
 {
-    const QString fullName = filterName();
-    const QString baseName = fullName.startsWith(QLatin1String("Filter"))
-                                 ? fullName.mid(6)
-                                 : fullName;
-
-    QString prefix = combinator();
+    // Combinator prefix is omitted for the first row of any parent (no
+    // predecessor to combine with).
+    const bool isFirstRow = tagRow().row == 0;
+    QString prefix;
+    if (!isFirstRow)
+    {
+        prefix = localizedCombinator(combinator());
+    }
     if (negated())
     {
-        prefix += QStringLiteral(" NOT");
+        if (!prefix.isEmpty())
+        {
+            prefix += QLatin1Char(' ');
+        }
+        prefix += localizedNegation();
     }
 
-    const QString body = isCollection()
-                             ? QCoreApplication::translate("TargetingFilterItem", "Collection")
-                             : baseName;
+    const QString body = TargetingRowFormatter::format(this);
     return prefix.trimmed().isEmpty() ? body : prefix.trimmed() + QLatin1Char(' ') + body;
 }
 
 void TargetingFilterItem::refreshDisplayName()
 {
     setDisplayName(label().toStdString());
+}
+
+// Item-aware overload of TargetingRowFormatter::format. Lives in this
+// translation unit (rather than targetingrowformatter.cpp) so that the
+// formatter's pure-data implementation stays free of MVVM linkage —
+// targetingtest links the formatter without MVVM.
+QString TargetingRowFormatter::format(const TargetingFilterItem *item)
+{
+    if (!item)
+    {
+        return {};
+    }
+    if (item->filterName() == QLatin1String("FilterCollection"))
+    {
+        const int n = item->itemCount(TargetingFilterItem::kChildrenTag);
+        return QCoreApplication::translate("TargetingRowFormatter", "collection (%1)").arg(n);
+    }
+    return format(item->filterName(), item->extras());
 }
 
 } // namespace preferences

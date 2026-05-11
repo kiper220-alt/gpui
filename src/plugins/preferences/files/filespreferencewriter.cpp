@@ -21,7 +21,10 @@
 #include "filespreferencewriter.h"
 
 #include "filesmodelbuilder.h"
+#include "item_level_targeting/filtersio.h"
 #include "schemas/filesschema.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -34,7 +37,12 @@ bool FilesPreferenceWriter::writeModel(std::ostream &output, const std::unique_p
     auto modelBuilder = std::make_unique<FilesModelBuilder>();
     auto files        = modelBuilder->modelToSchema(const_cast<std::unique_ptr<PreferencesModel> &>(model));
     const ::xml_schema::NamespaceInfomap map;
-    Files_(output, *files.get(), map);
+
+    std::ostringstream tmp;
+    Files_(tmp, *files.get(), map);
+
+    const auto patched = FiltersIO::injectFilters(tmp.str(), model.get());
+    output.write(patched.data(), static_cast<std::streamsize>(patched.size()));
     return true;
 }
 

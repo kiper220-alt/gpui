@@ -21,7 +21,10 @@
 #include "drivespreferencereader.h"
 
 #include "drivesmodelbuilder.h"
+#include "item_level_targeting/filtersio.h"
 #include "schemas/drivesschema.h"
+
+#include <sstream>
 
 namespace preferences
 {
@@ -31,9 +34,15 @@ DrivesPreferenceReader::DrivesPreferenceReader()
 
 std::unique_ptr<PreferencesModel> DrivesPreferenceReader::createModel(std::istream &input)
 {
-    auto schema       = Drives_(input, ::xsd::cxx::tree::flags::dont_validate);
+    auto stripped = FiltersIO::stripFilters(input);
+    std::istringstream cleaned(stripped.cleanedXml);
+
+    auto schema       = Drives_(cleaned, ::xsd::cxx::tree::flags::dont_validate);
     auto modelBuilder = std::make_unique<DrivesModelBuilder>();
-    return modelBuilder->schemaToModel(schema);
+    auto model        = modelBuilder->schemaToModel(schema);
+
+    FiltersIO::applyToModel(model.get(), stripped.filters);
+    return model;
 }
 
 } // namespace preferences
