@@ -45,6 +45,18 @@ private slots:
     void filterCollectionNestingSurvives();
     void applyOnceModelRoundTrip();
     void wrapUnwrapGolden();
+    void fixtureRoundTrip();
+    void setFiltersIsPureSetter();
+    void setFiltersFromXmlInfersApplyOnce();
+    void setFiltersFromXmlSetsItemLevelFlag();
+    void filtersForSerializationRespectsCheckbox();
+    void humanReadableLineSamples();
+    void formatterFallsBackForUnknown();
+    void combinatorPrefixRefreshesAfterFirstRowDelete();
+    void localizedRowFormattersUseLabels();
+    void osCatalogProductChoices();
+    void osCatalogDependentChoices();
+    void osCatalogKeepsLinuxReserved();
 };
 
 } // namespace tests

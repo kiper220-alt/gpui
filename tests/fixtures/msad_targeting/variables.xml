@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Filters>
+  <FilterRunOnce bool="1" not="0" id="{55555555-0000-0000-0000-000000000001}" userContext="1" comments=""/>
+  <FilterComputer bool="1" not="0" id="{55555555-0000-0000-0000-000000000002}" type="DNS" name="server.contoso.com" unknownExtAttr="future-compat"/>
+</Filters>

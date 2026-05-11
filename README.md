@@ -25,3 +25,24 @@ Options:
   -v, --version  Displays version information.
 ```
 
+## Group Policy Preferences
+
+The Preferences editor supports the "Common" tab controls that every MSAD
+Group Policy Preferences item exposes:
+
+- **Apply once and do not reapply** — run the preference exactly once per
+  client, matching the MSAD `FilterRunOnce` semantics.
+- **Item-level targeting** — restrict when a preference item is applied by
+  combining the full MSAD filter catalog (Battery Present, Computer Name,
+  CPU Speed, Date Match, Disk Space, Domain, Environment Variable, File
+  Match, IP Address Range, Language, LDAP Query, MAC Address Range, MSI
+  Query, Network Connection, Operating System, Organizational Unit,
+  PCMCIA, Portable Computer, Processing Mode, RAM, Registry Match,
+  Security Group, Site, Terminal Session, Time Range, User, WMI Query,
+  Dial-Up Networking) with AND/OR/NOT combinators and parenthesized
+  `FilterCollection` groups.
+
+The `<Filters>` subtree is persisted byte-for-byte compatibly with MSAD:
+filter ordering, `id` attributes and unknown attributes (e.g. from newer
+MSAD releases) round-trip through gpui unchanged.
+
