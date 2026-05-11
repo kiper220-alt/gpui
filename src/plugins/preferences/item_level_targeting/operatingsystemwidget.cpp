@@ -21,68 +21,41 @@
 #include "operatingsystemwidget.h"
 #include "ui_operatingsystemwidget.h"
 
-#include <QStringList>
+#include "oscatalog.h"
+
+#include <QComboBox>
+#include <QSignalBlocker>
 
 namespace preferences
 {
 
 namespace
 {
-const QStringList &osVersionEnum()
+QString currentValue(const QComboBox *combo)
 {
-    static const QStringList v = {
-        QStringLiteral("NE"),  QStringLiteral("95"),  QStringLiteral("98"),
-        QStringLiteral("ME"),  QStringLiteral("NT"),  QStringLiteral("2K"),
-        QStringLiteral("XP"),  QStringLiteral("2K3"), QStringLiteral("2K3R2"),
-        QStringLiteral("VISTA"), QStringLiteral("2K8"), QStringLiteral("WIN7"),
-        QStringLiteral("2K8R2"), QStringLiteral("WIN8"), QStringLiteral("WIN8S"),
-        QStringLiteral("WINBLUE"), QStringLiteral("WINBLUESRV"),
-        QStringLiteral("WINTHRESHOLD"), QStringLiteral("WINTHRESHOLDSRV"),
-    };
-    return v;
+    return combo->currentData().toString();
 }
 
-const QStringList &osEditionEnum()
+void addChoice(QComboBox *combo, const OsChoice &choice)
 {
-    static const QStringList v = {
-        QStringLiteral("NE"), QStringLiteral("64EP"), QStringLiteral("64DC"),
-        QStringLiteral("AS"), QStringLiteral("DTC"),  QStringLiteral("EP"),
-        QStringLiteral("WEB"), QStringLiteral("64"),  QStringLiteral("HM"),
-        QStringLiteral("MC"),  QStringLiteral("TPC"), QStringLiteral("SRV"),
-        QStringLiteral("STD"), QStringLiteral("TSE"), QStringLiteral("SBS"),
-        QStringLiteral("PRO"),
-    };
-    return v;
+    combo->addItem(choice.label, choice.value);
 }
 
-const QStringList &osSpEnum()
+void addUnknownValue(QComboBox *combo, const QString &value)
 {
-    static const QStringList v = {
-        QStringLiteral("NE"), QStringLiteral("Gold"),
-        QStringLiteral("Service Pack 1"), QStringLiteral("Service Pack 2"),
-        QStringLiteral("Service Pack 3"), QStringLiteral("Service Pack 4"),
-        QStringLiteral("Service Pack 5"), QStringLiteral("Service Pack 6"),
-    };
-    return v;
+    if (!value.isEmpty() && combo->findData(value) < 0)
+    {
+        combo->addItem(value, value);
+    }
 }
 
-const QStringList &osTypeEnum()
+void selectByValue(QComboBox *combo, const QString &value)
 {
-    static const QStringList v = {
-        QStringLiteral("NE"), QStringLiteral("R2"), QStringLiteral("SE"),
-        QStringLiteral("WS"), QStringLiteral("SV"), QStringLiteral("DC"),
-        QStringLiteral("PRO"), QStringLiteral("PR"),
-    };
-    return v;
-}
-
-void selectByText(QComboBox *combo, const QString &text)
-{
-    if (text.isEmpty())
+    if (value.isEmpty())
     {
         return;
     }
-    const int idx = combo->findText(text);
+    const int idx = combo->findData(value);
     if (idx >= 0)
     {
         combo->setCurrentIndex(idx);
@@ -95,10 +68,12 @@ OperatingSystemFilterWidget::OperatingSystemFilterWidget(QWidget *parent)
     , ui(new Ui::OperatingSystemWidget)
 {
     ui->setupUi(this);
-    ui->productComboBox->addItems(osVersionEnum());
-    ui->editionComboBox->addItems(osEditionEnum());
-    ui->releaseComboBox->addItems(osSpEnum());
-    ui->roleComboBox->addItems(osTypeEnum());
+
+    populateProducts();
+    populateDependentCombos();
+
+    connect(ui->productComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, [this]() { populateDependentCombos(); });
 }
 
 OperatingSystemFilterWidget::~OperatingSystemFilterWidget()
@@ -116,20 +91,78 @@ QStringList OperatingSystemFilterWidget::knownKeys() const
 
 void OperatingSystemFilterWidget::readFromExtras(const QMap<QString, QString> &extras)
 {
-    selectByText(ui->productComboBox, extras.value(QStringLiteral("version"), QStringLiteral("NE")));
-    selectByText(ui->editionComboBox, extras.value(QStringLiteral("edition"), QStringLiteral("NE")));
-    selectByText(ui->releaseComboBox, extras.value(QStringLiteral("sp"),      QStringLiteral("NE")));
-    selectByText(ui->roleComboBox,    extras.value(QStringLiteral("type"),    QStringLiteral("NE")));
+    const QString product = extras.value(QStringLiteral("version"), QStringLiteral("NE"));
+    addUnknownValue(ui->productComboBox, product);
+    selectByValue(ui->productComboBox, product);
+
+    populateDependentCombos(extras.value(QStringLiteral("edition"), QStringLiteral("NE")),
+                            extras.value(QStringLiteral("sp"),      QStringLiteral("NE")),
+                            extras.value(QStringLiteral("type"),    QStringLiteral("NE")));
 }
 
 QMap<QString, QString> OperatingSystemFilterWidget::writeToExtras() const
 {
     return {
-        {QStringLiteral("version"), ui->productComboBox->currentText()},
-        {QStringLiteral("edition"), ui->editionComboBox->currentText()},
-        {QStringLiteral("sp"),      ui->releaseComboBox->currentText()},
-        {QStringLiteral("type"),    ui->roleComboBox->currentText()},
+        {QStringLiteral("version"), currentValue(ui->productComboBox)},
+        {QStringLiteral("edition"), currentValue(ui->editionComboBox)},
+        {QStringLiteral("sp"),      currentValue(ui->releaseComboBox)},
+        {QStringLiteral("type"),    currentValue(ui->roleComboBox)},
     };
+}
+
+void OperatingSystemFilterWidget::populateProducts()
+{
+    QSignalBlocker block(ui->productComboBox);
+    ui->productComboBox->clear();
+    for (const auto &product : OsCatalog::visibleProducts())
+    {
+        ui->productComboBox->addItem(product.label, product.value);
+    }
+}
+
+void OperatingSystemFilterWidget::populateDependentCombos(const QString &editionValue,
+                                                          const QString &servicePackValue,
+                                                          const QString &roleValue)
+{
+    const QString productValue = currentValue(ui->productComboBox);
+    const OsProduct product = OsCatalog::productByValue(productValue);
+
+    const QString edition = editionValue.isEmpty() ? QStringLiteral("NE") : editionValue;
+    const QString servicePack = servicePackValue.isEmpty() ? QStringLiteral("NE") : servicePackValue;
+    const QString role = roleValue.isEmpty() ? QStringLiteral("NE") : roleValue;
+
+    {
+        QSignalBlocker block(ui->editionComboBox);
+        ui->editionComboBox->clear();
+        for (const auto &choice : product.editions)
+        {
+            addChoice(ui->editionComboBox, choice);
+        }
+        addUnknownValue(ui->editionComboBox, edition);
+        selectByValue(ui->editionComboBox, edition);
+    }
+
+    {
+        QSignalBlocker block(ui->releaseComboBox);
+        ui->releaseComboBox->clear();
+        for (const auto &choice : product.servicePacks)
+        {
+            addChoice(ui->releaseComboBox, choice);
+        }
+        addUnknownValue(ui->releaseComboBox, servicePack);
+        selectByValue(ui->releaseComboBox, servicePack);
+    }
+
+    {
+        QSignalBlocker block(ui->roleComboBox);
+        ui->roleComboBox->clear();
+        for (const auto &choice : product.roles)
+        {
+            addChoice(ui->roleComboBox, choice);
+        }
+        addUnknownValue(ui->roleComboBox, role);
+        selectByValue(ui->roleComboBox, role);
+    }
 }
 
 } // namespace preferences

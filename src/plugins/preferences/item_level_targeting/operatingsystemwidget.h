@@ -53,6 +53,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    void populateProducts();
+    void populateDependentCombos(const QString &editionValue = {},
+                                 const QString &servicePackValue = {},
+                                 const QString &roleValue = {});
+
     Ui::OperatingSystemWidget *ui{nullptr};
 };
 

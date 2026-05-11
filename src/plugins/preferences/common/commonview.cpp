@@ -39,6 +39,7 @@ CommonView::CommonView(QWidget *parent)
     ui->setupUi(this);
 
     connect(ui->targetingToolButton, &QToolButton::clicked, this, &CommonView::onTargetingClicked);
+    connect(ui->itemLevelCheckBox, &QCheckBox::toggled, this, &CommonView::updateTargetingButtonEnabled);
 }
 
 CommonView::~CommonView()
@@ -55,7 +56,7 @@ void CommonView::setItem(ModelView::SessionItem *item)
 
     mapper = std::make_unique<QDataWidgetMapper>();
 
-    mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
+    mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
     mapper->setOrientation(Qt::Vertical);
 
     mapper->setModel(view_model.get());
@@ -70,6 +71,8 @@ void CommonView::setItem(ModelView::SessionItem *item)
     mapper->addMapping(ui->itemLevelCheckBox,   CommonItem::propertyToInt(CommonItem::ITEM_LEVEL_TARGETING));
 
     mapper->setCurrentModelIndex(view_model->index(0, 1));
+
+    updateTargetingButtonEnabled();
 }
 
 QString CommonView::name() const
@@ -82,15 +85,19 @@ void CommonView::onTargetingClicked()
     if (!m_item)
         return;
 
-    mapper->submit();
-
     TargetingDialog dialog(this);
     dialog.setContainer(m_item->filters());
 
     if (dialog.exec() == QDialog::Accepted)
     {
         m_item->setFilters(dialog.container());
+        updateTargetingButtonEnabled();
     }
+}
+
+void CommonView::updateTargetingButtonEnabled()
+{
+    ui->targetingToolButton->setEnabled(ui->itemLevelCheckBox->isChecked());
 }
 
 }

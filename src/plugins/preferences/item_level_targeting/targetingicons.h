@@ -23,32 +23,36 @@
 
 #include <QIcon>
 #include <QString>
+#include <QStringList>
+#include <QStyle>
 
 namespace preferences
 {
 
-//! Icon lookup for targeting filters (task 8.2).
+//! Icon lookup for targeting filters and toolbar actions.
 //!
-//! Maps each MSAD XSD filter element name (e.g. `FilterComputer`) onto a
-//! Freedesktop icon-theme name resolved via `QIcon::fromTheme`. Using the
-//! system theme rather than shipping our own bitmaps keeps gpui's GUI
-//! consistent with the rest of the desktop and avoids the asset-licensing
-//! question for a feature that is editor-only.
-//!
-//! Icons returned by `iconFor()` can be null if the current theme does
-//! not ship the mapped name — Qt handles null icons gracefully by just
-//! not drawing them, and `QIcon::fromTheme` with a fallback name gives us
-//! a predictable result even then.
+//! Resolves an icon by walking a list of Freedesktop icon-theme names,
+//! trying each both as-is and with a `-symbolic` suffix (Adwaita's
+//! preferred form). When no theme name matches the active icon set, a
+//! `QStyle::StandardPixmap` is used so something always renders even on
+//! systems with a minimal icon-theme install (the user's complaint
+//! that drove this layer).
 class TargetingIcons
 {
 public:
-    //! Return the icon for a given XSD filter element name, falling back
-    //! to a generic icon when the name is unknown.
+    //! Return the icon for a given XSD filter element name.
     static QIcon iconFor(const QString &xsdName);
 
-    //! Name used for the filter-list rows shown in the tree.
-    //! Identical to `iconFor` but exposed separately so callers
-    //! documenting intent stay readable.
+    //! Toolbar icons (Delete, Cut, Copy, ...) keyed by Freedesktop name.
+    //! Falls back to the matching QStyle::StandardPixmap when the active
+    //! theme has nothing.
+    static QIcon toolbarIcon(const QString &xsdName);
+
+    //! Generic resolver: walk `themeNames`, trying each plain and as
+    //! `-symbolic`. If none match, return `QApplication::style()->standardIcon(fallback)`.
+    static QIcon resolve(const QStringList &themeNames, QStyle::StandardPixmap fallback);
+
+    //! Per-row tree icon (alias of iconFor for readability).
     static QIcon iconForRow(const QString &xsdName) { return iconFor(xsdName); }
 };
 

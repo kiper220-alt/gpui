@@ -62,6 +62,14 @@ void TargetingModel::fromContainer(const TargetingContainer &container)
                                                              {kFiltersTag, -1});
         item->loadRecord(record);
     }
+
+    // TopItemsViewModel's controller doesn't always pick up the items
+    // populated before the view's first paint — calling setRootSessionItem
+    // again forces a full rebuild so the tree shows them on initial open.
+    if (m_view)
+    {
+        m_view->setRootSessionItem(m_data->rootItem());
+    }
 }
 
 TargetingContainer TargetingModel::toContainer() const

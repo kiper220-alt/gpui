@@ -99,8 +99,17 @@ private:
     TargetingFilterWidget &operator=(const TargetingFilterWidget &) = delete;
     TargetingFilterWidget &operator=(TargetingFilterWidget &&)      = delete;
 
+    //! Hook every input child widget (`QLineEdit`, `QCheckBox`,
+    //! `QRadioButton`, `QComboBox`, `QSpinBox`, `QDoubleSpinBox`,
+    //! `QDateTimeEdit`, `QPlainTextEdit`) to call `submit()` on its
+    //! value-changed signal so the inline editor pane in
+    //! `TargetingDialog` commits live without an Apply button.
+    //! Idempotent: safe to call multiple times.
+    void installLiveCommitHooks();
+
     TargetingFilterItem *m_item{nullptr};
     QMap<QString, QString> m_originalExtras;
+    bool m_liveCommitInstalled{false};
 };
 
 } // namespace preferences

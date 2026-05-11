@@ -6,27 +6,10 @@
     <message>
         <location filename="../batterypresent.ui" line="20"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
-    </message>
-    <message>
-        <location filename="../batterypresent.ui" line="38"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;A Battery Present targeting item allows a preference item to be applied to computers or users only if one or more batteries are present in the processing computer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>BatteryPresentWidget</name>
-    <message>
-        <location filename="../batterypresentwidget.ui" line="26"/>
-        <source>Form</source>
         <translation>Form</translation>
     </message>
     <message>
-        <location filename="../batterypresentwidget.ui" line="44"/>
+        <location filename="../batterypresent.ui" line="38"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -36,66 +19,79 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>BatteryPresentWidget</name>
+    <message>
+        <location filename="../batterypresentwidget.ui" line="14"/>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <location filename="../batterypresentwidget.ui" line="23"/>
+        <source>A Battery Present targeting item allows a preference item to be applied to computers or users only if one or more batteries are present in the processing computer.</source>
+        <translation>A Battery Present targeting item allows a preference item to be applied to computers or users only if one or more batteries are present in the processing computer.</translation>
+    </message>
+</context>
+<context>
     <name>CPUSpeed</name>
     <message>
         <location filename="../cpuspeed.ui" line="20"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="26"/>
         <source>A CPU Speed targeting item allows a preference item to be applied to computers or users only if the processing computer&apos;s CPU speed is greater than or equal to the value specified in the targeting item.</source>
-        <translation type="unfinished">A CPU Speed targeting item allows a preference item to be applied to computers or users only if the processing computer&apos;s CPU speed is greater than or equal to the value specified in the targeting item.</translation>
+        <translation>A CPU Speed targeting item allows a preference item to be applied to computers or users only if the processing computer&apos;s CPU speed is greater than or equal to the value specified in the targeting item.</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="36"/>
         <source>MHz</source>
-        <translation type="unfinished">MHz</translation>
+        <translation>MHz</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="57"/>
         <source>500</source>
-        <translation type="unfinished">500</translation>
+        <translation>500</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="62"/>
         <source>1000</source>
-        <translation type="unfinished">1000</translation>
+        <translation>1000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="67"/>
         <source>2000</source>
-        <translation type="unfinished">2000</translation>
+        <translation>2000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="72"/>
         <source>3000</source>
-        <translation type="unfinished">3000</translation>
+        <translation>3000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="77"/>
         <source>4000</source>
-        <translation type="unfinished">4000</translation>
+        <translation>4000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="82"/>
         <source>5000</source>
-        <translation type="unfinished">5000</translation>
+        <translation>5000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="87"/>
         <source>6000</source>
-        <translation type="unfinished">6000</translation>
+        <translation>6000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="92"/>
         <source>7000</source>
-        <translation type="unfinished">7000</translation>
+        <translation>7000</translation>
     </message>
     <message>
         <location filename="../cpuspeed.ui" line="106"/>
         <source>Greater then or equal to:</source>
-        <translation type="unfinished">Greater then or equal to:</translation>
+        <translation>Greater then or equal to:</translation>
     </message>
 </context>
 <context>
@@ -948,6 +944,265 @@ p, li { white-space: pre-wrap; }
     </message>
 </context>
 <context>
+    <name>OperatingSystemFilterWidget</name>
+    <message>
+        <location filename="../oscatalog.cpp" line="34"/>
+        <source>Any</source>
+        <translation>Any</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="35"/>
+        <source>No service packs installed</source>
+        <translation>No service packs installed</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="36"/>
+        <source>Windows XP</source>
+        <translation>Windows XP</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="37"/>
+        <source>Windows Server 2003</source>
+        <translation>Windows Server 2003</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="38"/>
+        <source>Windows Server 2003 R2</source>
+        <translation>Windows Server 2003 R2</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="39"/>
+        <source>Windows Vista</source>
+        <translation>Windows Vista</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="40"/>
+        <source>Windows Server 2008</source>
+        <translation>Windows Server 2008</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="41"/>
+        <source>Windows 7</source>
+        <translation>Windows 7</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="42"/>
+        <source>Windows Server 2008 R2</source>
+        <translation>Windows Server 2008 R2</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="43"/>
+        <source>Windows 8</source>
+        <translation>Windows 8</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="44"/>
+        <source>Windows Server 2012 Family</source>
+        <translation>Windows Server 2012 Family</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="45"/>
+        <source>Windows 8.1</source>
+        <translation>Windows 8.1</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="46"/>
+        <source>Windows Server 2012 R2 Family</source>
+        <translation>Windows Server 2012 R2 Family</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="47"/>
+        <source>Windows 10</source>
+        <translation>Windows 10</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="48"/>
+        <source>Windows Server 2019 Family</source>
+        <translation>Windows Server 2019 Family</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="49"/>
+        <source>ALT Linux</source>
+        <translation>ALT Linux</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="50"/>
+        <source>Linux</source>
+        <translation>Linux</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="51"/>
+        <source>64-bit</source>
+        <translation>64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="52"/>
+        <source>Professional</source>
+        <translation>Professional</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="53"/>
+        <source>Media Center</source>
+        <translation>Media Center</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="54"/>
+        <source>Tablet PC</source>
+        <translation>Tablet PC</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="55"/>
+        <source>Enterprise</source>
+        <translation>Enterprise</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="56"/>
+        <location filename="../oscatalog.cpp" line="76"/>
+        <source>Datacenter</source>
+        <translation>Datacenter</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="57"/>
+        <source>Standard</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="58"/>
+        <source>Web</source>
+        <translation>Web</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="59"/>
+        <source>Enterprise, 64-bit</source>
+        <translation>Enterprise, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="60"/>
+        <source>Datacenter, 64-bit</source>
+        <translation>Datacenter, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="61"/>
+        <source>Standard, 64-bit</source>
+        <translation>Standard, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="62"/>
+        <source>Web, 64-bit</source>
+        <translation>Web, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="63"/>
+        <source>Business</source>
+        <translation>Business</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="64"/>
+        <source>Ultimate</source>
+        <translation>Ultimate</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="65"/>
+        <source>Business, 64-bit</source>
+        <translation>Business, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="66"/>
+        <source>Ultimate, 64-bit</source>
+        <translation>Ultimate, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="67"/>
+        <source>HPC Server</source>
+        <translation>HPC Server</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="68"/>
+        <source>Itanium-based Systems</source>
+        <translation>Itanium-based Systems</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="69"/>
+        <source>Standard without Hyper-V</source>
+        <translation>Standard without Hyper-V</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="70"/>
+        <source>Enterprise without Hyper-V</source>
+        <translation>Enterprise without Hyper-V</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="71"/>
+        <source>Datacenter without Hyper-V</source>
+        <translation>Datacenter without Hyper-V</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="72"/>
+        <source>Standard without Hyper-V, 64-bit</source>
+        <translation>Standard without Hyper-V, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="73"/>
+        <source>Enterprise without Hyper-V, 64-bit</source>
+        <translation>Enterprise without Hyper-V, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="74"/>
+        <source>Datacenter without Hyper-V, 64-bit</source>
+        <translation>Datacenter without Hyper-V, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="75"/>
+        <source>Professional, 64-bit</source>
+        <translation>Professional, 64-bit</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="77"/>
+        <source>Storage Server Standard</source>
+        <translation>Storage Server Standard</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="78"/>
+        <source>Storage Server Workgroup</source>
+        <translation>Storage Server Workgroup</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="79"/>
+        <source>MultiPoint Server Premium</source>
+        <translation>MultiPoint Server Premium</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="80"/>
+        <source>Essentials</source>
+        <translation>Essentials</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="81"/>
+        <source>Service Pack 1</source>
+        <translation>Service Pack 1</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="82"/>
+        <source>Service Pack 2</source>
+        <translation>Service Pack 2</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="83"/>
+        <source>Service Pack 3</source>
+        <translation>Service Pack 3</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="84"/>
+        <source>Member Server</source>
+        <translation>Member Server</translation>
+    </message>
+    <message>
+        <location filename="../oscatalog.cpp" line="85"/>
+        <source>Domain Controller</source>
+        <translation>Domain Controller</translation>
+    </message>
+</context>
+<context>
     <name>OperatingSystemWidget</name>
     <message>
         <location filename="../operatingsystemwidget.ui" line="26"/>
@@ -1487,13 +1742,466 @@ p, li { white-space: pre-wrap; }
         <source>Targeting Editor</source>
         <translation>Targeting Editor</translation>
     </message>
+    <message>
+        <location filename="../targetingdialog.ui" line="55"/>
+        <source>Select a filter to edit its parameters</source>
+        <translation>Select a filter to edit its parameters</translation>
+    </message>
 </context>
 <context>
     <name>TargetingFilterItem</name>
     <message>
-        <location filename="../targetingfilteritem.cpp" line="175"/>
-        <source>Collection</source>
-        <translation>Collection</translation>
+        <location filename="../targetingfilteritem.cpp" line="39"/>
+        <source>OR</source>
+        <translation>OR</translation>
+    </message>
+    <message>
+        <location filename="../targetingfilteritem.cpp" line="43"/>
+        <source>AND</source>
+        <translation>AND</translation>
+    </message>
+    <message>
+        <location filename="../targetingfilteritem.cpp" line="50"/>
+        <source>NOT</source>
+        <translation>NOT</translation>
+    </message>
+</context>
+<context>
+    <name>TargetingRowFormatter</name>
+    <message>
+        <location filename="../targetingfilteritem.cpp" line="227"/>
+        <source>collection (%1)</source>
+        <translation>collection (%1)</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="40"/>
+        <source>(unset)</source>
+        <translation>(unset)</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="41"/>
+        <source>battery is present</source>
+        <translation>battery is present</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="42"/>
+        <source>PCMCIA is present</source>
+        <translation>PCMCIA is present</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="43"/>
+        <source>computer is a portable</source>
+        <translation>computer is a portable</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="44"/>
+        <source>computer name is %1</source>
+        <translation>computer name is %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="45"/>
+        <source>CPU speed is at least %1 MHz</source>
+        <translation>CPU speed is at least %1 MHz</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="46"/>
+        <source>RAM is at least %1 MB</source>
+        <translation>RAM is at least %1 MB</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="47"/>
+        <source>free space on %1 is at least %2 MB</source>
+        <translation>free space on %1 is at least %2 MB</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="48"/>
+        <source>date matches %1 (period %2)</source>
+        <translation>date matches %1 (period %2)</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="49"/>
+        <source>time is between %1 and %2</source>
+        <translation>time is between %1 and %2</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="50"/>
+        <source>computer is in domain %1</source>
+        <translation>computer is in domain %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="51"/>
+        <source>computer is in organizational unit %1</source>
+        <translation>computer is in organizational unit %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="52"/>
+        <source>computer is in site %1</source>
+        <translation>computer is in site %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="53"/>
+        <source>file %1 version is between %2 and %3</source>
+        <translation>file %1 version is between %2 and %3</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="54"/>
+        <source>file %1 exists</source>
+        <translation>file %1 exists</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="55"/>
+        <source>user is member of group %1</source>
+        <translation>user is member of group %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="56"/>
+        <source>user is %1</source>
+        <translation>user is %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="57"/>
+        <source>IP address is in range %1 – %2</source>
+        <translation>IP address is in range %1 – %2</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="58"/>
+        <source>MAC address is in range %1 – %2</source>
+        <translation>MAC address is in range %1 – %2</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="59"/>
+        <source>language is %1</source>
+        <translation>language is %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="60"/>
+        <source>language code is %1</source>
+        <translation>language code is %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="61"/>
+        <source>User</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="62"/>
+        <source>System</source>
+        <translation>System</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="63"/>
+        <source>Native</source>
+        <translation>Native</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="64"/>
+        <source> or </source>
+        <translation> or </translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="65"/>
+        <source>MSI %1 matches</source>
+        <translation>MSI %1 matches</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="66"/>
+        <source>operating system</source>
+        <translation>operating system</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="67"/>
+        <source>operating system %1</source>
+        <translation>operating system %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="68"/>
+        <source>, role %1</source>
+        <translation>, role %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="69"/>
+        <source>Windows XP</source>
+        <translation>Windows XP</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="70"/>
+        <source>Windows Server 2003</source>
+        <translation>Windows Server 2003</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="71"/>
+        <source>Windows Server 2003 R2</source>
+        <translation>Windows Server 2003 R2</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="72"/>
+        <source>Windows Vista</source>
+        <translation>Windows Vista</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="73"/>
+        <source>Windows Server 2008</source>
+        <translation>Windows Server 2008</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="74"/>
+        <source>Windows 7</source>
+        <translation>Windows 7</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="75"/>
+        <source>Windows Server 2008 R2</source>
+        <translation>Windows Server 2008 R2</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="76"/>
+        <source>Windows 8</source>
+        <translation>Windows 8</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="77"/>
+        <source>Windows Server 2012 Family</source>
+        <translation>Windows Server 2012 Family</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="78"/>
+        <source>Windows 8.1</source>
+        <translation>Windows 8.1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="79"/>
+        <source>Windows Server 2012 R2 Family</source>
+        <translation>Windows Server 2012 R2 Family</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="80"/>
+        <source>Windows 10</source>
+        <translation>Windows 10</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="81"/>
+        <source>Windows Server 2019 Family</source>
+        <translation>Windows Server 2019 Family</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="97"/>
+        <source>terminal session</source>
+        <translation>terminal session</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="98"/>
+        <source>terminal session: %1</source>
+        <translation>terminal session: %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="99"/>
+        <source>Remote Desktop Services</source>
+        <translation>Remote Desktop Services</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="100"/>
+        <source>Application name</source>
+        <translation>Application name</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="101"/>
+        <source>Client name</source>
+        <translation>Client name</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="102"/>
+        <source>Initial program</source>
+        <translation>Initial program</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="103"/>
+        <source>Session name</source>
+        <translation>Session name</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="104"/>
+        <source>Working directory</source>
+        <translation>Working directory</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="105"/>
+        <source>Client TCP/IP address</source>
+        <translation>Client TCP/IP address</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="106"/>
+        <source>dial-up connection</source>
+        <translation>dial-up connection</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="107"/>
+        <source>dial-up connection %1</source>
+        <translation>dial-up connection %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="108"/>
+        <source>Telephone modem accessed through a COM port</source>
+        <translation>Telephone modem accessed through a COM port</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="109"/>
+        <source>ISDN card with corresponding NDISWAN driver installed</source>
+        <translation>ISDN card with corresponding NDISWAN driver installed</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="110"/>
+        <source>X.25 card with corresponding NDISWAN driver installed</source>
+        <translation>X.25 card with corresponding NDISWAN driver installed</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="111"/>
+        <source>Virtual Private Network (VPN)</source>
+        <translation>Virtual Private Network (VPN)</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="112"/>
+        <source>Packet Assembler/Disassembler</source>
+        <translation>Packet Assembler/Disassembler</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="113"/>
+        <source>Generic</source>
+        <translation>Generic</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="114"/>
+        <source>Serial Port direct connection</source>
+        <translation>Serial Port direct connection</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="115"/>
+        <source>Frame Relay</source>
+        <translation>Frame Relay</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="116"/>
+        <source>Asynchronous Transfer Mode (ATM)</source>
+        <translation>Asynchronous Transfer Mode (ATM)</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="117"/>
+        <source>Sonet</source>
+        <translation>Sonet</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="118"/>
+        <source>Switched 56K access</source>
+        <translation>Switched 56K access</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="119"/>
+        <source>Infrared Data Association (IrDA) device</source>
+        <translation>Infrared Data Association (IrDA) device</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="120"/>
+        <source>Parallel Port direct connection</source>
+        <translation>Parallel Port direct connection</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="121"/>
+        <source>PPP over Ethernet (PPPoE)</source>
+        <translation>PPP over Ethernet (PPPoE)</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="82"/>
+        <source>any</source>
+        <translation>any</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="83"/>
+        <source>processing mode matches</source>
+        <translation>processing mode matches</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="84"/>
+        <source>processing mode: %1</source>
+        <translation>processing mode: %1</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="85"/>
+        <source>synchronous foreground</source>
+        <translation>synchronous foreground</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="86"/>
+        <source>asynchronous foreground</source>
+        <translation>asynchronous foreground</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="87"/>
+        <source>background refresh</source>
+        <translation>background refresh</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="88"/>
+        <source>forced refresh</source>
+        <translation>forced refresh</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="89"/>
+        <source>link transition</source>
+        <translation>link transition</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="90"/>
+        <source>no changes</source>
+        <translation>no changes</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="91"/>
+        <source>RSoP transition</source>
+        <translation>RSoP transition</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="92"/>
+        <source>safe boot</source>
+        <translation>safe boot</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="93"/>
+        <source>slow link</source>
+        <translation>slow link</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="94"/>
+        <source>verbose logging</source>
+        <translation>verbose logging</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="95"/>
+        <source>registry value %1 in %2\%3 matches</source>
+        <translation>registry value %1 in %2\%3 matches</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="96"/>
+        <source>registry key %1\%2 exists</source>
+        <translation>registry key %1\%2 exists</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="122"/>
+        <source>environment variable %%1%% is %2</source>
+        <translation>environment variable %%1%% is %2</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="123"/>
+        <source>WMI query &quot;%1&quot; matches</source>
+        <translation>WMI query &quot;%1&quot; matches</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="124"/>
+        <source>LDAP query against %1 matches</source>
+        <translation>LDAP query against %1 matches</translation>
+    </message>
+    <message>
+        <location filename="../targetingrowformatter.cpp" line="125"/>
+        <source>collection</source>
+        <translation>collection</translation>
     </message>
 </context>
 <context>
@@ -1695,32 +2403,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../computername.ui" line="20"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location filename="../computername.ui" line="26"/>
         <source>Computer name</source>
-        <translation type="unfinished">Computer name</translation>
+        <translation>Computer name</translation>
     </message>
     <message>
         <location filename="../computername.ui" line="54"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="../computername.ui" line="61"/>
         <source>NetBIOS</source>
-        <translation type="unfinished">NetBIOS</translation>
+        <translation>NetBIOS</translation>
     </message>
     <message>
         <location filename="../computername.ui" line="71"/>
         <source>DNS</source>
-        <translation type="unfinished">DNS</translation>
+        <translation>DNS</translation>
     </message>
     <message>
         <location filename="../computername.ui" line="78"/>
         <source>A Computer name targeting item allows a preference item to be applied to computers or users only if the computer&apos;s name matches the specified computer name in the targeting item.</source>
-        <translation type="unfinished">A Computer name targeting item allows a preference item to be applied to computers or users only if the computer&apos;s name matches the specified computer name in the targeting item.</translation>
+        <translation>A Computer name targeting item allows a preference item to be applied to computers or users only if the computer&apos;s name matches the specified computer name in the targeting item.</translation>
     </message>
 </context>
 <context>
@@ -1759,93 +2467,234 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>preferences::TargetingDialog</name>
     <message>
-        <location filename="../targetingdialog.cpp" line="205"/>
-        <source>New Item</source>
-        <translation>New Item</translation>
-    </message>
-    <message>
-        <location filename="../targetingdialog.cpp" line="217"/>
-        <location filename="../targetingdialog.cpp" line="714"/>
+        <location filename="../targetingdialog.cpp" line="722"/>
+        <location filename="../targetingdialog.cpp" line="1352"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="221"/>
+        <location filename="../targetingdialog.cpp" line="704"/>
         <source>Up</source>
         <translation>Up</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="222"/>
+        <location filename="../targetingdialog.cpp" line="602"/>
+        <source>Battery Present</source>
+        <translation>Battery Present</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="603"/>
+        <source>Computer Name</source>
+        <translation>Computer Name</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="604"/>
+        <source>CPU Speed</source>
+        <translation>CPU Speed</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="605"/>
+        <source>Date Match</source>
+        <translation>Date Match</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="606"/>
+        <source>Disk Space</source>
+        <translation>Disk Space</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="607"/>
+        <source>Domain</source>
+        <translation>Domain</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="608"/>
+        <source>Dial-Up Networking</source>
+        <translation>Dial-Up Networking</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="609"/>
+        <source>Environment Variable</source>
+        <translation>Environment Variable</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="610"/>
+        <source>File Match</source>
+        <translation>File Match</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="611"/>
+        <source>Security Group</source>
+        <translation>Security Group</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="612"/>
+        <source>IP Address Range</source>
+        <translation>IP Address Range</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="613"/>
+        <source>Language</source>
+        <translation>Language</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="614"/>
+        <source>LDAP Query</source>
+        <translation>LDAP Query</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="615"/>
+        <source>MAC Address Range</source>
+        <translation>MAC Address Range</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="616"/>
+        <source>MSI Query</source>
+        <translation>MSI Query</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="617"/>
+        <source>Organizational Unit</source>
+        <translation>Organizational Unit</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="618"/>
+        <source>Operating System</source>
+        <translation>Operating System</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="619"/>
+        <source>PCMCIA Present</source>
+        <translation>PCMCIA Present</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="620"/>
+        <source>Portable Computer</source>
+        <translation>Portable Computer</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="621"/>
+        <source>Processing Mode</source>
+        <translation>Processing Mode</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="622"/>
+        <source>RAM</source>
+        <translation>RAM</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="623"/>
+        <source>Registry Match</source>
+        <translation>Registry Match</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="624"/>
+        <source>Site</source>
+        <translation>Site</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="625"/>
+        <source>Terminal Session</source>
+        <translation>Terminal Session</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="626"/>
+        <source>Time Range</source>
+        <translation>Time Range</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="627"/>
+        <source>User</source>
+        <translation>User</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="628"/>
+        <source>WMI Query</source>
+        <translation>WMI Query</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="645"/>
+        <location filename="../targetingdialog.cpp" line="1326"/>
+        <source>Create Item</source>
+        <translation>Create Item</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="662"/>
+        <location filename="../targetingdialog.cpp" line="663"/>
+        <location filename="../targetingdialog.cpp" line="1333"/>
+        <source>Add Collection</source>
+        <translation>Add Collection</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="677"/>
+        <source>Options:</source>
+        <translation>Options:</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="687"/>
+        <source>is</source>
+        <translation>is</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="688"/>
+        <source>is not</source>
+        <translation>is not</translation>
+    </message>
+    <message>
+        <location filename="../targetingdialog.cpp" line="705"/>
         <source>Down</source>
         <translation>Down</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="227"/>
-        <location filename="../targetingdialog.cpp" line="703"/>
+        <location filename="../targetingdialog.cpp" line="712"/>
+        <location filename="../targetingdialog.cpp" line="1341"/>
         <source>Cut</source>
         <translation>Cut</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="228"/>
-        <location filename="../targetingdialog.cpp" line="704"/>
+        <location filename="../targetingdialog.cpp" line="713"/>
+        <location filename="../targetingdialog.cpp" line="1342"/>
         <source>Copy</source>
         <translation>Copy</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="229"/>
-        <location filename="../targetingdialog.cpp" line="705"/>
+        <location filename="../targetingdialog.cpp" line="714"/>
+        <location filename="../targetingdialog.cpp" line="1335"/>
+        <location filename="../targetingdialog.cpp" line="1343"/>
         <source>Paste</source>
         <translation>Paste</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="235"/>
-        <location filename="../targetingdialog.cpp" line="707"/>
+        <location filename="../targetingdialog.cpp" line="731"/>
+        <location filename="../targetingdialog.cpp" line="1345"/>
         <source>Wrap in Collection</source>
         <translation>Wrap in Collection</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="236"/>
-        <location filename="../targetingdialog.cpp" line="708"/>
+        <location filename="../targetingdialog.cpp" line="735"/>
+        <location filename="../targetingdialog.cpp" line="1346"/>
         <source>Unwrap Collection</source>
         <translation>Unwrap Collection</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="241"/>
-        <location filename="../targetingdialog.cpp" line="712"/>
+        <location filename="../targetingdialog.cpp" line="739"/>
+        <location filename="../targetingdialog.cpp" line="1350"/>
         <source>Negate</source>
         <translation>Negate</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="245"/>
-        <location filename="../targetingdialog.cpp" line="710"/>
+        <location filename="../targetingdialog.cpp" line="680"/>
+        <location filename="../targetingdialog.cpp" line="743"/>
+        <location filename="../targetingdialog.cpp" line="1348"/>
         <source>AND</source>
         <translation>AND</translation>
     </message>
     <message>
-        <location filename="../targetingdialog.cpp" line="246"/>
-        <location filename="../targetingdialog.cpp" line="711"/>
+        <location filename="../targetingdialog.cpp" line="681"/>
+        <location filename="../targetingdialog.cpp" line="747"/>
+        <location filename="../targetingdialog.cpp" line="1349"/>
         <source>OR</source>
         <translation>OR</translation>
-    </message>
-    <message>
-        <location filename="../targetingdialog.cpp" line="253"/>
-        <source>Options...</source>
-        <translation>Options...</translation>
-    </message>
-    <message>
-        <location filename="../targetingdialog.cpp" line="656"/>
-        <source>Targeting Editor</source>
-        <translation>Targeting Editor</translation>
-    </message>
-    <message>
-        <location filename="../targetingdialog.cpp" line="657"/>
-        <source>No editor is registered for %1.</source>
-        <translation>No editor is registered for %1.</translation>
-    </message>
-    <message>
-        <location filename="../targetingdialog.cpp" line="700"/>
-        <source>Edit...</source>
-        <translation>Edit...</translation>
     </message>
 </context>
 </TS>

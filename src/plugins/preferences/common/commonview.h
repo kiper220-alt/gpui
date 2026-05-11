@@ -54,6 +54,7 @@ public:
 
 private slots:
     void onTargetingClicked();
+    void updateTargetingButtonEnabled();
 
 private:
     CommonView(const CommonView&)            = delete;   // copy ctor
