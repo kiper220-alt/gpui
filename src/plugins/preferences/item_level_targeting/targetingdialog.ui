@@ -29,7 +29,7 @@
      <property name="childrenCollapsible">
       <bool>false</bool>
      </property>
-     <widget class="QTreeView" name="treeView">
+     <widget class="preferences::TargetingTreeView" name="treeView">
       <property name="headerHidden">
        <bool>false</bool>
       </property>
@@ -77,6 +77,13 @@
   </layout>
  </widget>
  <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>preferences::TargetingTreeView</class>
+   <extends>QTreeView</extends>
+   <header>item_level_targeting/targetingtreeview.h</header>
+  </customwidget>
+ </customwidgets>
  <connections>
   <connection>
    <sender>buttonBox</sender>

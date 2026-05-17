@@ -154,7 +154,7 @@ public:
     void setMoveContext(ModelView::ViewModel *vm,
                         ModelView::SessionModel *model,
                         ModelView::SessionItem *root,
-                        std::function<void()> afterMove)
+                        std::function<void(const QList<TargetingFilterItem *> &)> afterMove)
     {
         m_vm        = vm;
         m_model     = model;
@@ -240,6 +240,21 @@ public:
         return mime;
     }
 
+    bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row,
+                         int column, const QModelIndex &parent) const override
+    {
+        Q_UNUSED(column);
+        if (action == Qt::IgnoreAction)
+        {
+            return true;
+        }
+
+        QList<TargetingFilterItem *> sources;
+        ModelView::SessionItem *targetParent = nullptr;
+        int insertAt = row;
+        return resolveDrop(data, action, row, parent, sources, targetParent, insertAt);
+    }
+
     bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row,
                       int column, const QModelIndex &parent) override
     {
@@ -248,6 +263,76 @@ public:
         {
             return true;
         }
+        QList<TargetingFilterItem *> sources;
+        ModelView::SessionItem *targetParent = nullptr;
+        int insertAt = row;
+        if (!resolveDrop(data, action, row, parent, sources, targetParent, insertAt))
+        {
+            return false;
+        }
+
+        struct MoveRecord
+        {
+            TargetingFilterItem *item;
+            ModelView::SessionItem *parent;
+            int row;
+            TargetingFilterRecord record;
+        };
+
+        QList<MoveRecord> moves;
+        moves.reserve(sources.size());
+        for (auto *source : sources)
+        {
+            moves.append({source, source->parent(), source->tagRow().row, source->toRecord()});
+        }
+
+        for (const auto &move : moves)
+        {
+            if (move.parent == targetParent && move.row < insertAt)
+            {
+                --insertAt;
+            }
+        }
+
+        auto removalOrder = moves;
+        std::sort(removalOrder.begin(), removalOrder.end(),
+                  [](const MoveRecord &a, const MoveRecord &b) {
+                      if (a.parent == b.parent)
+                      {
+                          return a.row > b.row;
+                      }
+                      return depth(a.item) > depth(b.item);
+                  });
+        for (const auto &move : removalOrder)
+        {
+            m_model->removeItem(move.parent, move.item->tagRow());
+        }
+
+        QList<TargetingFilterItem *> insertedItems;
+        insertedItems.reserve(moves.size());
+        const auto &targetTag = childTagFor(targetParent, m_root);
+        for (const auto &move : moves)
+        {
+            auto *inserted = m_model->insertItem<TargetingFilterItem>(
+                targetParent, {targetTag, insertAt++});
+            inserted->loadRecord(move.record);
+            insertedItems.append(inserted);
+        }
+
+        if (m_afterMove)
+        {
+            m_afterMove(insertedItems);
+        }
+        return true;
+    }
+
+private:
+    bool resolveDrop(const QMimeData *data, Qt::DropAction action, int row,
+                     const QModelIndex &parent,
+                     QList<TargetingFilterItem *> &sources,
+                     ModelView::SessionItem *&targetParent,
+                     int &insertAt) const
+    {
         if (action != Qt::MoveAction || !data
             || !data->hasFormat(QString::fromLatin1(kClipboardMimeType))
             || !m_vm || !m_model || !m_root)
@@ -255,7 +340,6 @@ public:
             return false;
         }
 
-        QList<TargetingFilterItem *> sources;
         QSet<TargetingFilterItem *> seen;
         QDataStream in(data->data(QString::fromLatin1(kClipboardMimeType)));
         in.setVersion(QDataStream::Qt_5_12);
@@ -278,8 +362,7 @@ public:
             return false;
         }
 
-        ModelView::SessionItem *targetParent = nullptr;
-        int insertAt = row;
+        insertAt = row;
         if (row < 0 && parent.isValid())
         {
             auto *dropTarget = itemFromProxyIndex(parent);
@@ -320,60 +403,9 @@ public:
                 }
             }
         }
-
-        struct MoveRecord
-        {
-            TargetingFilterItem *item;
-            ModelView::SessionItem *parent;
-            int row;
-            TargetingFilterRecord record;
-        };
-
-        QList<MoveRecord> moves;
-        moves.reserve(sources.size());
-        for (auto *source : sources)
-        {
-            moves.append({source, source->parent(), source->tagRow().row, source->toRecord()});
-        }
-
-        for (const auto &move : moves)
-        {
-            if (move.parent == targetParent && move.row < insertAt)
-            {
-                --insertAt;
-            }
-        }
-
-        auto removalOrder = moves;
-        std::sort(removalOrder.begin(), removalOrder.end(),
-                  [](const MoveRecord &a, const MoveRecord &b) {
-                      if (a.parent == b.parent)
-                      {
-                          return a.row > b.row;
-                      }
-                      return depth(a.item) > depth(b.item);
-                  });
-        for (const auto &move : removalOrder)
-        {
-            m_model->removeItem(move.parent, move.item->tagRow());
-        }
-
-        const auto &targetTag = childTagFor(targetParent, m_root);
-        for (const auto &move : moves)
-        {
-            auto *inserted = m_model->insertItem<TargetingFilterItem>(
-                targetParent, {targetTag, insertAt++});
-            inserted->loadRecord(move.record);
-        }
-
-        if (m_afterMove)
-        {
-            m_afterMove();
-        }
         return true;
     }
 
-private:
     TargetingFilterItem *itemFromProxyIndex(const QModelIndex &index) const
     {
         if (!m_vm || !index.isValid())
@@ -410,7 +442,7 @@ private:
     ModelView::ViewModel *m_vm{nullptr};
     ModelView::SessionModel *m_model{nullptr};
     ModelView::SessionItem *m_root{nullptr};
-    std::function<void()> m_afterMove;
+    std::function<void(const QList<TargetingFilterItem *> &)> m_afterMove;
 };
 
 //! Item delegate that paints the per-filter icon for column 0 of the
@@ -463,7 +495,10 @@ TargetingDialog::TargetingDialog(QWidget *parent)
     m_proxy = new SingleColumnProxy(this);
     static_cast<SingleColumnProxy *>(m_proxy)->setMoveContext(
         m_model->viewModel(), m_model->sessionModel(), m_model->rootFilterParent(),
-        [this]() { finishMutation(); });
+        [this](const QList<TargetingFilterItem *> &items) {
+            selectItems(items);
+            finishMutation();
+        });
     m_proxy->setSourceModel(m_model->viewModel());
 
     ui->treeView->setModel(m_proxy);
@@ -846,6 +881,34 @@ void TargetingDialog::selectItem(TargetingFilterItem *item)
     if (idx.isValid())
     {
         ui->treeView->setCurrentIndex(idx);
+    }
+}
+
+void TargetingDialog::selectItems(const QList<TargetingFilterItem *> &items)
+{
+    auto *selectionModel = ui->treeView->selectionModel();
+    if (!selectionModel || items.isEmpty())
+    {
+        return;
+    }
+
+    selectionModel->clearSelection();
+    QModelIndex current;
+    for (auto *item : items)
+    {
+        const QModelIndex idx = proxyIndexForItem(item);
+        if (!idx.isValid())
+        {
+            continue;
+        }
+        selectionModel->select(idx, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+        current = idx;
+    }
+
+    if (current.isValid())
+    {
+        selectionModel->setCurrentIndex(current, QItemSelectionModel::NoUpdate);
+        ui->treeView->scrollTo(current);
     }
 }
 

@@ -57,6 +57,8 @@ private slots:
     void osCatalogProductChoices();
     void osCatalogDependentChoices();
     void osCatalogKeepsLinuxReserved();
+    void dragFeedbackDistinguishesInsertionAndCollection();
+    void invalidDragTargetHidesFeedback();
 };
 
 } // namespace tests

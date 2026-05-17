@@ -25,6 +25,7 @@
 #include "src/plugins/preferences/item_level_targeting/targetingcontainer.h"
 #include "src/plugins/preferences/item_level_targeting/targetingfilteritem.h"
 #include "src/plugins/preferences/item_level_targeting/targetingrowformatter.h"
+#include "src/plugins/preferences/item_level_targeting/targetingtreeview.h"
 
 #include <mvvm/model/sessionmodel.h>
 #include <mvvm/model/taginfo.h>
@@ -33,6 +34,8 @@
 #include <QDomDocument>
 #include <QDomElement>
 #include <QFile>
+#include <QMimeData>
+#include <QStandardItemModel>
 #include <QUuid>
 
 namespace tests
@@ -134,6 +137,26 @@ preferences::TargetingContainer deserialize(const QString &xml)
 
 } // namespace
 
+class FeedbackModel final : public QStandardItemModel
+{
+public:
+    using QStandardItemModel::QStandardItemModel;
+
+    bool canDropMimeData(const QMimeData *, Qt::DropAction action, int row, int,
+                         const QModelIndex &parent) const override
+    {
+        if (action != Qt::MoveAction)
+        {
+            return false;
+        }
+        if (row >= 0)
+        {
+            return true;
+        }
+        return parent.isValid() && parent.data().toString() == QStringLiteral("Collection");
+    }
+};
+
 void TargetingTest::filterCatalogRoundTrip()
 {
     // Build one record per type from TargetingDialog's filter catalog,
@@ -169,6 +192,51 @@ void TargetingTest::filterCatalogRoundTrip()
         QCOMPARE(got.disabled, src.disabled);
         QCOMPARE(got.attributes, src.attributes);
     }
+}
+
+void TargetingTest::dragFeedbackDistinguishesInsertionAndCollection()
+{
+    preferences::TargetingTreeView view;
+    FeedbackModel model;
+    model.appendRow(new QStandardItem(QStringLiteral("First")));
+    model.appendRow(new QStandardItem(QStringLiteral("Collection")));
+    view.setModel(&model);
+    view.setAcceptDrops(true);
+    view.viewport()->setAcceptDrops(true);
+    view.resize(240, 120);
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+
+    QMimeData mime;
+    const QRect firstRect = view.visualRect(model.index(0, 0));
+    QVERIFY(view.updateDropFeedbackFor(firstRect.topLeft() + QPoint(5, 1),
+                                       &mime, Qt::MoveAction));
+    QCOMPARE(view.dropFeedbackKind(),
+             preferences::TargetingTreeView::DropFeedbackKind::InsertBefore);
+
+    const QRect collectionRect = view.visualRect(model.index(1, 0));
+    QVERIFY(view.updateDropFeedbackFor(collectionRect.center(), &mime, Qt::MoveAction));
+    QCOMPARE(view.dropFeedbackKind(),
+             preferences::TargetingTreeView::DropFeedbackKind::IntoCollection);
+}
+
+void TargetingTest::invalidDragTargetHidesFeedback()
+{
+    preferences::TargetingTreeView view;
+    FeedbackModel model;
+    model.appendRow(new QStandardItem(QStringLiteral("Plain")));
+    view.setModel(&model);
+    view.setAcceptDrops(true);
+    view.viewport()->setAcceptDrops(true);
+    view.resize(240, 80);
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+
+    QMimeData mime;
+    const QRect plainRect = view.visualRect(model.index(0, 0));
+    QVERIFY(!view.updateDropFeedbackFor(plainRect.center(), &mime, Qt::MoveAction));
+    QCOMPARE(view.dropFeedbackKind(),
+             preferences::TargetingTreeView::DropFeedbackKind::None);
 }
 
 void TargetingTest::unknownAttributeIsPreserved()

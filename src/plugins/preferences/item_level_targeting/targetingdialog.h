@@ -134,6 +134,7 @@ private:
     TargetingFilterItem *itemFromProxyIndex(const QModelIndex &index) const;
     QModelIndex proxyIndexForItem(TargetingFilterItem *item) const;
     void selectItem(TargetingFilterItem *item);
+    void selectItems(const QList<TargetingFilterItem *> &items);
 
     Ui::TargetingDialog *ui {nullptr};
     std::unique_ptr<TargetingModel> m_model;

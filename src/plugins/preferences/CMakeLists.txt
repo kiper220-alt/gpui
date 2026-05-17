@@ -94,6 +94,7 @@ set(HEADERS
     item_level_targeting/targetingcontainer.h
     item_level_targeting/targetingrowformatter.h
     item_level_targeting/targetingdialog.h
+    item_level_targeting/targetingtreeview.h
     item_level_targeting/targetingfilteritem.h
     item_level_targeting/targetingfilterwidget.h
     item_level_targeting/targetingicons.h
@@ -319,6 +320,7 @@ set(SOURCES
     item_level_targeting/targetingcontainer.cpp
     item_level_targeting/targetingrowformatter.cpp
     item_level_targeting/targetingdialog.cpp
+    item_level_targeting/targetingtreeview.cpp
     item_level_targeting/targetingfilteritem.cpp
     item_level_targeting/targetingfilterwidget.cpp
     item_level_targeting/targetingicons.cpp

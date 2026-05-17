@@ -16,6 +16,7 @@ set(SOURCES
     ${TARGETING_SRC_DIR}/targetingcontainer.cpp
     ${TARGETING_SRC_DIR}/targetingfilteritem.cpp
     ${TARGETING_SRC_DIR}/targetingrowformatter.cpp
+    ${TARGETING_SRC_DIR}/targetingtreeview.cpp
     # targetingdialog.cpp is compiled only for access to the static
     # `filterCatalog()`; its Qt UI members are unused in this test.
 )
