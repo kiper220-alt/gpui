@@ -1,10 +1,9 @@
 #include <memory>
 #include <string>
+#include <cinttypes>
 
-namespace model
-{
-namespace admx
-{
+namespace model {
+namespace admx {
 /*!
  * \brief The SupportedOnRange class The supportedOnRange element provides supported version range.
  */
@@ -12,25 +11,25 @@ class SupportedOnRange
 {
 public:
     /*!
-     * \brief A reference to a supported product definition, either a single version or a complex definition.
+     * \brief A reference to a supported product definition, either a single version or a complex
+     * definition.
      */
-    std::string itemReference{};
+    std::string itemReference{ };
 
     /*!
      * \brief Minimum supported version.
      */
-    uint32_t minVersionIndex{};
+    uint32_t minVersionIndex{ };
 
     /*!
      * \brief Maximum supported version.
      */
-    uint32_t maxVersionIndex{};
+    uint32_t maxVersionIndex{ };
 
     SupportedOnRange(const std::string &reference, uint32_t minVersion, uint32_t maxVersion)
-        : itemReference(reference)
-        , minVersionIndex(minVersion)
-        , maxVersionIndex(maxVersion)
-    {}
+        : itemReference(reference), minVersionIndex(minVersion), maxVersionIndex(maxVersion)
+    {
+    }
 };
 
 } // namespace admx
