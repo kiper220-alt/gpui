@@ -20,7 +20,7 @@
 
 #include "registrypreferencereader.h"
 
-#include "item_level_targeting/filtersio.h"
+#include "item_level_targeting/common/filtersio.h"
 #include "registrymodelbuilder.h"
 #include "schemas/registryschema.h"
 

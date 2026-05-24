@@ -22,7 +22,7 @@
 #define GPUI_COMMONITEM_H
 
 #include "basepreferenceitem.h"
-#include "item_level_targeting/targetingcontainer.h"
+#include "item_level_targeting/common/targetingcontainer.h"
 
 namespace preferences
 {

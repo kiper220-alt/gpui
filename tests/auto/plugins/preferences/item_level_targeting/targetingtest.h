@@ -41,6 +41,12 @@ class TargetingTest : public QObject
 
 private slots:
     void filterCatalogRoundTrip();
+    void documentedDefaultExpectations();
+    void createdFiltersSerializeDefaults();
+    void uiTemplateDefaultsMatchDocumentedExpectations();
+    void translationCatalogHasNoKnownGaps();
+    void rsatShapedFiltersRoundTrip();
+    void dateEveryYearOmitsYear();
     void unknownAttributeIsPreserved();
     void filterCollectionNestingSurvives();
     void applyOnceModelRoundTrip();
@@ -52,13 +58,23 @@ private slots:
     void filtersForSerializationRespectsCheckbox();
     void humanReadableLineSamples();
     void formatterFallsBackForUnknown();
+    void collectionLabelReflectsLoadedChildren();
     void combinatorPrefixRefreshesAfterFirstRowDelete();
     void localizedRowFormattersUseLabels();
     void osCatalogProductChoices();
     void osCatalogDependentChoices();
     void osCatalogKeepsLinuxReserved();
     void dragFeedbackDistinguishesInsertionAndCollection();
-    void invalidDragTargetHidesFeedback();
+    void nonCollectionCenterShowsInsertionFeedback();
+    void selectionNormalizationDropsDescendants();
+    void nestedSelectionDeleteRemovesAncestorOnly();
+    void nestedSelectionCutCopiesAncestorOnly();
+    void internalDragMimeAcceptsSameToken();
+    void internalDragMimePreservesTreeOrder();
+    void internalDragWorksForFiltersLoadedWithoutXmlIds();
+    void dropRowAdjustmentCountsAllOriginalRows();
+    void internalDragMimeRejectsForeignToken();
+    void internalDragMimeRejectsStaleIds();
 };
 
 } // namespace tests

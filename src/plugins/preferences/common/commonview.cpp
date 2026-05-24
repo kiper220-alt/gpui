@@ -22,7 +22,7 @@
 #include "ui_commonview.h"
 
 #include "commonitem.h"
-#include "item_level_targeting/targetingdialog.h"
+#include "item_level_targeting/common/targetingdialog.h"
 
 #include <mvvm/factories/viewmodelfactory.h>
 #include <mvvm/viewmodel/viewmodeldelegate.h>

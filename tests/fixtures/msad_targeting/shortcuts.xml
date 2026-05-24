@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Filters>
-  <FilterIpRange bool="1" not="0" id="{44444444-0000-0000-0000-000000000001}" min="192.168.1.1" max="192.168.1.254"/>
-  <FilterTime bool="1" not="0" id="{44444444-0000-0000-0000-000000000002}" begin="08:00:00" end="18:00:00"/>
+  <FilterIpRange bool="AND" not="0" min="192.168.1.1" max="192.168.1.254"/>
+  <FilterTime bool="AND" not="0" begin="08:00:00" end="18:00:00"/>
 </Filters>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="enumFilterBool">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AND"/>
+      <xs:enumeration value="OR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumTrueFalse">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterRegistryHive">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="HKEY_LOCAL_MACHINE"/>
+      <xs:enumeration value="HKEY_CLASSES_ROOT"/>
+      <xs:enumeration value="HKEY_CURRENT_USER"/>
+      <xs:enumeration value="HKEY_CURRENT_CONFIG"/>
+      <xs:enumeration value="HKEY_USERS"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterRegistryValueType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REG_SZ"/>
+      <xs:enumeration value="REG_EXPAND_SZ"/>
+      <xs:enumeration value="REG_MULTI_SZ"/>
+      <xs:enumeration value="REG_DWORD"/>
+      <xs:enumeration value="REG_BINARY"/>
+      <xs:enumeration value=""/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterRegistrySubType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="EQUALHEX"/>
+      <xs:enumeration value="EQUALDEC"/>
+      <xs:enumeration value="SUBSTRING"/>
+      <xs:enumeration value="VERSION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterRegistryType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="VALUEEXISTS"/>
+      <xs:enumeration value="KEYEXISTS"/>
+      <xs:enumeration value="MATCHVALUE"/>
+      <xs:enumeration value="GETVALUE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="IFilter" abstract="true">
+    <xs:attribute name="bool" type="enumFilterBool" use="required" />
+    <xs:attribute name="not" type="enumTrueFalse" use="required" />
+    <xs:attribute name="hidden" type="enumTrueFalse" use="optional" />
+  </xs:complexType>
+
+  <xs:element name="FilterRegistry">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="IFilter">
+          <xs:attribute name="type" type="enumFilterRegistryType" use="optional" default="KEYEXISTS" />
+          <xs:attribute name="subtype" type="enumFilterRegistrySubType" use="optional" default="EQUALHEX" />
+          <xs:attribute name="valueName" type="xs:string" use="optional" />
+          <xs:attribute name="valueType" type="enumFilterRegistryValueType" use="optional" default=""/>
+          <xs:attribute name="valueData" type="xs:string" use="optional" />
+          <xs:attribute name="variableName" type="xs:string" use="optional" />
+          <xs:attribute name="key" type="xs:string" use="required" />
+          <xs:attribute name="hive" type="enumFilterRegistryHive" use="optional" default="HKEY_LOCAL_MACHINE"/>
+          <xs:attribute name="min" type="xs:string" use="optional" />
+          <xs:attribute name="max" type="xs:string" use="optional" />
+          <xs:attribute name="gte" type="enumTrueFalse" use="optional" default="0" />
+          <xs:attribute name="lte" type="enumTrueFalse" use="optional" default="0" />
+          <xs:attribute name="version" type="xs:string" use="optional" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

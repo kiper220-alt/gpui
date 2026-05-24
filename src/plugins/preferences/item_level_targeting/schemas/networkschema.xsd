@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="enumFilterBool">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AND"/>
+      <xs:enumeration value="OR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumTrueFalse">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterDunType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value=""/>
+      <xs:enumeration value="modem"/>
+      <xs:enumeration value="isdn"/>
+      <xs:enumeration value="x25"/>
+      <xs:enumeration value="vpn"/>
+      <xs:enumeration value="pad"/>
+      <xs:enumeration value="GENERIC"/>
+      <xs:enumeration value="SERIAL"/>
+      <xs:enumeration value="FRAMERELAY"/>
+      <xs:enumeration value="ATM"/>
+      <xs:enumeration value="SONET"/>
+      <xs:enumeration value="SW56"/>
+      <xs:enumeration value="IRDA"/>
+      <xs:enumeration value="PARALLEL"/>
+      <xs:enumeration value="PPPoE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="IFilter" abstract="true">
+    <xs:attribute name="bool" type="enumFilterBool" use="required" />
+    <xs:attribute name="not" type="enumTrueFalse" use="required" />
+    <xs:attribute name="hidden" type="enumTrueFalse" use="optional" />
+  </xs:complexType>
+
+  <xs:element name="FilterDun">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="IFilter">
+          <xs:attribute name="type" type="enumFilterDunType" use="required" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

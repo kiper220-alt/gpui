@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MSIQueryWidget</class>
+ <widget class="QWidget" name="MSIQueryWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>576</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>250</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string/>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="queryLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Query type:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="queryComboBox">
+     <item>
+      <property name="text">
+       <string>Target exists</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Version match</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Get property</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Match property</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Get information</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Match information</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="targetLabel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Target type:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="3" colspan="2">
+    <widget class="QComboBox" name="targetComboBox">
+     <item>
+      <property name="text">
+       <string>Product</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Patch</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Component</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="productLabel">
+     <property name="text">
+      <string>Product code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="4">
+    <widget class="QLineEdit" name="productLineEdit"/>
+   </item>
+   <item row="2" column="4">
+    <widget class="QToolButton" name="productToolButton">
+     <property name="minimumSize">
+      <size>
+       <width>75</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="propertyNameLabel">
+     <property name="text">
+      <string>Property name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="3">
+    <widget class="QLineEdit" name="propertyNameLineEdit"/>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QLabel" name="propertyValueLabel">
+     <property name="text">
+      <string>Property value:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="3">
+    <widget class="QLineEdit" name="propertyValueLineEdit"/>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QLabel" name="infoItemLabel">
+     <property name="text">
+      <string>Information item:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" colspan="3">
+    <widget class="QComboBox" name="infoItemComboBox">
+     <property name="editable">
+      <bool>false</bool>
+     </property>
+     <item>
+      <property name="text">
+       <string>PackageName</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Transforms</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Language</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ProductName</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>AssignmentType</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>InstanceType</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>PackageCode</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Version</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ProductIcon</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>InstalledProductName</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>VersionString</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>HelpLink</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>HelpTelephone</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>InstallLocation</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>InstallSource</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>InstallDate</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Publisher</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>LocalPackage</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>URLInfoAbout</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>URLUpdateInfo</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>VersionMinor</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>VersionMajor</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="2">
+    <widget class="QLabel" name="infoValueLabel">
+     <property name="text">
+      <string>Item value:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2" colspan="3">
+    <widget class="QLineEdit" name="infoValueLineEdit"/>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <widget class="QLabel" name="variableNameLabel">
+     <property name="text">
+      <string>Variable name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2" colspan="3">
+    <widget class="QLineEdit" name="variableNameLineEdit"/>
+   </item>
+   <item row="8" column="0">
+    <widget class="QComboBox" name="minComboBox">
+     <property name="minimumSize">
+      <size>
+       <width>65</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>65</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <item>
+      <property name="text">
+       <string>&gt;=</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>&gt;</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QLineEdit" name="minLineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>180</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="inputMask">
+      <string>00000.00000.00000.00000</string>
+     </property>
+     <property name="text">
+      <string>0.0.0.0</string>
+     </property>
+     <property name="maxLength">
+      <number>23</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="QComboBox" name="maxComboBox">
+     <property name="minimumSize">
+      <size>
+       <width>65</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>65</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <item>
+      <property name="text">
+       <string>&lt;</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>&lt;=</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="8" column="3" colspan="2">
+    <widget class="QLineEdit" name="maxLineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>120</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>180</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="inputMask">
+      <string>00000.00000.00000.00000</string>
+     </property>
+     <property name="text">
+      <string>0.0.0.0</string>
+     </property>
+     <property name="maxLength">
+      <number>23</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0" colspan="5">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>A MSI Query targeting item allows a preference item to be applied to computers or users only if certain aspects of an MSI installed product, update, or component on the processing computer match the specified criteria in the targeting item.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="5">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>558</width>
+       <height>137</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

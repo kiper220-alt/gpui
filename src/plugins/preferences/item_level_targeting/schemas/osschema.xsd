@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="enumFilterBool">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AND"/>
+      <xs:enumeration value="OR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumTrueFalse">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterOsClass">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NE"/>
+      <xs:enumeration value="9X"/>
+      <xs:enumeration value="NT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterOsVersion">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NE"/>
+      <xs:enumeration value="95"/>
+      <xs:enumeration value="98"/>
+      <xs:enumeration value="ME"/>
+      <xs:enumeration value="NT"/>
+      <xs:enumeration value="2K"/>
+      <xs:enumeration value="XP"/>
+      <xs:enumeration value="2K3"/>
+      <xs:enumeration value="2K3R2"/>
+      <xs:enumeration value="VISTA"/>
+      <xs:enumeration value="2K8"/>
+      <xs:enumeration value="WIN7"/>
+      <xs:enumeration value="2K8R2"/>
+      <xs:enumeration value="WIN8"/>
+      <xs:enumeration value="WIN8S"/>
+      <xs:enumeration value="WINBLUE"/>
+      <xs:enumeration value="WINBLUESRV"/>
+      <xs:enumeration value="WINTHRESHOLD"/>
+      <xs:enumeration value="WINTHRESHOLDSRV"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterOsType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NE"/>
+      <xs:enumeration value="R2"/>
+      <xs:enumeration value="SE"/>
+      <xs:enumeration value="WS"/>
+      <xs:enumeration value="SV"/>
+      <xs:enumeration value="DC"/>
+      <xs:enumeration value="PRO"/>
+      <xs:enumeration value="PR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterOsEdition">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NE"/>
+      <xs:enumeration value="64EP"/>
+      <xs:enumeration value="64DC"/>
+      <xs:enumeration value="AS"/>
+      <xs:enumeration value="DTC"/>
+      <xs:enumeration value="EP"/>
+      <xs:enumeration value="WEB"/>
+      <xs:enumeration value="64"/>
+      <xs:enumeration value="HM"/>
+      <xs:enumeration value="MC"/>
+      <xs:enumeration value="TPC"/>
+      <xs:enumeration value="SRV"/>
+      <xs:enumeration value="STD"/>
+      <xs:enumeration value="TSE"/>
+      <xs:enumeration value="SBS"/>
+      <xs:enumeration value="PRO"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterOsSp">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NE"/>
+      <xs:enumeration value="Gold"/>
+      <xs:enumeration value="Service Pack 1"/>
+      <xs:enumeration value="Service Pack 2"/>
+      <xs:enumeration value="Service Pack 3"/>
+      <xs:enumeration value="Service Pack 4"/>
+      <xs:enumeration value="Service Pack 5"/>
+      <xs:enumeration value="Service Pack 6"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="IFilter" abstract="true">
+    <xs:attribute name="bool" type="enumFilterBool" use="required" />
+    <xs:attribute name="not" type="enumTrueFalse" use="required" />
+    <xs:attribute name="hidden" type="enumTrueFalse" use="optional" />
+  </xs:complexType>
+
+  <xs:element name="FilterOs">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="IFilter">
+          <xs:attribute name="class" type="enumFilterOsClass" use="optional" default="NE" />
+          <xs:attribute name="version" type="enumFilterOsVersion" use="optional" default="NE" />
+          <xs:attribute name="type" type="enumFilterOsType" use="optional" default="NE" />
+          <xs:attribute name="edition" type="enumFilterOsEdition" use="optional" default="NE" />
+          <xs:attribute name="sp" type="enumFilterOsSp" use="optional" default="NE" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

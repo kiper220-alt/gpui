@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Filters>
-  <FilterGroup bool="1" not="0" id="{22222222-0000-0000-0000-000000000001}" name="Domain Admins" sid="" userContext="1" primaryGroup="0" localGroup="0"/>
-  <FilterCollection bool="0" not="0" id="{22222222-0000-0000-0000-000000000002}">
-    <FilterCpu bool="1" not="0" id="{22222222-0000-0000-0000-000000000003}" speedMHz="2000"/>
-    <FilterRam bool="1" not="0" id="{22222222-0000-0000-0000-000000000004}" totalMB="4096"/>
+  <FilterGroup bool="AND" not="0" name="Domain Admins" sid="" userContext="1" primaryGroup="0" localGroup="0"/>
+  <FilterCollection bool="OR" not="0">
+    <FilterCpu bool="AND" not="0" speedMHz="2000"/>
+    <FilterRam bool="AND" not="0" totalMB="4096"/>
   </FilterCollection>
 </Filters>

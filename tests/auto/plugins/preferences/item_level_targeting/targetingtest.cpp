@@ -20,12 +20,14 @@
 
 #include "targetingtest.h"
 
-#include "src/plugins/preferences/item_level_targeting/filtersbridge.h"
-#include "src/plugins/preferences/item_level_targeting/oscatalog.h"
-#include "src/plugins/preferences/item_level_targeting/targetingcontainer.h"
-#include "src/plugins/preferences/item_level_targeting/targetingfilteritem.h"
-#include "src/plugins/preferences/item_level_targeting/targetingrowformatter.h"
-#include "src/plugins/preferences/item_level_targeting/targetingtreeview.h"
+#include "src/plugins/preferences/item_level_targeting/common/filtersbridge.h"
+#include "src/plugins/preferences/item_level_targeting/os/oscatalog.h"
+#include "src/plugins/preferences/item_level_targeting/common/targetingcontainer.h"
+#include "src/plugins/preferences/item_level_targeting/common/targetingfilterdefaults.h"
+#include "src/plugins/preferences/item_level_targeting/common/targetingfilteritem.h"
+#include "src/plugins/preferences/item_level_targeting/common/targetingrowformatter.h"
+#include "src/plugins/preferences/item_level_targeting/common/targetingselection.h"
+#include "src/plugins/preferences/item_level_targeting/common/targetingtreeview.h"
 
 #include <mvvm/model/sessionmodel.h>
 #include <mvvm/model/taginfo.h>
@@ -45,8 +47,10 @@ namespace
 {
 
 //! Recursively compare two filter-record lists for semantic equality.
-//! Returns true when every field (name, id, combinator, negation, disabled,
-//! attributes, children count) matches; reports mismatch via QTest on failure.
+//! Returns true when every persisted field (name, combinator, negation,
+//! disabled, attributes, children count) matches; reports mismatch via
+//! QTest on failure. Generated identity fields are intentionally excluded
+//! from the gpui XML contract.
 bool compareFilterLists(const QList<preferences::TargetingFilterRecord> &got,
                         const QList<preferences::TargetingFilterRecord> &want,
                         const QString &context)
@@ -62,8 +66,11 @@ bool compareFilterLists(const QList<preferences::TargetingFilterRecord> &got,
         const auto &w = want.at(i);
         const auto &g = got.at(i);
         const QString ctx = context + QStringLiteral("/") + w.name + QStringLiteral("[%1]").arg(i);
-        if (g.name != w.name || g.id != w.id || g.combinator != w.combinator
-            || g.negated != w.negated || g.disabled != w.disabled || g.attributes != w.attributes)
+        const QMap<QString, QString> wantAttributes =
+            preferences::materializeTargetingFilterExtras(w.name, w.attributes);
+        if (g.name != w.name || g.combinator != w.combinator
+            || g.negated != w.negated || g.disabled != w.disabled
+            || g.attributes != wantAttributes)
         {
             qWarning("Record mismatch at %s", qPrintable(ctx));
             return false;
@@ -135,6 +142,35 @@ preferences::TargetingContainer deserialize(const QString &xml)
     return preferences::containerFromXml(filters);
 }
 
+bool containsIdentityAttribute(const QDomElement &element)
+{
+    if (element.hasAttribute(QStringLiteral("id"))
+        || element.hasAttribute(QStringLiteral("uid")))
+    {
+        return true;
+    }
+    for (QDomElement child = element.firstChildElement(); !child.isNull();
+         child             = child.nextSiblingElement())
+    {
+        if (containsIdentityAttribute(child))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+QString readSourceFile(const QString &relativePath)
+{
+    QFile file(QString::fromUtf8(TARGETING_SOURCE_DIR) + QLatin1Char('/') + relativePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qWarning("Unable to open %s", qPrintable(file.fileName()));
+        return {};
+    }
+    return QString::fromUtf8(file.readAll());
+}
+
 } // namespace
 
 class FeedbackModel final : public QStandardItemModel
@@ -154,6 +190,64 @@ public:
             return true;
         }
         return parent.isValid() && parent.data().toString() == QStringLiteral("Collection");
+    }
+};
+
+preferences::TargetingFilterRecord makeFilter(const QString &name, const QString &id)
+{
+    preferences::TargetingFilterRecord record;
+    record.name = name;
+    record.id   = id;
+    return record;
+}
+
+struct TargetingTreeFixture
+{
+    ModelView::SessionModel model{"TargetingSelectionTest"};
+    preferences::TargetingFilterItem *collection{nullptr};
+    preferences::TargetingFilterItem *childA{nullptr};
+    preferences::TargetingFilterItem *childB{nullptr};
+    preferences::TargetingFilterItem *sibling{nullptr};
+    preferences::TargetingFilterItem *secondCollection{nullptr};
+    preferences::TargetingFilterItem *childC{nullptr};
+
+    TargetingTreeFixture()
+    {
+        model.registerItem<preferences::TargetingFilterItem>();
+        model.rootItem()->registerTag(
+            ModelView::TagInfo::universalTag(
+                "filters", {preferences::TargetingFilterItem::kModelType}),
+            true);
+
+        collection = model.insertItem<preferences::TargetingFilterItem>(
+            model.rootItem(), {"filters", -1});
+        collection->loadRecord(makeFilter(QStringLiteral("FilterCollection"),
+                                          QStringLiteral("{collection}")));
+
+        childA = model.insertItem<preferences::TargetingFilterItem>(
+            collection, {preferences::TargetingFilterItem::kChildrenTag, -1});
+        childA->loadRecord(makeFilter(QStringLiteral("FilterComputer"),
+                                      QStringLiteral("{child-a}")));
+
+        childB = model.insertItem<preferences::TargetingFilterItem>(
+            collection, {preferences::TargetingFilterItem::kChildrenTag, -1});
+        childB->loadRecord(makeFilter(QStringLiteral("FilterRam"),
+                                      QStringLiteral("{child-b}")));
+
+        sibling = model.insertItem<preferences::TargetingFilterItem>(
+            model.rootItem(), {"filters", -1});
+        sibling->loadRecord(makeFilter(QStringLiteral("FilterCpu"),
+                                       QStringLiteral("{sibling}")));
+
+        secondCollection = model.insertItem<preferences::TargetingFilterItem>(
+            model.rootItem(), {"filters", -1});
+        secondCollection->loadRecord(makeFilter(QStringLiteral("FilterCollection"),
+                                                QStringLiteral("{second-collection}")));
+
+        childC = model.insertItem<preferences::TargetingFilterItem>(
+            secondCollection, {preferences::TargetingFilterItem::kChildrenTag, -1});
+        childC->loadRecord(makeFilter(QStringLiteral("FilterUser"),
+                                      QStringLiteral("{child-c}")));
     }
 };
 
@@ -177,6 +271,11 @@ void TargetingTest::filterCatalogRoundTrip()
     source.setFilters(records);
 
     const QString xml = serialize(source);
+    QVERIFY(xml.contains(QStringLiteral("bool=\"AND\"")));
+    QVERIFY(xml.contains(QStringLiteral("bool=\"OR\"")));
+    QVERIFY(!xml.contains(QStringLiteral("bool=\"1\"")));
+    QVERIFY(!xml.contains(QStringLiteral("bool=\"0\"")));
+
     const preferences::TargetingContainer roundtripped = deserialize(xml);
 
     QCOMPARE(roundtripped.filters().size(), source.filters().size());
@@ -186,12 +285,237 @@ void TargetingTest::filterCatalogRoundTrip()
         const auto &got = roundtripped.filters().at(idx);
 
         QCOMPARE(got.name, src.name);
-        QCOMPARE(got.id, src.id);
         QCOMPARE(got.combinator, src.combinator);
         QCOMPARE(got.negated, src.negated);
         QCOMPARE(got.disabled, src.disabled);
-        QCOMPARE(got.attributes, src.attributes);
+        QCOMPARE(got.attributes,
+                 preferences::materializeTargetingFilterExtras(src.name, src.attributes));
     }
+}
+
+void TargetingTest::documentedDefaultExpectations()
+{
+    // Fixture-backed decisions for the remaining ambiguous RSAT-visible
+    // defaults. These values are intentionally checked here so later
+    // cleanups do not silently change the XML shape for newly-created
+    // filters.
+    const auto date = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterDate"));
+    QCOMPARE(date.value(QStringLiteral("period")), QStringLiteral("WEEKLY"));
+    QCOMPARE(date.value(QStringLiteral("dow")), QStringLiteral("SUN"));
+
+    const auto disk = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterDisk"));
+    QCOMPARE(disk.value(QStringLiteral("drive")), QStringLiteral("%SystemDrive%"));
+    QCOMPARE(disk.value(QStringLiteral("freeSpace")), QStringLiteral("80"));
+
+    const auto ipRange = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterIpRange"));
+    QCOMPARE(ipRange.value(QStringLiteral("min")), QStringLiteral("0.0.0.0"));
+    QCOMPARE(ipRange.value(QStringLiteral("max")), QStringLiteral("0.0.0.0"));
+
+    const auto macRange = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterMacRange"));
+    QCOMPARE(macRange.value(QStringLiteral("min")), QStringLiteral("00:00:00:00:00:00"));
+    QCOMPARE(macRange.value(QStringLiteral("max")), QStringLiteral("00:00:00:00:00:00"));
+
+    const auto wmi = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterWmi"));
+    QCOMPARE(wmi.value(QStringLiteral("nameSpace")), QStringLiteral("root\\cimv2"));
+
+    const auto portable = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterPortable"));
+    QCOMPARE(portable.value(QStringLiteral("unknown")), QStringLiteral("0"));
+    QCOMPARE(portable.value(QStringLiteral("docked")), QStringLiteral("0"));
+    QCOMPARE(portable.value(QStringLiteral("undocked")), QStringLiteral("0"));
+
+    const auto variable = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterVariable"));
+    QVERIFY(variable.contains(QStringLiteral("variableName")));
+    QVERIFY(!variable.contains(QStringLiteral("value")));
+
+    const auto time = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterTime"));
+    QCOMPARE(time.value(QStringLiteral("begin")), QStringLiteral("00:00"));
+    QCOMPARE(time.value(QStringLiteral("end")), QStringLiteral("23:59"));
+
+    const auto dun = preferences::defaultTargetingFilterExtras(QStringLiteral("FilterDun"));
+    QVERIFY(dun.contains(QStringLiteral("type")));
+    QCOMPARE(dun.value(QStringLiteral("type")), QString());
+}
+
+void TargetingTest::createdFiltersSerializeDefaults()
+{
+    QList<preferences::TargetingFilterRecord> records;
+    for (const auto &name : filterCatalog())
+    {
+        preferences::TargetingFilterRecord record;
+        record.name = name;
+        records.append(record);
+    }
+
+    preferences::TargetingContainer container;
+    container.setFilters(records);
+
+    const QString xml = serialize(container);
+    QDomDocument doc;
+    QVERIFY(doc.setContent(xml));
+    const QDomElement filters = doc.documentElement().firstChildElement(QStringLiteral("Filters"));
+    QVERIFY(!filters.isNull());
+    QVERIFY(!containsIdentityAttribute(filters));
+    QVERIFY(!xml.contains(QStringLiteral("bool=\"1\"")));
+    QVERIFY(!xml.contains(QStringLiteral("bool=\"0\"")));
+
+    for (QDomElement element = filters.firstChildElement(); !element.isNull();
+         element             = element.nextSiblingElement())
+    {
+        QCOMPARE(element.attribute(QStringLiteral("bool")), QStringLiteral("AND"));
+        QCOMPARE(element.attribute(QStringLiteral("not")), QStringLiteral("0"));
+
+        const auto defaults = preferences::defaultTargetingFilterExtras(element.tagName());
+        for (auto it = defaults.cbegin(); it != defaults.cend(); ++it)
+        {
+            QVERIFY2(element.hasAttribute(it.key()),
+                     qPrintable(QStringLiteral("%1 missing default attribute %2")
+                                    .arg(element.tagName(), it.key())));
+            QCOMPARE(element.attribute(it.key()), it.value());
+        }
+    }
+
+    const QDomElement disk = filters.firstChildElement(QStringLiteral("FilterDisk"));
+    QVERIFY(!disk.isNull());
+    QCOMPARE(disk.attribute(QStringLiteral("drive")), QStringLiteral("%SystemDrive%"));
+    QCOMPARE(disk.attribute(QStringLiteral("freeSpace")), QStringLiteral("80"));
+
+    const QDomElement date = filters.firstChildElement(QStringLiteral("FilterDate"));
+    QVERIFY(!date.isNull());
+    QCOMPARE(date.attribute(QStringLiteral("period")), QStringLiteral("WEEKLY"));
+    QVERIFY(date.hasAttribute(QStringLiteral("dow")));
+    QVERIFY(!date.hasAttribute(QStringLiteral("yearly")));
+
+    const QDomElement os = filters.firstChildElement(QStringLiteral("FilterOs"));
+    QVERIFY(!os.isNull());
+    QCOMPARE(os.attribute(QStringLiteral("class")), QStringLiteral("NE"));
+
+    const QDomElement variable = filters.firstChildElement(QStringLiteral("FilterVariable"));
+    QVERIFY(!variable.isNull());
+    QVERIFY(!variable.hasAttribute(QStringLiteral("value")));
+
+    const QDomElement time = filters.firstChildElement(QStringLiteral("FilterTime"));
+    QVERIFY(!time.isNull());
+    QCOMPARE(time.attribute(QStringLiteral("begin")), QStringLiteral("00:00"));
+    QCOMPARE(time.attribute(QStringLiteral("end")), QStringLiteral("23:59"));
+
+    const QDomElement dun = filters.firstChildElement(QStringLiteral("FilterDun"));
+    QVERIFY(!dun.isNull());
+    QCOMPARE(dun.attribute(QStringLiteral("type")), QString());
+}
+
+void TargetingTest::uiTemplateDefaultsMatchDocumentedExpectations()
+{
+    const QString ramUi = readSourceFile(QStringLiteral("ram/ramwidget.ui"));
+    QVERIFY(ramUi.contains(QStringLiteral("<property name=\"currentIndex\">\n      <number>2</number>")));
+
+    const QString timeUi = readSourceFile(QStringLiteral("timerange/timerangewidget.ui"));
+    QVERIFY(timeUi.contains(QStringLiteral("<string>HH:mm</string>")));
+    QVERIFY(!timeUi.contains(QStringLiteral("HH:mm:ss")));
+
+    const QString wmiUi = readSourceFile(QStringLiteral("wmi/wmiquerywidget.ui"));
+    QVERIFY(wmiUi.contains(QStringLiteral("<string>root\\cimv2</string>")));
+    QVERIFY(!wmiUi.contains(QStringLiteral("<string>Root\\cimv2</string>")));
+
+    const QString terminalUi = readSourceFile(QStringLiteral("terminal/terminalsessionwidget.ui"));
+    QVERIFY(terminalUi.contains(QStringLiteral("name=\"minLineEdit\"")));
+    QVERIFY(terminalUi.contains(QStringLiteral("name=\"maxLineEdit\"")));
+
+    const QString environmentUi = readSourceFile(QStringLiteral("environment/environmentwidget.ui"));
+    QVERIFY(!environmentUi.contains(QStringLiteral("<string>1</string>")));
+}
+
+void TargetingTest::translationCatalogHasNoKnownGaps()
+{
+    const QString ru = readSourceFile(QStringLiteral("i18n/item_level_targeting_translation_ru.ts"));
+    QVERIFY(!ru.isEmpty());
+    QVERIFY(!ru.contains(QStringLiteral("<translation></translation>")));
+    QVERIFY(!ru.contains(QStringLiteral("<translation/>")));
+    QVERIFY(!ru.contains(QStringLiteral(">Форма<")));
+    QVERIFY(!ru.contains(QStringLiteral("Nаргетинг")));
+    QVERIFY(!ru.contains(QStringLiteral("на перативную")));
+    QVERIFY(!ru.contains(QStringLiteral("локадизация")));
+    QVERIFY(!ru.contains(QStringLiteral("Переменная окружения")));
+    QVERIFY(!ru.contains(QStringLiteral("переменные окружения")));
+    QVERIFY(!ru.contains(QStringLiteral("сессия")));
+
+    const QString en = readSourceFile(QStringLiteral("i18n/item_level_targeting_translation_en.ts"));
+    QVERIFY(!en.isEmpty());
+    QVERIFY(!en.contains(QStringLiteral("targetting")));
+    QVERIFY(!en.contains(QStringLiteral("amout")));
+    QVERIFY(!en.contains(QStringLiteral("conputer")));
+    QVERIFY(!en.contains(QStringLiteral("indentified")));
+    QVERIFY(!en.contains(QStringLiteral("locate specified")));
+    QVERIFY(!en.contains(QStringLiteral("om the")));
+    QVERIFY(!en.contains(QStringLiteral("Greater then")));
+}
+
+void TargetingTest::rsatShapedFiltersRoundTrip()
+{
+    const QString inputXml = QStringLiteral(
+        "<root><Filters>"
+          "<FilterDisk bool=\"AND\" not=\"0\" drive=\"%SystemDrive%\" freeSpace=\"80\"/>"
+          "<FilterDate bool=\"AND\" not=\"0\" period=\"YEARLY\" day=\"24\" month=\"5\"/>"
+          "<FilterLanguage bool=\"OR\" not=\"0\" language=\"25\" locale=\"25\" "
+            "displayName=\"Russian (Russia)\" default=\"0\" system=\"1\" native=\"0\"/>"
+          "<FilterOs bool=\"AND\" not=\"1\" class=\"NE\" version=\"WINTHRESHOLD\" "
+            "edition=\"NE\" sp=\"NE\" type=\"NE\"/>"
+          "<FilterGroup bool=\"AND\" not=\"0\" name=\"Administrators\" sid=\"\" "
+            "userContext=\"1\" primaryGroup=\"0\" localGroup=\"1\"/>"
+          "<FilterRegistry bool=\"AND\" not=\"0\" type=\"MATCHVALUE\" subtype=\"VERSION\" "
+            "hive=\"HKEY_LOCAL_MACHINE\" key=\"SOFTWARE\\Vendor\" valueName=\"Version\" "
+            "valueType=\"REG_SZ\" min=\"1.0.0.0\" max=\"2.0.0.0\" gte=\"1\" lte=\"1\" "
+            "version=\"1.2.3.4\"/>"
+          "<FilterTerminal bool=\"AND\" not=\"0\" type=\"TS\" option=\"IP\" value=\"\" "
+            "min=\"10.0.0.1\" max=\"10.0.0.254\"/>"
+          "<FilterProcMode bool=\"AND\" not=\"0\" syncFore=\"1\" asyncFore=\"0\" "
+            "backRefr=\"0\" forceRefr=\"1\" linkTrns=\"0\" noChg=\"0\" rsopTrns=\"0\" "
+            "safeBoot=\"0\" slowLink=\"0\" verbLog=\"1\"/>"
+        "</Filters></root>");
+
+    const preferences::TargetingContainer parsed = deserialize(inputXml);
+    const QString xml = serialize(parsed);
+
+    QVERIFY(xml.contains(QStringLiteral("<FilterDisk")));
+    QVERIFY(xml.contains(QStringLiteral("drive=\"%SystemDrive%\"")));
+    QVERIFY(xml.contains(QStringLiteral("freeSpace=\"80\"")));
+    QVERIFY(xml.contains(QStringLiteral("locale=\"25\"")));
+    QVERIFY(xml.contains(QStringLiteral("class=\"NE\"")));
+    QVERIFY(xml.contains(QStringLiteral("localGroup=\"1\"")));
+    QVERIFY(xml.contains(QStringLiteral("version=\"1.2.3.4\"")));
+    QVERIFY(xml.contains(QStringLiteral("min=\"10.0.0.1\"")));
+    QVERIFY(xml.contains(QStringLiteral("max=\"10.0.0.254\"")));
+    QVERIFY(xml.contains(QStringLiteral("syncFore=\"1\"")));
+    QVERIFY(xml.contains(QStringLiteral("asyncFore=\"0\"")));
+    QVERIFY(!xml.contains(QStringLiteral("synchFore")));
+    QVERIFY(!xml.contains(QStringLiteral("asynchFore")));
+    QVERIFY(!xml.contains(QStringLiteral("yearly=")));
+    QDomDocument doc;
+    QVERIFY(doc.setContent(xml));
+    QVERIFY(!containsIdentityAttribute(doc.documentElement().firstChildElement(QStringLiteral("Filters"))));
+
+    const preferences::TargetingContainer reparsed = deserialize(xml);
+    QVERIFY2(compareFilterLists(reparsed.filters(), parsed.filters(), QStringLiteral("rsat")),
+             qPrintable(xml));
+}
+
+void TargetingTest::dateEveryYearOmitsYear()
+{
+    preferences::TargetingFilterRecord date;
+    date.name = QStringLiteral("FilterDate");
+    date.attributes.insert(QStringLiteral("period"), QStringLiteral("YEARLY"));
+    date.attributes.insert(QStringLiteral("day"), QStringLiteral("24"));
+    date.attributes.insert(QStringLiteral("month"), QStringLiteral("5"));
+    date.attributes.insert(QStringLiteral("yearly"), QStringLiteral("1"));
+
+    preferences::TargetingContainer container;
+    container.setFilters({date});
+
+    const QString xml = serialize(container);
+    QVERIFY2(xml.contains(QStringLiteral("period=\"YEARLY\"")), qPrintable(xml));
+    QVERIFY2(xml.contains(QStringLiteral("day=\"24\"")), qPrintable(xml));
+    QVERIFY2(xml.contains(QStringLiteral("month=\"5\"")), qPrintable(xml));
+    QVERIFY2(!xml.contains(QStringLiteral("year=")), qPrintable(xml));
+    QVERIFY2(!xml.contains(QStringLiteral("yearly=")), qPrintable(xml));
 }
 
 void TargetingTest::dragFeedbackDistinguishesInsertionAndCollection()
@@ -220,7 +544,7 @@ void TargetingTest::dragFeedbackDistinguishesInsertionAndCollection()
              preferences::TargetingTreeView::DropFeedbackKind::IntoCollection);
 }
 
-void TargetingTest::invalidDragTargetHidesFeedback()
+void TargetingTest::nonCollectionCenterShowsInsertionFeedback()
 {
     preferences::TargetingTreeView view;
     FeedbackModel model;
@@ -234,20 +558,199 @@ void TargetingTest::invalidDragTargetHidesFeedback()
 
     QMimeData mime;
     const QRect plainRect = view.visualRect(model.index(0, 0));
-    QVERIFY(!view.updateDropFeedbackFor(plainRect.center(), &mime, Qt::MoveAction));
+    QVERIFY(view.updateDropFeedbackFor(plainRect.center(), &mime, Qt::MoveAction));
     QCOMPARE(view.dropFeedbackKind(),
-             preferences::TargetingTreeView::DropFeedbackKind::None);
+             preferences::TargetingTreeView::DropFeedbackKind::InsertAfter);
+}
+
+void TargetingTest::selectionNormalizationDropsDescendants()
+{
+    TargetingTreeFixture tree;
+
+    const auto normalized = preferences::normalizeTargetingSelection(
+        {tree.childA, tree.collection, tree.childB, tree.sibling, tree.childA});
+
+    QCOMPARE(normalized.size(), 2);
+    QVERIFY(normalized.contains(tree.collection));
+    QVERIFY(normalized.contains(tree.sibling));
+    QVERIFY(!normalized.contains(tree.childA));
+    QVERIFY(!normalized.contains(tree.childB));
+}
+
+void TargetingTest::nestedSelectionDeleteRemovesAncestorOnly()
+{
+    TargetingTreeFixture tree;
+
+    const auto removalOrder = preferences::targetingRemovalOrder(
+        {tree.collection, tree.childA});
+
+    QCOMPARE(removalOrder.size(), 1);
+    QCOMPARE(removalOrder.first(), tree.collection);
+
+    for (auto *item : removalOrder)
+    {
+        tree.model.removeItem(item->parent(), item->tagRow());
+    }
+
+    QCOMPARE(tree.model.rootItem()->itemCount("filters"), static_cast<size_t>(2));
+    QCOMPARE(tree.sibling->parent(), tree.model.rootItem());
+    QCOMPARE(tree.sibling->tagRow().row, 0);
+}
+
+void TargetingTest::nestedSelectionCutCopiesAncestorOnly()
+{
+    TargetingTreeFixture tree;
+
+    const auto normalized = preferences::normalizeTargetingSelection(
+        {tree.collection, tree.childA});
+
+    QList<preferences::TargetingFilterRecord> copiedRecords;
+    for (auto *item : normalized)
+    {
+        copiedRecords.append(item->toRecord());
+    }
+
+    QCOMPARE(copiedRecords.size(), 1);
+    QCOMPARE(copiedRecords.first().name, QStringLiteral("FilterCollection"));
+    QCOMPARE(copiedRecords.first().children.size(), 2);
+    QCOMPARE(copiedRecords.first().children.at(0).id, QStringLiteral("{child-a}"));
+    QCOMPARE(copiedRecords.first().children.at(1).id, QStringLiteral("{child-b}"));
+
+    const auto removalOrder = preferences::targetingRemovalOrder(normalized);
+    QCOMPARE(removalOrder.size(), 1);
+    QCOMPARE(removalOrder.first(), tree.collection);
+}
+
+void TargetingTest::internalDragMimeAcceptsSameToken()
+{
+    TargetingTreeFixture tree;
+    const QString token = QStringLiteral("same-dialog");
+
+    QMimeData mime;
+    mime.setData(QString::fromLatin1(preferences::kTargetingInternalDragMimeType),
+                 preferences::encodeTargetingInternalDragData(
+                     token, {tree.collection, tree.childA}));
+
+    QList<preferences::TargetingFilterItem *> resolved;
+    QVERIFY(preferences::resolveTargetingInternalDragData(
+        &mime, token, tree.model.rootItem(), resolved));
+    QCOMPARE(resolved.size(), 1);
+    QCOMPARE(resolved.first(), tree.collection);
+}
+
+void TargetingTest::internalDragMimePreservesTreeOrder()
+{
+    TargetingTreeFixture tree;
+    const QString token = QStringLiteral("same-dialog");
+
+    QMimeData mime;
+    mime.setData(QString::fromLatin1(preferences::kTargetingInternalDragMimeType),
+                 preferences::encodeTargetingInternalDragData(
+                     token, {tree.childC, tree.sibling, tree.childB}));
+
+    QStringList ids;
+    QVERIFY(preferences::decodeTargetingInternalDragData(
+        mime.data(QString::fromLatin1(preferences::kTargetingInternalDragMimeType)),
+        token, ids));
+
+    QCOMPARE(ids, QStringList({QStringLiteral("{child-b}"),
+                               QStringLiteral("{sibling}"),
+                               QStringLiteral("{child-c}")}));
+}
+
+void TargetingTest::internalDragWorksForFiltersLoadedWithoutXmlIds()
+{
+    ModelView::SessionModel model{"TargetingEmptyIdDragTest"};
+    model.registerItem<preferences::TargetingFilterItem>();
+    model.rootItem()->registerTag(
+        ModelView::TagInfo::universalTag(
+            "filters", {preferences::TargetingFilterItem::kModelType}),
+        true);
+
+    preferences::TargetingFilterRecord first;
+    first.name = QStringLiteral("FilterComputer");
+    preferences::TargetingFilterRecord second;
+    second.name = QStringLiteral("FilterRam");
+
+    auto *firstItem = model.insertItem<preferences::TargetingFilterItem>(
+        model.rootItem(), {"filters", -1});
+    firstItem->loadRecord(first);
+    auto *secondItem = model.insertItem<preferences::TargetingFilterItem>(
+        model.rootItem(), {"filters", -1});
+    secondItem->loadRecord(second);
+
+    QVERIFY(!firstItem->filterId().isEmpty());
+    QVERIFY(!secondItem->filterId().isEmpty());
+    QVERIFY(firstItem->filterId() != secondItem->filterId());
+
+    const QString token = QStringLiteral("same-dialog");
+    QMimeData mime;
+    mime.setData(QString::fromLatin1(preferences::kTargetingInternalDragMimeType),
+                 preferences::encodeTargetingInternalDragData(token, {firstItem}));
+
+    QList<preferences::TargetingFilterItem *> resolved;
+    QVERIFY(preferences::resolveTargetingInternalDragData(
+        &mime, token, model.rootItem(), resolved));
+    QCOMPARE(resolved.size(), 1);
+    QCOMPARE(resolved.first(), firstItem);
+}
+
+void TargetingTest::dropRowAdjustmentCountsAllOriginalRows()
+{
+    TargetingTreeFixture tree;
+
+    QCOMPARE(tree.collection->tagRow().row, 0);
+    QCOMPARE(tree.sibling->tagRow().row, 1);
+    QCOMPARE(tree.secondCollection->tagRow().row, 2);
+
+    const int adjusted = preferences::adjustedTargetingDropRow(
+        2, tree.model.rootItem(), {tree.collection, tree.sibling});
+
+    QCOMPARE(adjusted, 0);
+}
+
+void TargetingTest::internalDragMimeRejectsForeignToken()
+{
+    TargetingTreeFixture tree;
+
+    QMimeData mime;
+    mime.setData(QString::fromLatin1(preferences::kTargetingInternalDragMimeType),
+                 preferences::encodeTargetingInternalDragData(
+                     QStringLiteral("dialog-a"), {tree.sibling}));
+
+    QList<preferences::TargetingFilterItem *> resolved;
+    QVERIFY(!preferences::resolveTargetingInternalDragData(
+        &mime, QStringLiteral("dialog-b"), tree.model.rootItem(), resolved));
+    QVERIFY(resolved.isEmpty());
+}
+
+void TargetingTest::internalDragMimeRejectsStaleIds()
+{
+    TargetingTreeFixture tree;
+    const QString token = QStringLiteral("same-dialog");
+
+    QMimeData mime;
+    mime.setData(QString::fromLatin1(preferences::kTargetingInternalDragMimeType),
+                 preferences::encodeTargetingInternalDragData(token, {tree.childA}));
+
+    tree.model.removeItem(tree.childA->parent(), tree.childA->tagRow());
+
+    QList<preferences::TargetingFilterItem *> resolved;
+    QVERIFY(!preferences::resolveTargetingInternalDragData(
+        &mime, token, tree.model.rootItem(), resolved));
+    QVERIFY(resolved.isEmpty());
 }
 
 void TargetingTest::unknownAttributeIsPreserved()
 {
     // Build XML with an attribute the current XSD does not define
-    // (simulating a newer-MSAD file). Parse via bridge, then re-emit,
-    // then re-parse: the attribute must still be there.
+    // (simulating a newer policy source). Parse via bridge, then re-emit,
+    // then re-parse: the non-identity attribute must still be there while
+    // generated identity attributes are normalized away.
     const QString inputXml = QStringLiteral(
         "<root><Filters>"
-          "<FilterComputer bool=\"1\" not=\"0\" id=\"{123}\" "
-            "name=\"FOO\" newMsadAttr=\"carry-me\" matchType=\"NetBIOS\"/>"
+          "<FilterComputer bool=\"AND\" not=\"0\" id=\"{123}\" uid=\"legacy-uid\" "
+            "name=\"FOO\" newPolicyAttr=\"carry-me\" matchType=\"NetBIOS\"/>"
         "</Filters></root>");
 
     const preferences::TargetingContainer parsed = deserialize(inputXml);
@@ -257,20 +760,27 @@ void TargetingTest::unknownAttributeIsPreserved()
     QCOMPARE(filter.name, QStringLiteral("FilterComputer"));
     QCOMPARE(filter.id, QStringLiteral("{123}"));
     QCOMPARE(filter.combinator, QStringLiteral("AND"));
-    QVERIFY(filter.attributes.contains(QStringLiteral("newMsadAttr")));
-    QCOMPARE(filter.attributes.value(QStringLiteral("newMsadAttr")),
+    QVERIFY(filter.attributes.contains(QStringLiteral("newPolicyAttr")));
+    QCOMPARE(filter.attributes.value(QStringLiteral("newPolicyAttr")),
              QStringLiteral("carry-me"));
     QCOMPARE(filter.attributes.value(QStringLiteral("name")),
              QStringLiteral("FOO"));
+    QCOMPARE(filter.attributes.value(QStringLiteral("uid")),
+             QStringLiteral("legacy-uid"));
 
-    // Re-serialize and re-parse: the unknown attribute must survive.
+    // Re-serialize and re-parse: the unknown non-identity attribute must
+    // survive, while id/uid must not be emitted.
     const QString reserialized = serialize(parsed);
-    QVERIFY(reserialized.contains(QStringLiteral("newMsadAttr=\"carry-me\"")));
+    QVERIFY(reserialized.contains(QStringLiteral("newPolicyAttr=\"carry-me\"")));
+    QVERIFY(!reserialized.contains(QStringLiteral("id=\"{123}\"")));
+    QVERIFY(!reserialized.contains(QStringLiteral("uid=\"legacy-uid\"")));
 
     const preferences::TargetingContainer second = deserialize(reserialized);
     QCOMPARE(second.filters().size(), 1);
-    QCOMPARE(second.filters().first().attributes.value(QStringLiteral("newMsadAttr")),
+    QCOMPARE(second.filters().first().attributes.value(QStringLiteral("newPolicyAttr")),
              QStringLiteral("carry-me"));
+    QVERIFY(second.filters().first().id.isEmpty());
+    QVERIFY(!second.filters().first().attributes.contains(QStringLiteral("uid")));
 }
 
 void TargetingTest::filterCollectionNestingSurvives()
@@ -295,9 +805,11 @@ void TargetingTest::filterCollectionNestingSurvives()
     QCOMPARE(outer.name, QStringLiteral("FilterCollection"));
     QCOMPARE(outer.children.size(), 2);
     QCOMPARE(outer.children.at(0).name, QStringLiteral("FilterCpu"));
-    QCOMPARE(outer.children.at(0).attributes, inner1.attributes);
+    QCOMPARE(outer.children.at(0).attributes,
+             preferences::materializeTargetingFilterExtras(inner1.name, inner1.attributes));
     QCOMPARE(outer.children.at(1).name, QStringLiteral("FilterRam"));
-    QCOMPARE(outer.children.at(1).attributes, inner2.attributes);
+    QCOMPARE(outer.children.at(1).attributes,
+             preferences::materializeTargetingFilterExtras(inner2.name, inner2.attributes));
 }
 
 void TargetingTest::applyOnceModelRoundTrip()
@@ -334,13 +846,16 @@ void TargetingTest::applyOnceModelRoundTrip()
     // Step 2: round-trip through the DOM bridge (this is what the writer
     // and reader use in production).
     const QString xml = serialize(onDisk);
+    QVERIFY(xml.contains(QStringLiteral("<FilterRunOnce")));
+    QVERIFY(xml.contains(QStringLiteral("bool=\"AND\"")));
+    QVERIFY(xml.contains(QStringLiteral("not=\"0\"")));
+    QVERIFY(!xml.contains(QStringLiteral("id=\"{ABC-DEF}\"")));
     const preferences::TargetingContainer parsed = deserialize(xml);
 
     // FilterRunOnce survives the XML trip.
     QVERIFY(parsed.hasRunOnce());
     QCOMPARE(parsed.filters().size(), 2);
     QCOMPARE(parsed.filters().at(0).name, QStringLiteral("FilterRunOnce"));
-    QCOMPARE(parsed.filters().at(0).id,   QStringLiteral("{ABC-DEF}"));
     QCOMPARE(parsed.filters().at(1).name, QStringLiteral("FilterComputer"));
 
     // Step 3: emulate `CommonItem::setFilters()` — strip FilterRunOnce,
@@ -359,7 +874,7 @@ void TargetingTest::applyOnceModelRoundTrip()
         visible.append(r);
     }
     QVERIFY(applyOnce);
-    QCOMPARE(cachedRunOnceId, QStringLiteral("{ABC-DEF}"));
+    QVERIFY(cachedRunOnceId.isEmpty());
     QCOMPARE(visible.size(), 1);
     QCOMPARE(visible.first().attributes.value(QStringLiteral("name")),
              QStringLiteral("HOST"));
@@ -393,7 +908,6 @@ void TargetingTest::wrapUnwrapGolden()
     const QString wrappedXml = serialize(wrapped);
     QVERIFY2(wrappedXml.contains(QStringLiteral("<FilterCollection")),
              qPrintable(wrappedXml));
-    QVERIFY(wrappedXml.contains(QStringLiteral("id=\"{coll-1}\"")));
     QVERIFY(wrappedXml.contains(QStringLiteral("<FilterCpu")));
     QVERIFY(wrappedXml.contains(QStringLiteral("<FilterRam")));
     QVERIFY(wrappedXml.contains(QStringLiteral("totalMB=\"1024\"")));
@@ -427,8 +941,6 @@ void TargetingTest::wrapUnwrapGolden()
     QVERIFY(!unwrappedXml.contains(QStringLiteral("FilterCollection")));
     QVERIFY(unwrappedXml.contains(QStringLiteral("<FilterCpu")));
     QVERIFY(unwrappedXml.contains(QStringLiteral("<FilterRam")));
-    QVERIFY(unwrappedXml.contains(QStringLiteral("id=\"{cpu-1}\"")));
-    QVERIFY(unwrappedXml.contains(QStringLiteral("id=\"{ram-1}\"")));
     QVERIFY(unwrappedXml.contains(QStringLiteral("min=\"2000\"")));
     QVERIFY(unwrappedXml.contains(QStringLiteral("totalMB=\"1024\"")));
 
@@ -441,13 +953,13 @@ void TargetingTest::wrapUnwrapGolden()
 
 void TargetingTest::fixtureRoundTrip()
 {
-    // Task 9.1 / 9.2 — load each XML fixture from tests/fixtures/msad_targeting/,
-    // route it through containerFromXml + appendContainerToXml, then parse the
-    // output again and assert that the two TargetingContainer objects are
-    // semantically identical.  Attribute order in QDomDocument serialisation is
-    // QHash-order (non-deterministic across runs), so string equality is not
-    // tested; instead we compare the parsed data model.
-    const QString fixturePath = QStringLiteral("../../../../fixtures/msad_targeting");
+    // Load each XML fixture, route it through containerFromXml and
+    // appendContainerToXml, then parse the output again and assert that both
+    // TargetingContainer objects are semantically identical under the gpui XML
+    // contract. Attribute order in
+    // QDomDocument serialisation is QHash-order (non-deterministic across runs),
+    // so string equality is not tested; instead we compare the parsed data model.
+    const QString fixturePath = QString::fromUtf8(TARGETING_FIXTURES_DIR);
     QDir dir(fixturePath);
     const QStringList xmlFiles = dir.entryList({QStringLiteral("*.xml")}, QDir::Files);
     QVERIFY2(!xmlFiles.isEmpty(),
@@ -485,6 +997,13 @@ void TargetingTest::fixtureRoundTrip()
         doc2.appendChild(root2);
         preferences::appendContainerToXml(doc2, root2, c1);
         const QDomElement filters2 = root2.firstChildElement(QStringLiteral("Filters"));
+        QVERIFY2(!containsIdentityAttribute(filters2),
+                 qPrintable(QStringLiteral("Identity attribute leaked in fixture: %1").arg(fileName)));
+        const QString serialized = doc2.toString(-1);
+        QVERIFY2(!serialized.contains(QStringLiteral("bool=\"1\"")),
+                 qPrintable(QStringLiteral("Numeric AND leaked in fixture: %1").arg(fileName)));
+        QVERIFY2(!serialized.contains(QStringLiteral("bool=\"0\"")),
+                 qPrintable(QStringLiteral("Numeric OR leaked in fixture: %1").arg(fileName)));
         const preferences::TargetingContainer c2 = preferences::containerFromXml(filters2);
 
         // The two containers must be semantically identical.
@@ -780,6 +1299,32 @@ void TargetingTest::formatterFallsBackForUnknown()
     QCOMPARE(raw, QStringLiteral("Plain"));
 }
 
+void TargetingTest::collectionLabelReflectsLoadedChildren()
+{
+    ModelView::SessionModel model("TargetingLoadedCollectionLabelTest");
+    model.registerItem<preferences::TargetingFilterItem>();
+    model.rootItem()->registerTag(
+        ModelView::TagInfo::universalTag("filters",
+                                         {preferences::TargetingFilterItem::kModelType}),
+        true);
+
+    preferences::TargetingFilterRecord collection;
+    collection.name = QStringLiteral("FilterCollection");
+    collection.children = {
+        makeFilter(QStringLiteral("FilterComputer"), QStringLiteral("{one}")),
+        makeFilter(QStringLiteral("FilterRam"), QStringLiteral("{two}")),
+        makeFilter(QStringLiteral("FilterUser"), QStringLiteral("{three}")),
+    };
+
+    auto *item = model.insertItem<preferences::TargetingFilterItem>(
+        model.rootItem(), {"filters", -1});
+    item->loadRecord(collection);
+
+    QCOMPARE(item->itemCount(preferences::TargetingFilterItem::kChildrenTag),
+             static_cast<size_t>(3));
+    QVERIFY(item->label().endsWith(QStringLiteral("(3)")));
+}
+
 void TargetingTest::combinatorPrefixRefreshesAfterFirstRowDelete()
 {
     ModelView::SessionModel model("TargetingLabelRefreshTest");
@@ -859,13 +1404,13 @@ void TargetingTest::localizedRowFormattersUseLabels()
 
     {
         QMap<QString, QString> e;
-        e.insert(QStringLiteral("synchFore"), QStringLiteral("1"));
+        e.insert(QStringLiteral("syncFore"), QStringLiteral("1"));
         e.insert(QStringLiteral("verbLog"),   QStringLiteral("1"));
 
         const auto out = TargetingRowFormatter::format(QStringLiteral("FilterProcMode"), e);
         QVERIFY(out.contains(QStringLiteral("synchronous foreground")));
         QVERIFY(out.contains(QStringLiteral("verbose logging")));
-        QVERIFY(!out.contains(QStringLiteral("synchFore")));
+        QVERIFY(!out.contains(QStringLiteral("syncFore")));
         QVERIFY(!out.contains(QStringLiteral("verbLog")));
     }
 

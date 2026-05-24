@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="enumFilterBool">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AND"/>
+      <xs:enumeration value="OR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumTrueFalse">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterMsiType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PRODUCT"/>
+      <xs:enumeration value="PATCH"/>
+      <xs:enumeration value="FILECOMPONENT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumFilterMsiSubType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="EXISTS"/>
+      <xs:enumeration value="VERSION"/>
+      <xs:enumeration value="GET_PROPERTY"/>
+      <xs:enumeration value="GET_INFORMATION"/>
+      <xs:enumeration value="MATCH_PROPERTY"/>
+      <xs:enumeration value="MATCH_INFORMATION"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="IFilter" abstract="true">
+    <xs:attribute name="bool" type="enumFilterBool" use="required" />
+    <xs:attribute name="not" type="enumTrueFalse" use="required" />
+    <xs:attribute name="hidden" type="enumTrueFalse" use="optional" />
+  </xs:complexType>
+
+  <xs:element name="FilterMsi">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="IFilter">
+          <xs:attribute name="type" type="enumFilterMsiType" use="required" />
+          <xs:attribute name="subtype" type="enumFilterMsiSubType" use="required" />
+          <xs:attribute name="code" type="xs:string" use="optional" />
+          <xs:attribute name="item" type="xs:string" use="optional" />
+          <xs:attribute name="value" type="xs:string" use="optional" />
+          <xs:attribute name="min" type="xs:string" use="optional" />
+          <xs:attribute name="max" type="xs:string" use="optional" />
+          <xs:attribute name="gte" type="enumTrueFalse" use="optional" default="0" />
+          <xs:attribute name="lte" type="enumTrueFalse" use="optional" default="0" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

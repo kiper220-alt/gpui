@@ -21,7 +21,7 @@
 #include "inipreferencereader.h"
 
 #include "inimodelbuilder.h"
-#include "item_level_targeting/filtersio.h"
+#include "item_level_targeting/common/filtersio.h"
 #include "schemas/inischema.h"
 
 #include <sstream>

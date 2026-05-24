@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="enumFilterBool">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AND"/>
+      <xs:enumeration value="OR"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="enumTrueFalse">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="IFilter" abstract="true">
+    <xs:attribute name="bool" type="enumFilterBool" use="required" />
+    <xs:attribute name="not" type="enumTrueFalse" use="required" />
+    <xs:attribute name="hidden" type="enumTrueFalse" use="optional" />
+  </xs:complexType>
+
+  <xs:element name="FilterGroup">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="IFilter">
+          <xs:attribute name="name" type="xs:string" use="optional" default="" />
+          <xs:attribute name="sid" type="xs:string" use="optional" default="" />
+          <xs:attribute name="userContext" type="enumTrueFalse" use="optional" default="1" />
+          <xs:attribute name="primaryGroup" type="enumTrueFalse" use="optional" default="0" />
+          <xs:attribute name="localGroup" type="enumTrueFalse" use="optional" default="0" />
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

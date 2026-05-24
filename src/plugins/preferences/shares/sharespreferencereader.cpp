@@ -20,7 +20,7 @@
 
 #include "sharespreferencereader.h"
 
-#include "item_level_targeting/filtersio.h"
+#include "item_level_targeting/common/filtersio.h"
 #include "schemas/sharesschema.h"
 #include "sharesmodelbuilder.h"
 

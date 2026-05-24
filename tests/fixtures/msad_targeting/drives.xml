@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Filters>
-  <FilterOs bool="1" not="0" id="{11111111-0000-0000-0000-000000000001}" class="NE" version="WINTHRESHOLD" type="WS" edition="NE" sp="NE"/>
-  <FilterComputer bool="1" not="0" id="{11111111-0000-0000-0000-000000000002}" type="NETBIOS" name="WORKSTATION01"/>
+  <FilterOs bool="AND" not="0" class="NE" version="WINTHRESHOLD" type="WS" edition="NE" sp="NE"/>
+  <FilterComputer bool="AND" not="0" type="NETBIOS" name="WORKSTATION01"/>
 </Filters>

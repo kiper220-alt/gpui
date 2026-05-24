@@ -20,7 +20,7 @@
 
 #include "variablespreferencereader.h"
 
-#include "item_level_targeting/filtersio.h"
+#include "item_level_targeting/common/filtersio.h"
 #include "schemas/variablesschema.h"
 #include "variablesmodelbuilder.h"
 
