@@ -154,15 +154,15 @@ void RegistryMatchFilterWidget::onDataMatchChanged(int index)
 
     if (index == 0) // Any
     {
-        ui->valDataLabel_3->setText(QStringLiteral("Value data:"));
+        ui->valDataLabel_3->setText(tr("Value data:"));
     }
     else if (index == 1) // Substring match
     {
-        ui->valDataLabel_3->setText(QStringLiteral("Substring:"));
+        ui->valDataLabel_3->setText(tr("Substring:"));
     }
     else if (index == 2) // Version match
     {
-        ui->valDataLabel_3->setText(QStringLiteral("Version:"));
+        ui->valDataLabel_3->setText(tr("Version:"));
         ui->valDataLineEdit_3->setVisible(false);
         ui->regMinComboBox->setVisible(true);
         ui->regMinLineEdit->setVisible(true);

@@ -2560,6 +2560,21 @@ p, li { white-space: pre-wrap; }
         <source>Selection dialog is not implemented yet</source>
         <translation>Selection dialog is not implemented yet</translation>
     </message>
+    <message>
+        <location filename="../registry/registrymatchwidget.cpp" line="157"/>
+        <source>Value data:</source>
+        <translation>Value data:</translation>
+    </message>
+    <message>
+        <location filename="../registry/registrymatchwidget.cpp" line="161"/>
+        <source>Substring:</source>
+        <translation>Substring:</translation>
+    </message>
+    <message>
+        <location filename="../registry/registrymatchwidget.cpp" line="165"/>
+        <source>Version:</source>
+        <translation>Version:</translation>
+    </message>
 </context>
 <context>
     <name>preferences::SecurityGroupFilterWidget</name>

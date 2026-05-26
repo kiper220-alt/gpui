@@ -14,7 +14,7 @@ p, li { white-space: pre-wrap; }
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=" font-family:'Noto Sans'; font-size:9pt; font-weight:400; font-style:normal;"&gt;
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;A Battery Present targeting item allows a preference item to be applied to computers or users only if one or more batteries are present in the processing computer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;Элемент нацеливания «Наличие батареи» позволяет применять элемент предпочтений к компьютерам или пользователям только если на обрабатывающем компьютере присутствует одна или несколько батарей.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -169,7 +169,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../datematch/datematchwidget.ui" line="170"/>
         <source>of every month</source>
-        <translation>of every month</translation>
+        <translation>каждого месяца</translation>
     </message>
     <message>
         <location filename="../datematch/datematchwidget.ui" line="245"/>
@@ -209,7 +209,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../datematch/datematchwidget.ui" line="283"/>
         <source>every week</source>
-        <translation>every week</translation>
+        <translation>каждую неделю</translation>
     </message>
 </context>
 <context>
@@ -407,7 +407,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../diskspace/diskspacewidget.ui" line="257"/>
         <source>A Disk Space targeting item allows a preference item to be applied to computers or users only if the processing computer's available disk space is greater than or equal to the amount specified in the targeting item.</source>
-        <translation>A Disk Space targeting item allows a preference item to be applied to computers or users only if the processing computer's available disk space is greater than or equal to the amount specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «Место на диске» позволяет применять элемент предпочтений к компьютерам или пользователям только если доступное место на диске обрабатывающего компьютера больше или равно объему, указанному в элементе нацеливания.</translation>
     </message>
 </context>
 <context>
@@ -435,7 +435,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../domain/domainwidget.ui" line="91"/>
         <source>A Domain Name targeting item allows a preference item to be applied to computers or users only if the user logged on to or the computer is a member of the domain specified in the targeting item.</source>
-        <translation>A Domain Name targeting item allows a preference item to be applied to computers or users only if the user logged on to or the computer is a member of the domain specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «Имя домена» позволяет применять элемент предпочтений к компьютерам или пользователям только если вошедший пользователь или компьютер является участником домена, указанного в элементе нацеливания.</translation>
     </message>
 </context>
 <context>
@@ -453,7 +453,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../environment/environmentwidget.ui" line="108"/>
         <source>An Environment Variable targeting item allows a preference item to be applied to computers or users only if the environment variable and value specified in the targeting item are equal.</source>
-        <translation>An Environment Variable targeting item allows a preference item to be applied to computers or users only if the environment variable and value specified in the targeting item are equal.</translation>
+        <translation>Элемент нацеливания «Переменная среды» позволяет применять элемент предпочтений к компьютерам или пользователям только если переменная среды и значение, указанные в элементе нацеливания, совпадают.</translation>
     </message>
 </context>
 <context>
@@ -529,7 +529,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../filematch/filematchwidget.ui" line="376"/>
         <source>A File Match targeting item allows a preference item to be applied to computers or users only if the file or folder specified in the targeting item exists, or only if the file exists and is a version within the range specified in the targeting item.</source>
-        <translation>A File Match targeting item allows a preference item to be applied to computers or users only if the file or folder specified in the targeting item exists, or only if the file exists and is a version within the range specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «Соответствие файла» позволяет применять элемент предпочтений к компьютерам или пользователям только если указанный файл или папка существуют либо если файл существует и его версия находится в диапазоне, указанном в элементе нацеливания.</translation>
     </message>
 </context>
 <context>
@@ -599,7 +599,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../iprange/ipaddressrangewidget.ui" line="132"/>
         <source>An IP Address Range targeting item allows a preference item to be applied to computers or users only if the processing computer's IP address is within the range specified in the targeting item.</source>
-        <translation>An IP Address Range targeting item allows a preference item to be applied to computers or users only if the processing computer's IP address is within the range specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «Диапазон IP-адресов» позволяет применять элемент предпочтений к компьютерам или пользователям только если IP-адрес обрабатывающего компьютера находится в диапазоне, указанном в элементе нацеливания.</translation>
     </message>
 </context>
 <context>
@@ -617,7 +617,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../ldap/ldapwidget.ui" line="65"/>
         <source>An LDAP Query targeting item allows a preference item to be applied to computers or users only if the LDAP query returns a value for the attribute specified in the targeting item.</source>
-        <translation>An LDAP Query targeting item allows a preference item to be applied to computers or users only if the LDAP query returns a value for the attribute specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «LDAP-запрос» позволяет применять элемент предпочтений к компьютерам или пользователям только если LDAP-запрос возвращает значение атрибута, указанного в элементе нацеливания.</translation>
     </message>
     <message>
         <location filename="../ldap/ldapwidget.ui" line="81"/>
@@ -645,7 +645,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../language/languagewidget.ui" line="48"/>
         <source>A Language targeting item allows a preference item to be applied to computers or users only if the locale specified in the targeting item is installed on the processing computer.</source>
-        <translation>A Language targeting item allows a preference item to be applied to computers or users only if the locale specified in the targeting item is installed on the processing computer.</translation>
+        <translation>Элемент нацеливания «Язык» позволяет применять элемент предпочтений к компьютерам или пользователям только если локаль, указанная в элементе нацеливания, установлена на обрабатывающем компьютере.</translation>
     </message>
     <message>
         <location filename="../language/languagewidget.ui" line="58"/>
@@ -738,17 +738,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../msi/msiquerywidget.ui" line="134"/>
         <source>Property name:</source>
-        <translation>Property name:</translation>
+        <translation>Имя свойства:</translation>
     </message>
     <message>
         <location filename="../msi/msiquerywidget.ui" line="144"/>
         <source>Property value:</source>
-        <translation>Property value:</translation>
+        <translation>Значение свойства:</translation>
     </message>
     <message>
         <location filename="../msi/msiquerywidget.ui" line="154"/>
         <source>Information item:</source>
-        <translation>Information item:</translation>
+        <translation>Элемент сведений:</translation>
     </message>
     <message>
         <location filename="../msi/msiquerywidget.ui" line="165"/>
@@ -863,7 +863,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../msi/msiquerywidget.ui" line="278"/>
         <source>Item value:</source>
-        <translation>Item value:</translation>
+        <translation>Значение элемента:</translation>
     </message>
     <message>
         <location filename="../msi/msiquerywidget.ui" line="288"/>
@@ -1115,7 +1115,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../os/oscatalog.cpp" line="52"/>
         <source>Professional</source>
-        <translation>Professional</translation>
+        <translation>Профессиональная</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="53"/>
@@ -1130,7 +1130,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../os/oscatalog.cpp" line="55"/>
         <source>Enterprise</source>
-        <translation>Enterprise</translation>
+        <translation>Корпоративная</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="56"/>
@@ -1141,12 +1141,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../os/oscatalog.cpp" line="57"/>
         <source>Standard</source>
-        <translation>Standard</translation>
+        <translation>Стандартная</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="58"/>
         <source>Web</source>
-        <translation>Web</translation>
+        <translation>Веб</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="59"/>
@@ -1171,12 +1171,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../os/oscatalog.cpp" line="63"/>
         <source>Business</source>
-        <translation>Business</translation>
+        <translation>Бизнес</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="64"/>
         <source>Ultimate</source>
-        <translation>Ultimate</translation>
+        <translation>Максимальная</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="65"/>
@@ -1191,7 +1191,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../os/oscatalog.cpp" line="67"/>
         <source>HPC Server</source>
-        <translation>HPC Server</translation>
+        <translation>Сервер HPC</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="68"/>
@@ -1251,22 +1251,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../os/oscatalog.cpp" line="80"/>
         <source>Essentials</source>
-        <translation>Essentials</translation>
+        <translation>Основные возможности</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="81"/>
         <source>Service Pack 1</source>
-        <translation>Service Pack 1</translation>
+        <translation>Пакет обновления 1</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="82"/>
         <source>Service Pack 2</source>
-        <translation>Service Pack 2</translation>
+        <translation>Пакет обновления 2</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="83"/>
         <source>Service Pack 3</source>
-        <translation>Service Pack 3</translation>
+        <translation>Пакет обновления 3</translation>
     </message>
     <message>
         <location filename="../os/oscatalog.cpp" line="84"/>
@@ -1363,7 +1363,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../portable/portablecomputerwidget.ui" line="52"/>
         <source>A Portable Computer targeting item allows a preference item to be applied to computers or users only if the processing computer is identified as a portable computer in the current hardware profile on the processing computer or if the processing computer is identified as a portable computer with the docking state specified in the targeting item.</source>
-        <translation>A Portable Computer targeting item allows a preference item to be applied to computers or users only if the processing computer is identified as a portable computer in the current hardware profile on the processing computer or if the processing computer is identified as a portable computer with the docking state specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «Переносной компьютер» позволяет применять элемент предпочтений к компьютерам или пользователям только если обрабатывающий компьютер определен как переносной компьютер в текущем аппаратном профиле либо определен как переносной компьютер с состоянием док-станции, указанным в элементе нацеливания.</translation>
     </message>
     <message>
         <location filename="../portable/portablecomputerwidget.ui" line="75"/>
@@ -2389,7 +2389,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../timerange/timerangewidget.ui" line="92"/>
         <source>A Time Range targeting item allows a preference item to be applied to computers or users only if the current time on the end user's computer is within the time range specified in the targeting item.</source>
-        <translation>A Time Range targeting item allows a preference item to be applied to computers or users only if the current time on the end user's computer is within the time range specified in the targeting item.</translation>
+        <translation>Элемент нацеливания «Диапазон времени» позволяет применять элемент предпочтений к компьютерам или пользователям только если текущее время на компьютере конечного пользователя находится в диапазоне, указанном в элементе нацеливания.</translation>
     </message>
     <message>
         <location filename="../timerange/timerangewidget.ui" line="68"/>
@@ -2559,6 +2559,21 @@ p, li { white-space: pre-wrap; }
         <location filename="../registry/registrymatchwidget.cpp" line="106"/>
         <source>Selection dialog is not implemented yet</source>
         <translation>Диалог выбора пока не реализован</translation>
+    </message>
+    <message>
+        <location filename="../registry/registrymatchwidget.cpp" line="157"/>
+        <source>Value data:</source>
+        <translation>Данные значения:</translation>
+    </message>
+    <message>
+        <location filename="../registry/registrymatchwidget.cpp" line="161"/>
+        <source>Substring:</source>
+        <translation>Подстрока:</translation>
+    </message>
+    <message>
+        <location filename="../registry/registrymatchwidget.cpp" line="165"/>
+        <source>Version:</source>
+        <translation>Версия:</translation>
     </message>
 </context>
 <context>
