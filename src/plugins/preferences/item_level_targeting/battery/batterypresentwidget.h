@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override { return {}; }
 
 private:
+    BatteryPresentWidget(const BatteryPresentWidget &)            = delete;
+    BatteryPresentWidget(BatteryPresentWidget &&)                 = delete;
+    BatteryPresentWidget &operator=(const BatteryPresentWidget &) = delete;
+    BatteryPresentWidget &operator=(BatteryPresentWidget &&)      = delete;
+
     Ui::BatteryPresentWidget *ui{nullptr};
 };
 

@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    OrganizationUnitFilterWidget(const OrganizationUnitFilterWidget &)            = delete;
+    OrganizationUnitFilterWidget(OrganizationUnitFilterWidget &&)                 = delete;
+    OrganizationUnitFilterWidget &operator=(const OrganizationUnitFilterWidget &) = delete;
+    OrganizationUnitFilterWidget &operator=(OrganizationUnitFilterWidget &&)      = delete;
+
     Ui::OrganizationUnitWidget *ui{nullptr};
 };
 

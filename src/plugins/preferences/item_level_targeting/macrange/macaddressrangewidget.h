@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    MacAddressRangeFilterWidget(const MacAddressRangeFilterWidget &)            = delete;
+    MacAddressRangeFilterWidget(MacAddressRangeFilterWidget &&)                 = delete;
+    MacAddressRangeFilterWidget &operator=(const MacAddressRangeFilterWidget &) = delete;
+    MacAddressRangeFilterWidget &operator=(MacAddressRangeFilterWidget &&)      = delete;
+
     Ui::MacAdderessRangeWidget *ui{nullptr};
 };
 

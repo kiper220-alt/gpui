@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override { return {}; }
 
 private:
+    PcmciaPresentWidget(const PcmciaPresentWidget &)            = delete;
+    PcmciaPresentWidget(PcmciaPresentWidget &&)                 = delete;
+    PcmciaPresentWidget &operator=(const PcmciaPresentWidget &) = delete;
+    PcmciaPresentWidget &operator=(PcmciaPresentWidget &&)      = delete;
+
     Ui::PCMCIAPresentWidget *ui{nullptr};
 };
 

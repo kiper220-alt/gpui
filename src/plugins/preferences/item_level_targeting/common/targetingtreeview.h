@@ -35,10 +35,17 @@ protected:
 private:
     struct DropProposal
     {
-        DropFeedbackKind kind{DropFeedbackKind::None};
+        DropProposal()
+            : kind(DropFeedbackKind::None)
+            , index()
+            , parent()
+            , row(-1)
+        {}
+
+        DropFeedbackKind kind;
         QModelIndex index;
         QModelIndex parent;
-        int row{-1};
+        int row;
     };
 
     DropProposal proposalFor(const QPoint &pos) const;
@@ -50,7 +57,7 @@ private:
     void setFeedback(DropFeedbackKind kind, const QModelIndex &index);
     void clearFeedback();
 
-    DropFeedbackKind m_feedbackKind{DropFeedbackKind::None};
+    DropFeedbackKind m_feedbackKind;
     QModelIndex m_feedbackIndex;
 };
 

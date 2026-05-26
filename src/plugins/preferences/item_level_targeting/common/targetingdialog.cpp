@@ -152,7 +152,11 @@ class SingleColumnProxy : public QIdentityProxyModel
 public:
     explicit SingleColumnProxy(QObject *parent = nullptr)
         : QIdentityProxyModel(parent)
+        , m_vm(nullptr)
+        , m_model(nullptr)
+        , m_root(nullptr)
         , m_sourceToken(QUuid::createUuid().toString())
+        , m_afterMove()
     {}
 
     void setMoveContext(ModelView::ViewModel *vm,
@@ -260,6 +264,32 @@ public:
 
         struct MoveRecord
         {
+            MoveRecord(TargetingFilterItem *newItem,
+                       ModelView::SessionItem *newParent,
+                       int newRow,
+                       const TargetingFilterRecord &newRecord)
+                : item(newItem)
+                , parent(newParent)
+                , row(newRow)
+                , record(newRecord)
+            {}
+
+            MoveRecord(const MoveRecord &other)
+                : item(other.item)
+                , parent(other.parent)
+                , row(other.row)
+                , record(other.record)
+            {}
+
+            MoveRecord &operator=(const MoveRecord &other)
+            {
+                item   = other.item;
+                parent = other.parent;
+                row    = other.row;
+                record = other.record;
+                return *this;
+            }
+
             TargetingFilterItem *item;
             ModelView::SessionItem *parent;
             int row;
@@ -270,7 +300,8 @@ public:
         moves.reserve(sources.size());
         for (auto *source : sources)
         {
-            moves.append({source, source->parent(), source->tagRow().row, source->toRecord()});
+            moves.append(MoveRecord(source, source->parent(), source->tagRow().row,
+                                    source->toRecord()));
         }
 
         insertAt = adjustedTargetingDropRow(insertAt, targetParent, sources);
@@ -378,6 +409,12 @@ private:
     ModelView::SessionItem *m_root{nullptr};
     QString m_sourceToken;
     std::function<void(const QList<TargetingFilterItem *> &)> m_afterMove;
+
+private:
+    SingleColumnProxy(const SingleColumnProxy &)            = delete;
+    SingleColumnProxy(SingleColumnProxy &&)                 = delete;
+    SingleColumnProxy &operator=(const SingleColumnProxy &) = delete;
+    SingleColumnProxy &operator=(SingleColumnProxy &&)      = delete;
 };
 
 //! Item delegate that paints the per-filter icon for column 0 of the
@@ -411,6 +448,11 @@ protected:
     }
 
 private:
+    TargetingIconDelegate(const TargetingIconDelegate &)            = delete;
+    TargetingIconDelegate(TargetingIconDelegate &&)                 = delete;
+    TargetingIconDelegate &operator=(const TargetingIconDelegate &) = delete;
+    TargetingIconDelegate &operator=(TargetingIconDelegate &&)      = delete;
+
     ModelView::ViewModel *m_vm;
     QAbstractProxyModel *m_proxy;
 };
@@ -422,6 +464,22 @@ TargetingDialog::TargetingDialog(QWidget *parent)
     , ui(new Ui::TargetingDialog())
     , m_model(std::make_unique<TargetingModel>())
     , m_widgetFactory(std::make_unique<TargetingWidgetFactory>())
+    , m_proxy(nullptr)
+    , m_actDelete(nullptr)
+    , m_actUp(nullptr)
+    , m_actDown(nullptr)
+    , m_actCut(nullptr)
+    , m_actCopy(nullptr)
+    , m_actPaste(nullptr)
+    , m_actAddCollection(nullptr)
+    , m_actWrap(nullptr)
+    , m_actUnwrap(nullptr)
+    , m_actNegate(nullptr)
+    , m_actCombAnd(nullptr)
+    , m_actCombOr(nullptr)
+    , m_combCombinator(nullptr)
+    , m_combNegated(nullptr)
+    , m_editorCache()
 {
     ui->setupUi(this);
 

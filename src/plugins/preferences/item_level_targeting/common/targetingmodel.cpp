@@ -36,6 +36,8 @@ const std::string TargetingModel::kFiltersTag = "filters";
 TargetingModel::TargetingModel(QObject *parent)
     : QObject(parent)
     , m_data(std::make_unique<ModelView::SessionModel>("TargetingModel"))
+    , m_view(nullptr)
+    , m_hiddenRunOnce()
 {
     m_data->registerItem<TargetingFilterItem>();
     m_data->rootItem()->registerTag(

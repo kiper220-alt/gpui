@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    EnvironmentVariableFilterWidget(const EnvironmentVariableFilterWidget &)            = delete;
+    EnvironmentVariableFilterWidget(EnvironmentVariableFilterWidget &&)                 = delete;
+    EnvironmentVariableFilterWidget &operator=(const EnvironmentVariableFilterWidget &) = delete;
+    EnvironmentVariableFilterWidget &operator=(EnvironmentVariableFilterWidget &&)      = delete;
+
     Ui::EnvironmentWidget *ui{nullptr};
 };
 

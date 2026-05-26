@@ -52,6 +52,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    SecurityGroupFilterWidget(const SecurityGroupFilterWidget &)            = delete;
+    SecurityGroupFilterWidget(SecurityGroupFilterWidget &&)                 = delete;
+    SecurityGroupFilterWidget &operator=(const SecurityGroupFilterWidget &) = delete;
+    SecurityGroupFilterWidget &operator=(SecurityGroupFilterWidget &&)      = delete;
+
     Ui::SecurityGroupWidget *ui{nullptr};
     QString m_localGroup;
 };

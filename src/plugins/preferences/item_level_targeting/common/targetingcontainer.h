@@ -48,6 +48,16 @@ inline QString combinatorFromString(const QString &value)
 //! unknown attributes round-trip verbatim.
 struct TargetingFilterRecord
 {
+    TargetingFilterRecord()
+        : name()
+        , id()
+        , combinator(QStringLiteral("AND"))
+        , negated(false)
+        , disabled(false)
+        , attributes()
+        , children()
+    {}
+
     //! XSD element name, e.g. "FilterComputer", "FilterCollection".
     QString name;
 
@@ -55,13 +65,13 @@ struct TargetingFilterRecord
     QString id;
 
     //! Combinator with predecessor. First filter defaults to "AND".
-    QString combinator = QStringLiteral("AND");
+    QString combinator;
 
     //! Negation (not="1"): apply NOT to this filter's result.
-    bool negated = false;
+    bool negated;
 
     //! Whether the filter is currently disabled (MSAD `disabled`).
-    bool disabled = false;
+    bool disabled;
 
     //! Raw attributes as read from XML. Preserves unknown attributes so
     //! round-trip with MSAD is byte-stable (D7 in design.md).

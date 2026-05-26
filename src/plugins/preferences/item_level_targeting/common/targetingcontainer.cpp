@@ -28,6 +28,11 @@ namespace preferences
 class TargetingContainerData : public QSharedData
 {
 public:
+    TargetingContainerData()
+        : QSharedData()
+        , filters()
+    {}
+
     QList<TargetingFilterRecord> filters;
 };
 

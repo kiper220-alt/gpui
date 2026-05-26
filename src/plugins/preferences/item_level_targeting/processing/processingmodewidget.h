@@ -50,6 +50,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    ProcessingModeFilterWidget(const ProcessingModeFilterWidget &)            = delete;
+    ProcessingModeFilterWidget(ProcessingModeFilterWidget &&)                 = delete;
+    ProcessingModeFilterWidget &operator=(const ProcessingModeFilterWidget &) = delete;
+    ProcessingModeFilterWidget &operator=(ProcessingModeFilterWidget &&)      = delete;
+
     Ui::ProcessingModeWidget *ui{nullptr};
 };
 

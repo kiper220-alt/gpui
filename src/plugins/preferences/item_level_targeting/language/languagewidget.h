@@ -53,6 +53,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    LanguageFilterWidget(const LanguageFilterWidget &)            = delete;
+    LanguageFilterWidget(LanguageFilterWidget &&)                 = delete;
+    LanguageFilterWidget &operator=(const LanguageFilterWidget &) = delete;
+    LanguageFilterWidget &operator=(LanguageFilterWidget &&)      = delete;
+
     Ui::LanguageWidget *ui{nullptr};
     QString m_loadedLanguage;
     QString m_loadedLocale;

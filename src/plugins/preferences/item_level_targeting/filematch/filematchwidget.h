@@ -46,6 +46,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    FileMatchFilterWidget(const FileMatchFilterWidget &)            = delete;
+    FileMatchFilterWidget(FileMatchFilterWidget &&)                 = delete;
+    FileMatchFilterWidget &operator=(const FileMatchFilterWidget &) = delete;
+    FileMatchFilterWidget &operator=(FileMatchFilterWidget &&)      = delete;
+
     void onMatchTypeChanged(int index);
 
     Ui::FileMatchWidget *ui{nullptr};

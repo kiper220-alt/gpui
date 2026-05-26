@@ -61,6 +61,11 @@ public:
 
     struct StripResult
     {
+        StripResult()
+            : cleanedXml()
+            , filters()
+        {}
+
         //! XML with every `<Filters>` element removed; safe to feed to
         //! xsd-cxx generated parsers.
         std::string cleanedXml;

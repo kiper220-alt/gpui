@@ -93,6 +93,7 @@ void selectComboData(QComboBox *combo, const QStringList &order, const QString &
 RegistryMatchFilterWidget::RegistryMatchFilterWidget(QWidget *parent)
     : TargetingFilterWidget(parent)
     , ui(new Ui::RegistryMatchWidget)
+    , m_version()
 {
     ui->setupUi(this);
 

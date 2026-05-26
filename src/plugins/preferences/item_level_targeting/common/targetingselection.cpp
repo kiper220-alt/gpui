@@ -267,7 +267,7 @@ bool resolveTargetingInternalDragData(const QMimeData *mime,
                 }
                 const auto &tag = filter ? TargetingFilterItem::kChildrenTag
                                          : kTopLevelFiltersTag;
-                for (size_t i = 0; i < node->itemCount(tag); ++i)
+                for (int i = 0; i < node->itemCount(tag); ++i)
                 {
                     walk(node->getItem(tag, i));
                 }

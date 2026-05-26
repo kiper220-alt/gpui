@@ -50,6 +50,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    UserFilterWidget(const UserFilterWidget &)            = delete;
+    UserFilterWidget(UserFilterWidget &&)                 = delete;
+    UserFilterWidget &operator=(const UserFilterWidget &) = delete;
+    UserFilterWidget &operator=(UserFilterWidget &&)      = delete;
+
     Ui::UserWidget *ui{nullptr};
 };
 

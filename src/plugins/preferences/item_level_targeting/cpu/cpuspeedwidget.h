@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    CpuSpeedFilterWidget(const CpuSpeedFilterWidget &)            = delete;
+    CpuSpeedFilterWidget(CpuSpeedFilterWidget &&)                 = delete;
+    CpuSpeedFilterWidget &operator=(const CpuSpeedFilterWidget &) = delete;
+    CpuSpeedFilterWidget &operator=(CpuSpeedFilterWidget &&)      = delete;
+
     Ui::CPUSpeedWidget *ui{nullptr};
 };
 

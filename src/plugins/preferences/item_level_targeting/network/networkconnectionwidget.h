@@ -50,6 +50,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    NetworkConnectionFilterWidget(const NetworkConnectionFilterWidget &)            = delete;
+    NetworkConnectionFilterWidget(NetworkConnectionFilterWidget &&)                 = delete;
+    NetworkConnectionFilterWidget &operator=(const NetworkConnectionFilterWidget &) = delete;
+    NetworkConnectionFilterWidget &operator=(NetworkConnectionFilterWidget &&)      = delete;
+
     Ui::NetworkConnectionWidget *ui{nullptr};
 };
 

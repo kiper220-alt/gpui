@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    DomainFilterWidget(const DomainFilterWidget &)            = delete;
+    DomainFilterWidget(DomainFilterWidget &&)                 = delete;
+    DomainFilterWidget &operator=(const DomainFilterWidget &) = delete;
+    DomainFilterWidget &operator=(DomainFilterWidget &&)      = delete;
+
     Ui::DomainWidget *ui{nullptr};
 };
 

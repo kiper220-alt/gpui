@@ -51,6 +51,11 @@ private:
     void onPropertyChanged(const QString &text);
 
 private:
+    WmiQueryFilterWidget(const WmiQueryFilterWidget &)            = delete;
+    WmiQueryFilterWidget(WmiQueryFilterWidget &&)                 = delete;
+    WmiQueryFilterWidget &operator=(const WmiQueryFilterWidget &) = delete;
+    WmiQueryFilterWidget &operator=(WmiQueryFilterWidget &&)      = delete;
+
     Ui::WmiQueryWidget *ui{nullptr};
 };
 

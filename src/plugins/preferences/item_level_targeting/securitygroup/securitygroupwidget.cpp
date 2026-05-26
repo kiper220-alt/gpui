@@ -27,6 +27,7 @@ namespace preferences
 SecurityGroupFilterWidget::SecurityGroupFilterWidget(QWidget *parent)
     : TargetingFilterWidget(parent)
     , ui(new Ui::SecurityGroupWidget)
+    , m_localGroup()
 {
     ui->setupUi(this);
     ui->groupToolButton->setEnabled(false);

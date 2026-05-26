@@ -53,6 +53,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    OperatingSystemFilterWidget(const OperatingSystemFilterWidget &)            = delete;
+    OperatingSystemFilterWidget(OperatingSystemFilterWidget &&)                 = delete;
+    OperatingSystemFilterWidget &operator=(const OperatingSystemFilterWidget &) = delete;
+    OperatingSystemFilterWidget &operator=(OperatingSystemFilterWidget &&)      = delete;
+
     void populateProducts();
     void populateDependentCombos(const QString &editionValue = {},
                                  const QString &servicePackValue = {},

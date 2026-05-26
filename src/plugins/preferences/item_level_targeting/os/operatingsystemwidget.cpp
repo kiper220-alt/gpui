@@ -66,6 +66,7 @@ void selectByValue(QComboBox *combo, const QString &value)
 OperatingSystemFilterWidget::OperatingSystemFilterWidget(QWidget *parent)
     : TargetingFilterWidget(parent)
     , ui(new Ui::OperatingSystemWidget)
+    , m_osClass(QStringLiteral("NE"))
 {
     ui->setupUi(this);
 

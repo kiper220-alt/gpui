@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    TimeRangeFilterWidget(const TimeRangeFilterWidget &)            = delete;
+    TimeRangeFilterWidget(TimeRangeFilterWidget &&)                 = delete;
+    TimeRangeFilterWidget &operator=(const TimeRangeFilterWidget &) = delete;
+    TimeRangeFilterWidget &operator=(TimeRangeFilterWidget &&)      = delete;
+
     Ui::TimeRangeWidget *ui{nullptr};
 };
 

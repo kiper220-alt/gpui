@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    SiteFilterWidget(const SiteFilterWidget &)            = delete;
+    SiteFilterWidget(SiteFilterWidget &&)                 = delete;
+    SiteFilterWidget &operator=(const SiteFilterWidget &) = delete;
+    SiteFilterWidget &operator=(SiteFilterWidget &&)      = delete;
+
     Ui::SiteWidget *ui{nullptr};
 };
 

@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    RamFilterWidget(const RamFilterWidget &)            = delete;
+    RamFilterWidget(RamFilterWidget &&)                 = delete;
+    RamFilterWidget &operator=(const RamFilterWidget &) = delete;
+    RamFilterWidget &operator=(RamFilterWidget &&)      = delete;
+
     Ui::RamWidget *ui{nullptr};
 };
 

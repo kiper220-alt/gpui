@@ -46,6 +46,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    DateMatchFilterWidget(const DateMatchFilterWidget &)            = delete;
+    DateMatchFilterWidget(DateMatchFilterWidget &&)                 = delete;
+    DateMatchFilterWidget &operator=(const DateMatchFilterWidget &) = delete;
+    DateMatchFilterWidget &operator=(DateMatchFilterWidget &&)      = delete;
+
     void onPeriodChanged(int index);
     void onYearlyToggled(bool checked);
 

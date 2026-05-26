@@ -46,6 +46,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    MsiQueryFilterWidget(const MsiQueryFilterWidget &)            = delete;
+    MsiQueryFilterWidget(MsiQueryFilterWidget &&)                 = delete;
+    MsiQueryFilterWidget &operator=(const MsiQueryFilterWidget &) = delete;
+    MsiQueryFilterWidget &operator=(MsiQueryFilterWidget &&)      = delete;
+
     void onQueryTypeChanged(int index);
     void updateFieldVisibility(int queryType);
 

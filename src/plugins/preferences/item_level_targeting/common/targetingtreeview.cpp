@@ -25,6 +25,8 @@ Qt::DropAction effectiveDropAction(const QDropEvent *event)
 
 TargetingTreeView::TargetingTreeView(QWidget *parent)
     : QTreeView(parent)
+    , m_feedbackKind(DropFeedbackKind::None)
+    , m_feedbackIndex()
 {}
 
 TargetingTreeView::DropFeedbackKind TargetingTreeView::dropFeedbackKind() const

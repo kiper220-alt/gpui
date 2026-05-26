@@ -36,6 +36,9 @@ namespace preferences
 
 TargetingFilterWidget::TargetingFilterWidget(QWidget *parent)
     : BasePreferenceWidget(parent)
+    , m_item(nullptr)
+    , m_originalExtras()
+    , m_liveCommitInstalled(false)
 {
 }
 

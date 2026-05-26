@@ -73,7 +73,7 @@ int qLocaleToPrimaryLanguageId(QLocale::Language lang)
     case QLocale::Japanese:             return 0x11;
     case QLocale::Korean:               return 0x12;
     case QLocale::Dutch:                return 0x13;
-    case QLocale::Norwegian:            return 0x14;
+    case QLocale::NorwegianBokmal:      return 0x14;
     case QLocale::Polish:               return 0x15;
     case QLocale::Portuguese:           return 0x16;
     case QLocale::Romansh:              return 0x17;
@@ -160,6 +160,8 @@ QString displayNameFor(QLocale::Language lang, QLocale::Country country)
 LanguageFilterWidget::LanguageFilterWidget(QWidget *parent)
     : TargetingFilterWidget(parent)
     , ui(new Ui::LanguageWidget)
+    , m_loadedLanguage()
+    , m_loadedLocale()
 {
     ui->setupUi(this);
     ui->languageComboBox->setEditable(false);

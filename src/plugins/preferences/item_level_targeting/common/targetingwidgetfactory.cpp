@@ -65,6 +65,7 @@ TargetingWidgetFactory::Builder makeBuilder()
 } // namespace
 
 TargetingWidgetFactory::TargetingWidgetFactory()
+    : m_builders()
 {
     registerWidget(QStringLiteral("FilterBattery"),  makeBuilder<BatteryPresentWidget>());
     registerWidget(QStringLiteral("FilterComputer"), makeBuilder<ComputerNameFilterWidget>());

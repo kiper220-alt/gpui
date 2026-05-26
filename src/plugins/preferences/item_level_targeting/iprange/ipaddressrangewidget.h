@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    IpAddressRangeFilterWidget(const IpAddressRangeFilterWidget &)            = delete;
+    IpAddressRangeFilterWidget(IpAddressRangeFilterWidget &&)                 = delete;
+    IpAddressRangeFilterWidget &operator=(const IpAddressRangeFilterWidget &) = delete;
+    IpAddressRangeFilterWidget &operator=(IpAddressRangeFilterWidget &&)      = delete;
+
     Ui::IpAdderessRangeWidget *ui{nullptr};
 };
 

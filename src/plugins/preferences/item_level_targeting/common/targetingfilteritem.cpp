@@ -59,6 +59,7 @@ const std::string TargetingFilterItem::kChildrenTag    = "children";
 
 TargetingFilterItem::TargetingFilterItem()
     : ModelView::CompoundItem(kModelType)
+    , m_extras()
 {
     // mvvm rejects empty QVariants in addProperty, so store strings as
     // std::string (matching CommonItem) and convert at the accessor boundary.

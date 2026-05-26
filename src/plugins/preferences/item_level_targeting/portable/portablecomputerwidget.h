@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    PortableComputerFilterWidget(const PortableComputerFilterWidget &)            = delete;
+    PortableComputerFilterWidget(PortableComputerFilterWidget &&)                 = delete;
+    PortableComputerFilterWidget &operator=(const PortableComputerFilterWidget &) = delete;
+    PortableComputerFilterWidget &operator=(PortableComputerFilterWidget &&)      = delete;
+
     Ui::PortableComputerWidget *ui{nullptr};
 };
 

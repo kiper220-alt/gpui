@@ -49,6 +49,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    LdapFilterWidget(const LdapFilterWidget &)            = delete;
+    LdapFilterWidget(LdapFilterWidget &&)                 = delete;
+    LdapFilterWidget &operator=(const LdapFilterWidget &) = delete;
+    LdapFilterWidget &operator=(LdapFilterWidget &&)      = delete;
+
     Ui::LDAPWidget *ui{nullptr};
 };
 

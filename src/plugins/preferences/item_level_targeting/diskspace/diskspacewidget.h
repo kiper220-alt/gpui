@@ -48,6 +48,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    DiskSpaceFilterWidget(const DiskSpaceFilterWidget &)            = delete;
+    DiskSpaceFilterWidget(DiskSpaceFilterWidget &&)                 = delete;
+    DiskSpaceFilterWidget &operator=(const DiskSpaceFilterWidget &) = delete;
+    DiskSpaceFilterWidget &operator=(DiskSpaceFilterWidget &&)      = delete;
+
     Ui::DiskSpaceWidget *ui{nullptr};
 };
 

@@ -27,6 +27,7 @@ namespace preferences
 
 CommonItem::CommonItem()
     : BasePreferenceItem<::preferences::CommonItem>("CommonItem")
+    , m_filters()
 {
     addProperty(propertyToString(CLSID), "");
     addProperty(propertyToString(DISABLED), false);

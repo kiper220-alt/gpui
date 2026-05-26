@@ -46,6 +46,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    TerminalSessionFilterWidget(const TerminalSessionFilterWidget &)            = delete;
+    TerminalSessionFilterWidget(TerminalSessionFilterWidget &&)                 = delete;
+    TerminalSessionFilterWidget &operator=(const TerminalSessionFilterWidget &) = delete;
+    TerminalSessionFilterWidget &operator=(TerminalSessionFilterWidget &&)      = delete;
+
     void onParamChanged(int index);
 
     Ui::TerminalSessionWidget *ui{nullptr};

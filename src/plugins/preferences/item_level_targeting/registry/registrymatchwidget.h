@@ -46,6 +46,11 @@ protected:
     QMap<QString, QString> writeToExtras() const override;
 
 private:
+    RegistryMatchFilterWidget(const RegistryMatchFilterWidget &)            = delete;
+    RegistryMatchFilterWidget(RegistryMatchFilterWidget &&)                 = delete;
+    RegistryMatchFilterWidget &operator=(const RegistryMatchFilterWidget &) = delete;
+    RegistryMatchFilterWidget &operator=(RegistryMatchFilterWidget &&)      = delete;
+
     void onMatchTypeChanged(int index);
     void onDataMatchChanged(int index);
 
