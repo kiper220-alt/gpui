@@ -27,6 +27,7 @@
 #include <QLibraryInfo>
 #include <QTranslator>
 #include <QUuid>
+#include <QDebug>
 
 namespace gpui
 {
